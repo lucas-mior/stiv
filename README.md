@@ -1,6 +1,6 @@
 stiv - simple terminal image viewer
 -----------------------------------
-stiv is a simple terminal which uses ueberzug and imlib2.
+stiv is a simple terminal image viewer which uses ueberzug and imlib2.
 
 
 Requirements
