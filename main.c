@@ -137,7 +137,7 @@ void display_img(Image *img, Options *options) {
     char *aux = NULL;
     char name[20] = "preview";
 
-    char drawed_file[100];
+    char drawed_file[256];
     char *ueberzug = NULL;
     FILE *UZUG, *DRAWED;
 
@@ -180,7 +180,7 @@ void display_img(Image *img, Options *options) {
 
 void display_clear(int preview) {
     char *ueberzug = NULL;
-    char drawed_file[100];
+    char drawed_file[256];
     FILE *UZUG = NULL;
     FILE *DRAWED = NULL;
     char line[256];

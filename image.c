@@ -21,7 +21,7 @@ void get_img_size(Image *img) {
 }
 
 void reduce_img_size(Image *img) {
-    static char cache_file[200];
+    static char cache_file[256];
     FILE *cache_img;
     char *cache = NULL;
 
