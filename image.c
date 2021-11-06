@@ -21,7 +21,6 @@ void get_img_size(Image *img) {
 }
 
 void reduce_img_size(Image *img) {
-    static char cache_file[256];
     FILE *cache_img;
     char *cache = NULL;
 
@@ -36,11 +35,13 @@ void reduce_img_size(Image *img) {
 
     cache = getenv("XDG_CACHE_HOME");
 
-    sprintf(cache_file, "%s/%s/%s.%s", cache, previewer, img->hash, jpg);
+    if (!(img->path = malloc(256)))
+        return;
 
-    if ((cache_img = fopen(cache_file, "r"))) {
+    snprintf(img->path, 255, "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
+
+    if ((cache_img = fopen(img->path, "r"))) {
         fclose(cache_img);
-        img->path = cache_file;
         return;
     } else if (errno == ENOENT) {
         image = imlib_load_image(img->filename);
@@ -50,8 +51,10 @@ void reduce_img_size(Image *img) {
 
         imlib_context_set_anti_alias(1);
         image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, new_w, new_h);
-        if (image == NULL)
+        if (image == NULL) {
+            img->path = NULL;
             return;
+        }
 
         imlib_context_set_image(image);
 
@@ -61,11 +64,12 @@ void reduce_img_size(Image *img) {
             imlib_image_set_format("jpg");
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
-        imlib_save_image_with_error_return(cache_file, &err);
-        if (err)
+        imlib_save_image_with_error_return(img->path, &err);
+        if (err) {
+            img->path = NULL;
             return;
+        }
 
         imlib_free_image_and_decache();
-        img->path = cache_file;
     }
 }

@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     Image img = {
         .filename = NULL,
         .path = NULL,
-        .hash = NULL,
+        .cache = NULL,
         .w = 0,
         .h = 0,
     };
@@ -48,19 +48,14 @@ int main(int argc, char *argv[]) {
     get_img_size(&img);
     printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
 
-    if (!(img.path = realpath(img.filename, NULL))) {
-        error(strerror(errno));
-        return 1;
-    }
-
     if (img.w > 2000) {
-        img.hash = cache(img.path);
+        img.cache = cache(img.filename);
         reduce_img_size(&img);
     }
 
     display_img(&img, &options);
 
-    free(img.hash);
+    free(img.cache);
 
     return 1; // it should always return error so that programs will call it again to redraw
 }
@@ -158,6 +153,10 @@ void display_img(Image *img, Options *options) {
             snprintf(name, sizeof(name), "%d%s", rand(), aux);
         }
     }
+    if(img->path == NULL) {
+        if (!(img->path = realpath(img->filename, NULL)))
+            error(strerror(errno));
+    }
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                      "x": %d, "y": %d, "width": %d, "height": %d, "path": "%s"}\n), name,
@@ -166,15 +165,15 @@ void display_img(Image *img, Options *options) {
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 
-        snprintf(drawed_file, 100, "%s.drawed", ueberzug);
+        snprintf(drawed_file, 255, "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
-            // free(img->path);
+            free(img->path);
             return;
         }
         fprintf(DRAWED, "%s\n", name);
     }
 
-  // free(img->path);
+    free(img->path);
     return;
 }
 
@@ -190,7 +189,7 @@ void display_clear(int preview) {
     if ((UZUG = fopen(ueberzug, "w"))) {
         switch(preview) {
             case 0:
-                snprintf(drawed_file, 100, "%s.drawed", ueberzug);
+                snprintf(drawed_file, 255, "%s.drawed", ueberzug);
                 if ((DRAWED = fopen(drawed_file, "r"))) {
                     while (fgets(line, (int) sizeof(line), DRAWED)) {
                         line[strcspn(line, "\n")] = 0;
