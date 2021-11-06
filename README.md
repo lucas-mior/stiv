@@ -12,7 +12,7 @@ Installation
 ------------
 Edit Makefile to match your local setup (stiv is installed into the /usr/local namespace by default).
 
-Afterwards enter the following command to build and install st (if
+Afterwards enter the following command to build and install stiv (if
 necessary as root):
 
     make clean install
