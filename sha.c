@@ -34,11 +34,8 @@ char * sha256(char *string) {
 
 char * cache(char *filename) {
     struct stat sb;
-    char *string = NULL;
+    char string[100];
     char *cache = NULL;
-
-    if (!(string = malloc(100)))
-        return NULL;
 
     if (lstat(filename, &sb) == -1) {
         perror("lstat");
