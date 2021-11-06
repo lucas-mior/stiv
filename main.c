@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
 
     if (!(img.path = realpath(img.filename, NULL))) {
-        fprintf(stderr, "realpath(%s) : %s\n", img.filename, strerror(errno));
+        error(strerror(errno));
         return 1;
     }
 
