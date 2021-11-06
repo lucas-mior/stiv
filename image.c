@@ -40,7 +40,7 @@ void reduce_img_size(Image *img) {
 
     if ((cache_img = fopen(cache_file, "r"))) {
         fclose(cache_img);
-        img->filename = cache_file;
+        img->path = cache_file;
         return;
     } else if (errno == ENOENT) {
         image = imlib_load_image(img->filename);
@@ -66,6 +66,6 @@ void reduce_img_size(Image *img) {
             return;
 
         imlib_free_image_and_decache();
-        img->filename = cache_file;
+        img->path = cache_file;
     }
 }

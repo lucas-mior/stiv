@@ -11,6 +11,9 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <stdint.h>
+#include <sys/sysmacros.h>
 
 #include "stiv.h"
 #include "util.h"
@@ -29,6 +32,7 @@ int main(int argc, char *argv[]) {
 
     Image img = {
         .filename = NULL,
+        .path = NULL,
         .hash = NULL,
         .w = 0,
         .h = 0,
@@ -44,8 +48,15 @@ int main(int argc, char *argv[]) {
     get_img_size(&img);
     printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
 
-    if ((img.w > 2000) && (img.hash = sha256_file(img.filename)))
+    if (!(img.path = realpath(img.filename, NULL))) {
+        fprintf(stderr, "realpath(%s) : %s\n", img.filename, strerror(errno));
+        return 1;
+    }
+
+    if (img.w > 2000) {
+        img.hash = cache(img.path);
         reduce_img_size(&img);
+    }
 
     display_img(&img, &options);
 
@@ -124,17 +135,11 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
 void display_img(Image *img, Options *options) {
     char *aux = NULL;
-    char *path = NULL;
     char name[20] = "preview";
 
     char drawed_file[100];
     char *ueberzug = NULL;
     FILE *UZUG, *DRAWED;
-
-    if (!(path = realpath(img->filename, NULL))) {
-        fprintf(stderr, "realpath(%s) : %s\n", img->filename, strerror(errno));
-        return;
-    }
 
     ueberzug = egetenv("UZUG");
     UZUG = efopen(ueberzug, "w");
@@ -156,20 +161,20 @@ void display_img(Image *img, Options *options) {
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                      "x": %d, "y": %d, "width": %d, "height": %d, "path": "%s"}\n), name,
-                     options->x, options->y, options->w, options->h, path);
+                     options->x, options->y, options->w, options->h, img->path);
 
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 
         snprintf(drawed_file, 100, "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
-            free(path);
+            // free(img->path);
             return;
         }
         fprintf(DRAWED, "%s\n", name);
     }
 
-    free(path);
+  // free(img->path);
     return;
 }
 
