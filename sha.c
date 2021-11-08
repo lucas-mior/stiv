@@ -34,7 +34,7 @@ char * sha256(char *string) {
 
 char * cache(char *filename) {
     struct stat sb;
-    char string[100];
+    char string[256];
     char *cache = NULL;
 
     if (lstat(filename, &sb) == -1) {
@@ -42,7 +42,7 @@ char * cache(char *filename) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(string, 90, "%s%s", filename, ctime(&sb.st_ctime));
+    snprintf(string, 256, "%s%s", filename, ctime(&sb.st_mtime));
     cache = sha256(string);
     return cache;
 }
