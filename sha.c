@@ -33,16 +33,16 @@ char * sha256(char *string) {
 }
 
 char * cache(char *filename) {
-    struct stat sb;
-    char string[256];
+    struct stat filestat;
+    char mtime[256];
     char *cache = NULL;
 
-    if (lstat(filename, &sb) == -1) {
+    if (lstat(filename, &filestat) == -1) {
         perror("lstat");
         exit(EXIT_FAILURE);
     }
 
-    snprintf(string, 256, "%s%s", filename, ctime(&sb.st_mtime));
-    cache = sha256(string);
+    snprintf(mtime, 256, "%li%ld", filestat.st_size, filestat.st_mtim.tv_nsec);
+    cache = sha256(mtime);
     return cache;
 }
