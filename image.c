@@ -24,7 +24,7 @@ void reduce_img_size(Image *img) {
     FILE *cache_img;
     char *cache = NULL;
 
-    const char previewer[] = "previewer";
+    const char previewer[] = "previewer/stiv";
     const char jpg[] = "jpg";
 
     Imlib_Image image;
