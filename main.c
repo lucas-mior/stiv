@@ -48,8 +48,9 @@ int main(int argc, char *argv[]) {
     printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
 
     if (img.w > 2000) {
-        img.cache = cache(img.filename);
-        reduce_img_size(&img);
+        cache(&img);
+        if(img.cache) 
+            reduce_img_size(&img);
     }
 
     display_img(&img, &options);
@@ -208,18 +209,17 @@ void display_clear(int preview) {
     return;
 }
 
-char * cache(char *filename) {
+void cache(Image *img) {
     struct stat file;
-    char *cache = NULL;
 
-    if (lstat(filename, &file) == -1) {
+    if (stat(img->filename, &file) == -1) {
         perror("lstat");
         exit(EXIT_FAILURE);
     }
 
-    if (!(cache = malloc(256)))
-        return NULL;
+    if ((img->cache = malloc(256)))
+        snprintf(img->cache, 256, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    else
+        return;
 
-    snprintf(cache, 256, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-    return cache;
 }

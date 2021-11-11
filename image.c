@@ -51,10 +51,8 @@ void reduce_img_size(Image *img) {
 
         imlib_context_set_anti_alias(1);
         image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, new_w, new_h);
-        if (image == NULL) {
-            img->path = NULL;
-            return;
-        }
+        if (image == NULL)
+            goto dontcache;
 
         imlib_context_set_image(image);
 
@@ -65,11 +63,14 @@ void reduce_img_size(Image *img) {
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
         imlib_save_image_with_error_return(img->path, &err);
-        if (err) {
-            img->path = NULL;
-            return;
-        }
+        if (err)
+            goto dontcache;
 
         imlib_free_image_and_decache();
+        return;
     }
+    dontcache:
+    free(img->path);
+    img->path = NULL;
+    return;
 }
