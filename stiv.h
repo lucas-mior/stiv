@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
     char *filename;
     char *path;
-    char *cache;
+    char cache[100];
     int w, h;
 } Image;
 

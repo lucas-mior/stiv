@@ -32,7 +32,6 @@ int main(int argc, char *argv[]) {
     Image img = {
         .filename = NULL,
         .path = NULL,
-        .cache = NULL,
         .w = 0,
         .h = 0,
     };
@@ -48,14 +47,11 @@ int main(int argc, char *argv[]) {
     printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
 
     if (img.w > 2000) {
-        cache(&img);
-        if(img.cache) 
-            reduce_img_size(&img);
+        cache_name(&img);
+        reduce_img_size(&img);
     }
 
     display_img(&img, &options);
-
-    free(img.cache);
 
     return 1; // it should always return error so that programs will call it again to redraw
 }
@@ -209,17 +205,12 @@ void display_clear(int preview) {
     return;
 }
 
-void cache(Image *img) {
+void cache_name(Image *img) {
     struct stat file;
 
-    if (stat(img->filename, &file) == -1) {
-        perror("lstat");
-        exit(EXIT_FAILURE);
-    }
+    if (stat(img->filename, &file) == -1)
+        error(strerror(errno));
 
-    if ((img->cache = malloc(256)))
-        snprintf(img->cache, 256, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-    else
-        return;
-
+    snprintf(img->cache, 100, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    return;
 }
