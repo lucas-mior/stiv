@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
@@ -12,7 +13,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <stdint.h>
 #include <sys/sysmacros.h>
 
 #include "stiv.h"
