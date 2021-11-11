@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
 
 void usage() {
     printf("usage: %s IMAGE W H [X Y]\n", program);
-    printf("usage: %s -h | --help\n", program);
-    printf("usage: %s -c | --clear 0 | 1\n", program);
+    printf("       %s -h | --help\n", program);
+    printf("       %s -c | --clear 0 | 1\n", program);
     printf("Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
     exit(EXIT_FAILURE);
 }
