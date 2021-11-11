@@ -126,9 +126,9 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
 void display_img(Image *img, Options *options) {
     char *aux = NULL;
-    char name[20] = "preview";
+    char instance[20] = "preview";
 
-    char drawed_file[256];
+    char drawed_file[200];
     char *ueberzug = NULL;
     FILE *UZUG, *DRAWED;
 
@@ -146,7 +146,7 @@ void display_img(Image *img, Options *options) {
             fprintf(stderr, "basename(%s) : %s\n", img->filename, strerror(errno));
         } else {
             srand((unsigned int) time(NULL));
-            snprintf(name, sizeof(name), "%d%s", rand(), aux);
+            snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
         }
     }
     if(img->path == NULL) {
@@ -155,18 +155,18 @@ void display_img(Image *img, Options *options) {
     }
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
-                     "x": %d, "y": %d, "width": %d, "height": %d, "path": "%s"}\n), name,
+                     "x": %d, "y": %d, "width": %d, "height": %d, "path": "%s"}\n), instance,
                      options->x, options->y, options->w, options->h, img->path);
 
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 
-        snprintf(drawed_file, 255, "%s.drawed", ueberzug);
+        snprintf(drawed_file, 200, "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
             free(img->path);
             return;
         }
-        fprintf(DRAWED, "%s\n", name);
+        fprintf(DRAWED, "%s\n", instance);
     }
 
     free(img->path);
@@ -175,17 +175,17 @@ void display_img(Image *img, Options *options) {
 
 void display_clear(int preview) {
     char *ueberzug = NULL;
-    char drawed_file[256];
+    char drawed_file[200];
     FILE *UZUG = NULL;
     FILE *DRAWED = NULL;
-    char line[256];
+    char line[200];
 
     ueberzug = egetenv("UZUG");
 
     if ((UZUG = fopen(ueberzug, "w"))) {
         switch(preview) {
             case 0:
-                snprintf(drawed_file, 255, "%s.drawed", ueberzug);
+                snprintf(drawed_file, 200, "%s.drawed", ueberzug);
                 if ((DRAWED = fopen(drawed_file, "r"))) {
                     while (fgets(line, (int) sizeof(line), DRAWED)) {
                         line[strcspn(line, "\n")] = 0;

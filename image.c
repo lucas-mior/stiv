@@ -35,10 +35,10 @@ void reduce_img_size(Image *img) {
 
     cache = getenv("XDG_CACHE_HOME");
 
-    if (!(img->path = malloc(256)))
+    if (!(img->path = malloc(200)))
         return;
 
-    snprintf(img->path, 255, "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
+    snprintf(img->path, 200, "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
 
     if ((cache_img = fopen(img->path, "r"))) {
         fclose(cache_img);
