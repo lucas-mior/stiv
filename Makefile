@@ -11,9 +11,9 @@ CC=cc
 cflags = -Wall -Wextra $(CFLAGS)
 cppflags = $(CPPFLAGS)
 
-ldlibs = $(LDLIBS) -lImlib2 -lssl -lcrypto
+ldlibs = $(LDLIBS) -lImlib2
 
-objs = sha.o image.o main.o util.o cursor.o
+objs = image.o main.o util.o cursor.o
 
 all: stiv
 
@@ -27,7 +27,6 @@ stiv: $(objs)
 
 $(objs): Makefile stiv.h
 
-sha.o: sha.h
 image.o: image.h
 main.o: main.h
 util.o: util.h

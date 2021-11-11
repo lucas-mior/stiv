@@ -17,7 +17,6 @@
 
 #include "stiv.h"
 #include "util.h"
-#include "sha.h"
 #include "cursor.h"
 #include "image.h"
 #include "main.h"
@@ -207,4 +206,20 @@ void display_clear(int preview) {
     }
 
     return;
+}
+
+char * cache(char *filename) {
+    struct stat file;
+    char *cache = NULL;
+
+    if (lstat(filename, &file) == -1) {
+        perror("lstat");
+        exit(EXIT_FAILURE);
+    }
+
+    if (!(cache = malloc(256)))
+        return NULL;
+
+    snprintf(cache, 256, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    return cache;
 }
