@@ -10,6 +10,7 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <time.h>
+#include <magic.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -49,6 +50,14 @@ int main(int argc, char *argv[]) {
     if (img.w > 2000) {
         cache_name(&img);
         reduce_img_size(&img);
+    } else if (img.w > 1600) {
+        magic_t my_magic = magic_open(MAGIC_MIME_TYPE);
+        magic_load(my_magic, NULL);
+        if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {
+            cache_name(&img);
+            reduce_img_size(&img);
+        }
+        magic_close(my_magic);
     }
 
     display_img(&img, &options);
