@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     program = argv[0];
     parse_args(&options, argc, argv);
     img.filename = argv[1];
+    magic_t my_magic;
 
     if (access(img.filename, R_OK))
         error(strerror(errno));
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
         cache_name(&img);
         reduce_img_size(&img);
     } else if (img.w > 1600) {
-        magic_t my_magic = magic_open(MAGIC_MIME_TYPE);
+        my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {
             cache_name(&img);
@@ -84,9 +85,9 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
     if (!strcmp(argv[1], "-c") || !strcmp(argv[1], "--clear")) {
         if (argc == 3)
-            display_clear(estrtol(argv[2]));
+            display_clear(CLEAR_PREVIEW);
         else
-            display_clear(0);
+            display_clear(CLEAR_ALL);
         exit(EXIT_FAILURE);
     }
 
@@ -147,7 +148,7 @@ void display_img(Image *img, Options *options) {
     if (options->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
         printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img->w, img->h);
-        display_clear(0); // wipe drawn images
+        display_clear(CLEAR_ALL);
     }
 
     if (!options->preview) {
@@ -184,7 +185,7 @@ void display_img(Image *img, Options *options) {
     return;
 }
 
-void display_clear(int preview) {
+void display_clear(int clear_what) {
     char *ueberzug = NULL;
     char drawed_file[200];
     FILE *UZUG = NULL;
@@ -194,8 +195,8 @@ void display_clear(int preview) {
     ueberzug = egetenv("UZUG");
 
     if ((UZUG = fopen(ueberzug, "w"))) {
-        switch(preview) {
-            case 0:
+        switch(clear_what) {
+            case CLEAR_ALL:
                 snprintf(drawed_file, 200, "%s.drawed", ueberzug);
                 if ((DRAWED = fopen(drawed_file, "r"))) {
                     while (fgets(line, (int) sizeof(line), DRAWED)) {
@@ -206,7 +207,7 @@ void display_clear(int preview) {
                         fclose(DRAWED);
                 }
             // fall through
-            case 1:
+            default:
                 fprintf(UZUG, S({"action": "remove", "identifier": "preview"}\n));
                 break;
         }
