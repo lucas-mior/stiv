@@ -173,12 +173,14 @@ void display_img(Image *img, Options *options) {
         snprintf(drawed_file, 200, "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
             free(img->path);
+            img->path = NULL;
             return;
         }
         fprintf(DRAWED, "%s\n", instance);
     }
 
     free(img->path);
+    img->path = NULL;
     return;
 }
 
