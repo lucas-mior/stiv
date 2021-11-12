@@ -170,7 +170,7 @@ void display_img(Image *img, Options *options) {
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 
-        snprintf(drawed_file, 200, "%s.drawed", ueberzug);
+        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
             free(img->path);
             img->path = NULL;
@@ -222,6 +222,6 @@ void cache_name(Image *img) {
     if (stat(img->filename, &file) == -1)
         error(strerror(errno));
 
-    snprintf(img->cache, 100, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
     return;
 }
