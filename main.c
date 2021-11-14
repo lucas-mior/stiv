@@ -122,7 +122,7 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
         options->preview = false;
 
-        if (HEIGHT_SHELL > (l - options->y - 1)) {
+        if (HEIGHT_SHELL > (l - options->y)) {
             options->y = 1;
             options->clear = true;
         }
@@ -169,7 +169,7 @@ void display_img(Image *img, Options *options) {
                      options->x, options->y, options->w, options->h, img->path);
 
     if (!options->preview) {
-        printf("\n\n\n\n\n\n\n\n\n\n\n\n");
+        printf("\n\n\n\n\n\n\n\n\n\n\n");
 
         snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {

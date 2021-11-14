@@ -2,7 +2,7 @@
 #define STIV_H
 
 #define STRLEN(s) (sizeof(s)/sizeof(s[0]))
-#define HEIGHT_SHELL 12
+#define HEIGHT_SHELL 11
 #define CLEAR_PREVIEW 1
 #define CLEAR_ALL 0
 #define S(x...) #x
