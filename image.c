@@ -30,7 +30,7 @@ void reduce_img_size(Image *img) {
     Imlib_Image image;
     Imlib_Load_Error err;
 
-    int new_w = 1000, new_h;
+    int new_w = 1024, new_h;
     float z;
 
     cache = getenv("XDG_CACHE_HOME");
