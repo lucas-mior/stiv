@@ -8,7 +8,7 @@ MANPREFIX = $(PREFIX)/share/man
 
 # CC=clang
 CC=cc
-cflags = -Wall -Wextra $(CFLAGS)
+cflags = -Wall -Wextra -s $(CFLAGS)
 cppflags = $(CPPFLAGS)
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic
@@ -23,7 +23,7 @@ all: stiv
 
 stiv: $(objs)
 	ctags *.h *.c
-	$(CC) $(cflags) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
+	$(CC) $(cflags) $(LDFLAGS) -s -o $@ $(objs) $(ldlibs)
 
 $(objs): Makefile stiv.h
 
