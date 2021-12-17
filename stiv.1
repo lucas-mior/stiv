@@ -15,65 +15,25 @@ stiv \- image previews on the terminal using ueberzug.
 .\" Add any additional description here
 .PP
 In the 1st form, draw FILE with maximum WIDTH and HEIGHt on position (X, Y).
-In the 2nd form, clear previows draws.
+.PP
+In the 2nd form, clear previous draws.
+.PP
 In the 3rd form, print help message.
 .PP
 Mandatory arguments to long options are mandatory for short options too.
 .TP
-\fB\-S\fR, \fB\-\-suffix\fR=\fI\,SUFFIX\/\fR
-override the usual backup suffix
-.TP
-\fB\-t\fR, \fB\-\-target\-directory\fR=\fI\,DIRECTORY\/\fR
-specify the DIRECTORY in which to create
-the links
-.TP
-\fB\-T\fR, \fB\-\-no\-target\-directory\fR
-treat LINK_NAME as a normal file always
-.TP
-\fB\-v\fR, \fB\-\-verbose\fR
-print name of each linked file
-.TP
 \fB\-\-help\fR
 display this help and exit
 .TP
-\fB\-\-version\fR
-output version information and exit
-.PP
-The backup suffix is '~', unless set with \fB\-\-suffix\fR or SIMPLE_BACKUP_SUFFIX.
-The version control method may be selected via the \fB\-\-backup\fR option or through
-the VERSION_CONTROL environment variable.  Here are the values:
-.TP
-none, off
-never make backups (even if \fB\-\-backup\fR is given)
-.TP
-numbered, t
-make numbered backups
-.TP
-existing, nil
-numbered if numbered backups exist, simple otherwise
-.TP
-simple, never
-always make simple backups
-.PP
-Using \fB\-s\fR ignores \fB\-L\fR and \fB\-P\fR.  Otherwise, the last option specified controls
-behavior when a TARGET is a symbolic link, defaulting to \fB\-P\fR.
+\fB\-\-clear WHICH\fR
+Clear previous draws. If WHICH is 1, clear previews. Else, clear others.
 .SH AUTHOR
-Written by Mike Parker and David MacKenzie.
-.SH "REPORTING BUGS"
-GNU coreutils online help: <https://www.gnu.org/software/coreutils/>
-.br
-Report any translation bugs to <https://translationproject.org/team/>
+Written by Lucas Mior.
 .SH COPYRIGHT
-Copyright \(co 2020 Free Software Foundation, Inc.
+Copyright \(co 2020 Lucas Mior.
 License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
 .br
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
 .SH "SEE ALSO"
 link(2), symlink(2)
-.PP
-.br
-Full documentation <https://www.gnu.org/software/coreutils/ln>
-.br
-or available locally via: info \(aq(coreutils) ln invocation\(aq
-
