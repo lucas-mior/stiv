@@ -12,6 +12,7 @@ typedef struct {
     int x, y;
     bool preview;
     bool clear;
+    bool print_dim;
 } Options;
 
 typedef struct {

@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
         .x = 0, .y = 1,
         .preview = true,
         .clear = false,
+        .print_dim = true,
     };
 
     Image img = {
@@ -45,8 +46,10 @@ int main(int argc, char *argv[]) {
     if (access(img.filename, R_OK))
         error(strerror(errno));
 
-    get_img_size(&img);
-    printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
+    if (options.print_dim) {
+        get_img_size(&img);
+        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
+    }
 
     if (img.w > 2000) {
         cache_name(&img);
@@ -92,6 +95,9 @@ void parse_args(Options *options, int argc, char *argv[]) {
     }
 
     if (argc >= 6) {
+        if (argc >= 7) {
+            options->print_dim = false;
+        }
         // chamado por `lf > pistol > stiv`
         options->w = estrtol(argv[2]);
         options->h = estrtol(argv[3]) - 1;
