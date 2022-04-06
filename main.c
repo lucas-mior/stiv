@@ -22,6 +22,8 @@
 #include "image.h"
 #include "main.h"
 
+int exit_code = 1;
+
 int main(int argc, char *argv[]) {
     Options options = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
@@ -66,7 +68,7 @@ int main(int argc, char *argv[]) {
 
     display_img(&img, &options);
 
-    return 1; // it should always return error so that programs will call it again to redraw
+    return exit_code; // it should always return error so that programs will call it again to redraw
 }
 
 void usage() {
@@ -114,6 +116,15 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
         options->x = options->w + (options->w % 2);
         options->y = 1;
+    } else if ((columns = getenv("COLUMNS"))
+            && (lines = getenv("LINES"))) {
+        // chamado por `skim > pistol > stiv`
+        options->w = estrtol(columns);
+        options->h = estrtol(lines);
+
+        options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
+        options->y = 1;
+        exit_code = 0; //skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
         columns = argv[2];
