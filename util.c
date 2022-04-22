@@ -45,3 +45,13 @@ FILE *efopen(char *filename, char *mode) {
     }
     return file;
 }
+
+int ends_with(const char *str, const char *end) {
+    const char *ldot = strrchr(str, '.');
+    int length = 0;
+    if (ldot != NULL) {
+        length = strlen(end);
+        return !strncmp(ldot + 1, end, length);
+    }
+    return 0;
+}

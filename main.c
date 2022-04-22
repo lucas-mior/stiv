@@ -53,17 +53,20 @@ int main(int argc, char *argv[]) {
         printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
     }
 
-    if (img.w > 2000) {
+    if (img.w > MAX_IMG_WIDTH) {
         cache_name(&img);
-        reduce_img_size(&img);
-    } else if (img.w > 1600) {
+        reduce_img_size(&img, CACHE_IMG_WIDTH);
+    } else if (img.w > MAX_PNG_WIDTH) {
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {
             cache_name(&img);
-            reduce_img_size(&img);
+            reduce_img_size(&img, CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
+    } else if (ends_with(img.filename, "ff")) {
+        cache_name(&img);
+        reduce_img_size(&img, img.w);
     }
 
     display_img(&img, &options);
