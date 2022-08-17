@@ -25,6 +25,7 @@
 int exit_code = 1;
 
 int main(int argc, char *argv[]) {
+    program = argv[0];
     Options options = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
         .x = 0, .y = 1,
@@ -40,13 +41,9 @@ int main(int argc, char *argv[]) {
         .h = 0,
     };
 
-    program = argv[0];
-    parse_args(&options, argc, argv);
     img.filename = argv[1];
-    magic_t my_magic;
 
-    if (access(img.filename, R_OK))
-        error(strerror(errno));
+    parse_args(&options, argc, argv);
 
     if (options.print_dim) {
         get_img_size(&img);
@@ -57,6 +54,7 @@ int main(int argc, char *argv[]) {
         cache_name(&img);
         reduce_img_size(&img, CACHE_IMG_WIDTH);
     } else if (img.w > MAX_PNG_WIDTH) {
+        magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {

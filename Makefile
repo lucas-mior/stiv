@@ -23,6 +23,7 @@ all: stiv
 
 stiv: $(objs)
 	ctags *.h *.c
+	vtags.sed tags > .tags.vim
 	$(CC) $(cflags) $(LDFLAGS) -s -o $@ $(objs) $(ldlibs)
 
 $(objs): Makefile stiv.h
