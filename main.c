@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     if (options.print_dim) {
         get_img_size(&img);
-        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img.w, img.h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img.w, img.h);
     }
 
     if (img.w > MAX_IMG_WIDTH) {
@@ -83,8 +83,8 @@ void usage() {
 void parse_args(Options *options, int argc, char *argv[]) {
     char *lines = NULL;
     char *columns = NULL;
-    int l = 0;
-    int c = 0;
+    uint l = 0;
+    uint c = 0;
 
     if (argc == 1 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
         usage();
@@ -102,26 +102,26 @@ void parse_args(Options *options, int argc, char *argv[]) {
             options->print_dim = false;
         }
         // chamado por `lf > pistol > stiv`
-        options->w = estrtol(argv[2]);
-        options->h = estrtol(argv[3]) - 1;
-        options->x = estrtol(argv[4]);
-        options->y = estrtol(argv[5]) + 1;
+        options->w = estrtoul(argv[2]);
+        options->h = estrtoul(argv[3]) - 1;
+        options->x = estrtoul(argv[4]);
+        options->y = estrtoul(argv[5]) + 1;
 
         options->w -= 2;
         options->x += 2;
     } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        options->w = estrtol(columns);
-        options->h = estrtol(lines);
+        options->w = estrtoul(columns);
+        options->h = estrtoul(lines);
 
         options->x = options->w + (options->w % 2);
         options->y = 1;
     } else if ((columns = getenv("COLUMNS"))
             && (lines = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        options->w = estrtol(columns);
-        options->h = estrtol(lines);
+        options->w = estrtoul(columns);
+        options->h = estrtoul(lines);
 
         options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
         options->y = 1;
@@ -130,8 +130,8 @@ void parse_args(Options *options, int argc, char *argv[]) {
         // chamado por `zsh > stiv`
         columns = argv[2];
         lines = argv[3];
-        c = estrtol(columns);
-        l = estrtol(lines);
+        c = estrtoul(columns);
+        l = estrtoul(lines);
 
         options->w = c;
         options->h = HEIGHT_SHELL;
@@ -165,7 +165,7 @@ void display_img(Image *img, Options *options) {
 
     if (options->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
-        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", img->w, img->h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img->w, img->h);
         display_clear(CLEAR_ALL);
     }
 
@@ -173,7 +173,7 @@ void display_img(Image *img, Options *options) {
         if (!(aux = basename(img->filename))) {
             fprintf(stderr, "basename(%s) : %s\n", img->filename, strerror(errno));
         } else {
-            srand((unsigned int) time(NULL));
+            srand((uint) time(NULL));
             snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
         }
     }

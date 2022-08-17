@@ -10,11 +10,11 @@
 
 const char *program;
 
-int estrtol(char *string) {
-    int number = 0;
+int estrtoul(char *string) {
+    uint number = 0;
     char *end_pointer;
-    number = (int) strtol(string, &end_pointer, 10);
-    if ((number < 0) || (end_pointer == string)) {
+    number = (uint) strtoul(string, &end_pointer, 10);
+    if (end_pointer == string) {
         fprintf(stderr, "%i != stroul(\"%s\")\n", number, string);
         exit(1);
     }
