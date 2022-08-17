@@ -2,6 +2,7 @@
 #define STIV_H
 
 #define S(x...) #x
+#define CLEAR_ALL 0
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
@@ -13,7 +14,6 @@ static const uint MAX_PNG_WIDTH =  1600;
 static const uint CACHE_IMG_WIDTH = 1024;
 static const uint HEIGHT_SHELL = 11;
 static const uint CLEAR_PREVIEW = 1;
-static const uint CLEAR_ALL = 0;
 
 typedef struct {
     uint w, h, H;

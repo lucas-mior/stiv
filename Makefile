@@ -8,7 +8,7 @@ MANPREFIX = $(PREFIX)/share/man
 
 # CC=clang
 CC=cc
-cflags = -Wall -Wextra -s $(CFLAGS) -O2
+cflags = -Wall -Wextra -Wpedantic -s $(CFLAGS) -O2
 cppflags = $(CPPFLAGS)
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic
