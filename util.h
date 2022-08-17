@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "stiv.h"
 
-int estrtoul(char *string);
+uint estrtoul(char *string);
 void *emalloc(size_t size);
 char *egetenv(char *variable);
 FILE *efopen(char *filename, char *mode);
