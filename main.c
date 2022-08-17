@@ -26,7 +26,7 @@ int exit_code = 1;
 
 int main(int argc, char *argv[]) {
     program = argv[0];
-    Options options = {
+    Options opt = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
         .x = 0, .y = 1,
         .preview = true,
@@ -43,9 +43,9 @@ int main(int argc, char *argv[]) {
 
     img.filename = argv[1];
 
-    parse_args(&options, argc, argv);
+    parse_args(&opt, argc, argv);
 
-    if (options.print_dim) {
+    if (opt.print_dim) {
         get_img_size(&img);
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img.w, img.h);
     }
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
         reduce_img_size(&img, img.w);
     }
 
-    display_img(&img, &options);
+    display_img(&img, &opt);
 
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
@@ -80,7 +80,7 @@ void usage() {
     exit(EXIT_FAILURE);
 }
 
-void parse_args(Options *options, int argc, char *argv[]) {
+void parse_args(Options *opt, int argc, char *argv[]) {
     char *lines = NULL;
     char *columns = NULL;
     uint l = 0;
@@ -99,32 +99,32 @@ void parse_args(Options *options, int argc, char *argv[]) {
 
     if (argc >= 6) {
         if (argc >= 7) {
-            options->print_dim = false;
+            opt->print_dim = false;
         }
         // chamado por `lf > pistol > stiv`
-        options->w = estrtoul(argv[2]);
-        options->h = estrtoul(argv[3]) - 1;
-        options->x = estrtoul(argv[4]);
-        options->y = estrtoul(argv[5]) + 1;
+        opt->w = estrtoul(argv[2]);
+        opt->h = estrtoul(argv[3]) - 1;
+        opt->x = estrtoul(argv[4]);
+        opt->y = estrtoul(argv[5]) + 1;
 
-        options->w -= 2;
-        options->x += 2;
+        opt->w -= 2;
+        opt->x += 2;
     } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        options->w = estrtoul(columns);
-        options->h = estrtoul(lines);
+        opt->w = estrtoul(columns);
+        opt->h = estrtoul(lines);
 
-        options->x = options->w + (options->w % 2);
-        options->y = 1;
+        opt->x = opt->w + (opt->w % 2);
+        opt->y = 1;
     } else if ((columns = getenv("COLUMNS"))
             && (lines = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        options->w = estrtoul(columns);
-        options->h = estrtoul(lines);
+        opt->w = estrtoul(columns);
+        opt->h = estrtoul(lines);
 
-        options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
-        options->y = 1;
+        opt->x = opt->w + 1 + ((opt->w + 1) % 2) + 1;
+        opt->y = 1;
         exit_code = 0; //skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
@@ -133,16 +133,16 @@ void parse_args(Options *options, int argc, char *argv[]) {
         c = estrtoul(columns);
         l = estrtoul(lines);
 
-        options->w = c;
-        options->h = HEIGHT_SHELL;
-        options->x = 0;
-        options->y = getx();
+        opt->w = c;
+        opt->h = HEIGHT_SHELL;
+        opt->x = 0;
+        opt->y = getx();
 
-        options->preview = false;
+        opt->preview = false;
 
-        if (HEIGHT_SHELL > (l - options->y)) {
-            options->y = 1;
-            options->clear = true;
+        if (HEIGHT_SHELL > (l - opt->y)) {
+            opt->y = 1;
+            opt->clear = true;
         }
 
         return;
@@ -152,7 +152,7 @@ void parse_args(Options *options, int argc, char *argv[]) {
     return;
 }
 
-void display_img(Image *img, Options *options) {
+void display_img(Image *img, Options *opt) {
     char *aux = NULL;
     char instance[20] = "preview";
 
@@ -163,13 +163,13 @@ void display_img(Image *img, Options *options) {
     ueberzug = egetenv("UZUG");
     UZUG = efopen(ueberzug, "w");
 
-    if (options->clear) {
+    if (opt->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img->w, img->h);
         display_clear(CLEAR_ALL);
     }
 
-    if (!options->preview) {
+    if (!opt->preview) {
         if (!(aux = basename(img->filename))) {
             fprintf(stderr, "basename(%s) : %s\n", img->filename, strerror(errno));
         } else {
@@ -184,9 +184,9 @@ void display_img(Image *img, Options *options) {
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                      "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
-                     options->x, options->y, options->w, options->h, img->path);
+                     opt->x, opt->y, opt->w, opt->h, img->path);
 
-    if (!options->preview) {
+    if (!opt->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");
 
         snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
