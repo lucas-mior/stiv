@@ -183,7 +183,7 @@ void display_img(Image *img, Options *options) {
     }
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
-                     "x": %d, "y": %d, "width": %d, "height": %d, "path": "%s"}\n), instance,
+                     "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
                      options->x, options->y, options->w, options->h, img->path);
 
     if (!options->preview) {

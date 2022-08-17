@@ -10,7 +10,7 @@
 
 const char *program;
 
-int estrtoul(char *string) {
+uint estrtoul(char *string) {
     uint number = 0;
     char *end_pointer;
     number = (uint) strtoul(string, &end_pointer, 10);
@@ -46,12 +46,12 @@ FILE *efopen(char *filename, char *mode) {
     return file;
 }
 
-int ends_with(const char *str, const char *end) {
+bool ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');
-    int length = 0;
+    size_t length = 0;
     if (ldot != NULL) {
         length = strlen(end);
         return !strncmp(ldot + 1, end, length);
     }
-    return 0;
+    return false;
 }
