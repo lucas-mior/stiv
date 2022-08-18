@@ -156,7 +156,7 @@ void display_img(Image *img, Options *opt) {
     char *aux = NULL;
     char instance[20] = "preview";
 
-    char drawed_file[200];
+    char drawed_file[128];
     char *ueberzug = NULL;
     FILE *UZUG, *DRAWED;
 
@@ -205,32 +205,34 @@ void display_img(Image *img, Options *opt) {
 
 void display_clear(int clear_what) {
     char *ueberzug = NULL;
-    char drawed_file[200];
+    char drawed_file[128];
     FILE *UZUG = NULL;
     FILE *DRAWED = NULL;
-    char line[200];
+    char line[128];
 
     ueberzug = egetenv("UZUG");
 
-    if ((UZUG = fopen(ueberzug, "w"))) {
-        switch(clear_what) {
-            case CLEAR_ALL:
-                snprintf(drawed_file, 200, "%s.drawed", ueberzug);
-                if ((DRAWED = fopen(drawed_file, "r"))) {
-                    while (fgets(line, (int) sizeof(line), DRAWED)) {
-                        line[strcspn(line, "\n")] = 0;
-                        fprintf(UZUG, S({"action": "remove", "identifier": "%s"}\n), line);
-                    }
-                    if ((DRAWED = freopen(drawed_file, "w", DRAWED)))
-                        fclose(DRAWED);
-                }
-            // fall through
-            default:
-                fprintf(UZUG, S({"action": "remove", "identifier": "preview"}\n));
-                break;
-        }
-        fclose(UZUG);
+    if (!(UZUG = fopen(ueberzug, "w"))) {
+        fprintf(stderr, "fopen() failed!\n");
+        return;
     }
+    switch(clear_what) {
+    case CLEAR_ALL:
+        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
+        if ((DRAWED = fopen(drawed_file, "r"))) {
+            while (fgets(line, (int) sizeof(line), DRAWED)) {
+                line[strcspn(line, "\n")] = 0;
+                fprintf(UZUG, S({"action": "remove", "identifier": "%s"}\n), line);
+            }
+            if ((DRAWED = freopen(drawed_file, "w", DRAWED)))
+                fclose(DRAWED);
+        }
+    // fall through
+    default:
+        fprintf(UZUG, S({"action": "remove", "identifier": "preview"}\n));
+        break;
+    }
+    fclose(UZUG);
 
     return;
 }
@@ -241,6 +243,7 @@ void cache_name(Image *img) {
     if (stat(img->filename, &file) == -1)
         error(strerror(errno));
 
-    snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld",
+             file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
     return;
 }
