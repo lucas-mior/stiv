@@ -10,8 +10,8 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
-static const uint MAX_IMG_WIDTH = 2000;
-static const uint MAX_PNG_WIDTH =  1600;
+static const uint MAX_IMG_WIDTH = 2048;
+static const uint MAX_PNG_WIDTH =  1536;
 static const uint CACHE_IMG_WIDTH = 1024;
 static const uint HEIGHT_SHELL = 11;
 
