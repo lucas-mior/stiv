@@ -6,9 +6,9 @@ VPATH = $(srcdir)
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
-# CC=clang
-CC=cc
-cflags = -Wall -Wextra -Wpedantic -s $(CFLAGS) -O2
+CC=clang
+# CC=gcc
+cflags = -Weverything -s $(CFLAGS) -O2
 cppflags = $(CPPFLAGS)
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic
