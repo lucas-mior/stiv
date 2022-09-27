@@ -34,8 +34,6 @@ void reduce_img_size(Image *img, uint new_w) {
     if (new_w > MAX_IMG_WIDTH)
         new_w = CACHE_IMG_WIDTH;
 
-    float z;
-
     cache = getenv("XDG_CACHE_HOME");
 
     if (!(img->path = malloc(200)))
@@ -47,10 +45,11 @@ void reduce_img_size(Image *img, uint new_w) {
         fclose(cache_img);
         return;
     } else if (errno == ENOENT) {
+        float z;
         image = imlib_load_image(img->filename);
         imlib_context_set_image(image);
         z = (float) img->w / (float) new_w;
-        new_h = (uint) (img->h / z);
+        new_h = (uint) ((float) img->h / z);
 
         imlib_context_set_anti_alias(1);
         image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, new_w, new_h);
