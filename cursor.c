@@ -3,6 +3,8 @@
 #include <termios.h>
 #include <errno.h>
 
+#include "cursor.h"
+
 #define RD_EOF -1
 #define RD_EIO -2
 
