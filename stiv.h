@@ -1,6 +1,8 @@
 #ifndef STIV_H
 #define STIV_H
 
+#include <stdbool.h>
+
 #define S(x...) #x
 #define CLEAR_ALL 0
 #define CLEAR_PREVIEW 1
@@ -10,9 +12,9 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
+static const double CACHE_IMG_WIDTH = 1024;
 static const uint MAX_IMG_WIDTH = 2048;
 static const uint MAX_PNG_WIDTH =  1536;
-static const uint CACHE_IMG_WIDTH = 1024;
 static const uint HEIGHT_SHELL = 11;
 
 typedef struct {

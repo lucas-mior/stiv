@@ -45,10 +45,9 @@ int main(int argc, char *argv[]) {
 
     parse_args(&opt, argc, argv);
 
-    if (opt.print_dim) {
-        get_img_size(&img);
+    get_img_size(&img);
+    if (opt.print_dim)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img.w, img.h);
-    }
 
     if (img.w > MAX_IMG_WIDTH) {
         cache_name(&img);
@@ -72,11 +71,11 @@ int main(int argc, char *argv[]) {
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
 
-void usage() {
-    printf("usage: %s IMAGE W H [X Y]\n", program);
-    printf("       %s -h | --help\n", program);
-    printf("       %s -c | --clear 0 | 1\n", program);
-    printf("Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
+void usage(FILE *stream) {
+    fprintf(stream, "usage: %s IMAGE W H [X Y]\n", program);
+    fprintf(stream, "       %s -h | --help\n", program);
+    fprintf(stream, "       %s -c | --clear 0 | 1\n", program);
+    fprintf(stream, "Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
     exit(EXIT_FAILURE);
 }
 
@@ -86,8 +85,11 @@ void parse_args(Options *opt, int argc, char *argv[]) {
     uint l = 0;
     uint c = 0;
 
-    if (argc == 1 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
-        usage();
+    if (argc == 1) {
+        usage(stderr);
+    } else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+        usage(stdout);
+    }
 
     if (!strcmp(argv[1], "-c") || !strcmp(argv[1], "--clear")) {
         if (argc == 3)
@@ -147,7 +149,7 @@ void parse_args(Options *opt, int argc, char *argv[]) {
 
         return;
     } else {
-        usage();
+        usage(stderr);
     }
     return;
 }

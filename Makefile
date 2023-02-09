@@ -11,7 +11,7 @@ CC=clang
 cflags = -Weverything -s $(CFLAGS) -O2
 cppflags = $(CPPFLAGS)
 
-ldlibs = $(LDLIBS) -lImlib2 -lmagic
+ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
 objs = image.o main.o util.o cursor.o
 

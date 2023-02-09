@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <math.h>
 #include <Imlib2.h>
 
 #include "stiv.h"
@@ -21,7 +22,7 @@ void get_img_size(Image *img) {
     return;
 }
 
-void reduce_img_size(Image *img, uint new_w) {
+void reduce_img_size(Image *img, double new_w) {
     FILE *cache_img;
     char *cache = NULL;
 
@@ -46,14 +47,15 @@ void reduce_img_size(Image *img, uint new_w) {
         fclose(cache_img);
         return;
     } else if (errno == ENOENT) {
-        float z;
+        double z;
         image = imlib_load_image(img->filename);
         imlib_context_set_image(image);
-        z = (float) img->w / (float) new_w;
-        new_h = (uint) ((float) img->h / z);
+        z = (double) img->w / new_w;
+        new_h = round(((double) img->h / z));
 
         imlib_context_set_anti_alias(1);
-        image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, new_w, new_h);
+        image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, 
+                                                        new_w, new_h);
         if (image == NULL)
             goto dontcache;
 
