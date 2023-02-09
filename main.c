@@ -22,10 +22,10 @@
 #include "image.h"
 #include "main.h"
 
+extern int exit_code;
 int exit_code = 1;
 
 int main(int argc, char *argv[]) {
-    program = argv[0];
     Options opt = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
         .x = 0, .y = 1,
@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
 
-void usage(FILE *stream) {
-    fprintf(stream, "usage: %s IMAGE W H [X Y]\n", program);
-    fprintf(stream, "       %s -h | --help\n", program);
-    fprintf(stream, "       %s -c | --clear 0 | 1\n", program);
+__attribute__((noreturn)) static void usage(FILE *stream) {
+    fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
+    fprintf(stream, "       stiv -h | --help\n");
+    fprintf(stream, "       stiv -c | --clear 0 | 1\n");
     fprintf(stream, "Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
     exit(EXIT_FAILURE);
 }
@@ -82,8 +82,8 @@ void usage(FILE *stream) {
 void parse_args(Options *opt, int argc, char *argv[]) {
     char *lines = NULL;
     char *columns = NULL;
-    uint l = 0;
-    uint c = 0;
+    int l = 0;
+    int c = 0;
 
     if (argc == 1) {
         usage(stderr);
@@ -104,26 +104,26 @@ void parse_args(Options *opt, int argc, char *argv[]) {
             opt->print_dim = false;
         }
         // chamado por `lf > pistol > stiv`
-        opt->w = estrtoul(argv[2]);
-        opt->h = estrtoul(argv[3]) - 1;
-        opt->x = estrtoul(argv[4]);
-        opt->y = estrtoul(argv[5]) + 1;
+        opt->w = estrtol(argv[2]);
+        opt->h = estrtol(argv[3]) - 1;
+        opt->x = estrtol(argv[4]);
+        opt->y = estrtol(argv[5]) + 1;
 
         opt->w -= 2;
         opt->x += 2;
     } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        opt->w = estrtoul(columns);
-        opt->h = estrtoul(lines);
+        opt->w = estrtol(columns);
+        opt->h = estrtol(lines);
 
         opt->x = opt->w + (opt->w % 2);
         opt->y = 1;
     } else if ((columns = getenv("COLUMNS"))
             && (lines = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        opt->w = estrtoul(columns);
-        opt->h = estrtoul(lines);
+        opt->w = estrtol(columns);
+        opt->h = estrtol(lines);
 
         opt->x = opt->w + 1 + ((opt->w + 1) % 2) + 1;
         opt->y = 1;
@@ -132,8 +132,8 @@ void parse_args(Options *opt, int argc, char *argv[]) {
         // chamado por `zsh > stiv`
         columns = argv[2];
         lines = argv[3];
-        c = estrtoul(columns);
-        l = estrtoul(lines);
+        c = estrtol(columns);
+        l = estrtol(lines);
 
         opt->w = c;
         opt->h = HEIGHT_SHELL;
@@ -180,8 +180,10 @@ void display_img(Image *img, Options *opt) {
         }
     }
     if(img->path == NULL) {
-        if (!(img->path = realpath(img->filename, NULL)))
-            error(strerror(errno));
+        if (!(img->path = realpath(img->filename, NULL))) {
+            perror("Exiting.");
+            exit(1);
+        }
     }
 
     fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
@@ -242,8 +244,10 @@ void display_clear(int clear_what) {
 void cache_name(Image *img) {
     struct stat file;
 
-    if (stat(img->filename, &file) == -1)
-        error(strerror(errno));
+    if (stat(img->filename, &file) == -1) {
+        perror("Exiting.");
+        exit(1);
+    }
 
     snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld",
              file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);

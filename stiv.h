@@ -13,13 +13,13 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 
 static const double CACHE_IMG_WIDTH = 1024;
-static const uint MAX_IMG_WIDTH = 2048;
-static const uint MAX_PNG_WIDTH =  1536;
-static const uint HEIGHT_SHELL = 11;
+static const int MAX_IMG_WIDTH = 2048;
+static const int MAX_PNG_WIDTH =  1536;
+static const int HEIGHT_SHELL = 11;
 
 typedef struct {
-    uint w, h, H;
-    uint x, y;
+    int w, h, H;
+    int x, y;
     bool preview;
     bool clear;
     bool print_dim;
@@ -29,7 +29,7 @@ typedef struct {
     char *filename;
     char *path;
     char cache[100];
-    uint w, h;
+    int w, h;
 } Image;
 
 #endif /* STIV_H */

@@ -32,7 +32,7 @@ void reduce_img_size(Image *img, double new_w) {
     Imlib_Image image;
     Imlib_Load_Error err;
 
-    uint new_h;
+    double new_h;
     if (new_w > MAX_IMG_WIDTH)
         new_w = CACHE_IMG_WIDTH;
 
@@ -47,15 +47,14 @@ void reduce_img_size(Image *img, double new_w) {
         fclose(cache_img);
         return;
     } else if (errno == ENOENT) {
-        double z;
-        image = imlib_load_image(img->filename);
-        imlib_context_set_image(image);
-        z = (double) img->w / new_w;
+        double z = img->w / new_w;
         new_h = round(((double) img->h / z));
 
+        image = imlib_load_image(img->filename);
+        imlib_context_set_image(image);
         imlib_context_set_anti_alias(1);
         image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, 
-                                                        new_w, new_h);
+                                                        (int) new_w, (int) new_h);
         if (image == NULL)
             goto dontcache;
 

@@ -10,15 +10,19 @@
 
 const char *program;
 
-uint estrtoul(char *string) {
-    uint number = 0;
+int estrtol(char *string) {
+    long number = 0;
     char *end_pointer;
-    number = (uint) strtoul(string, &end_pointer, 10);
+    number = strtol(string, &end_pointer, 10);
+	if (number > INT_MAX || number < INT_MIN) {
+        fprintf(stderr, "stroul(\"%s\") failed.", string);
+        exit(1);
+	}
     if (end_pointer == string) {
-        fprintf(stderr, "%i != stroul(\"%s\")\n", number, string);
+        fprintf(stderr, "stroul(\"%s\") failed.", string);
         exit(1);
     }
-    return number;
+    return (int) number;
 }
 
 void *emalloc(size_t size) {

@@ -77,7 +77,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
     struct termios saved, temporary;
     int retval, result, rows, cols, saved_errno;
 
-    /* Bad tty? */
     if (tty == -1)
         return ENOTTY;
 
@@ -141,7 +140,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
         if (result != '[')
             break;
 
-        /* Parse rows. */
         rows = 0;
         result = eread(tty);
         while (result >= '0' && result <= '9') {
@@ -152,7 +150,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
         if (result != ';')
             break;
 
-        /* Parse cols. */
         cols = 0;
         result = eread(tty);
         while (result >= '0' && result <= '9') {
@@ -162,8 +159,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
 
         if (result != 'R')
             break;
-
-        /* Success! */
 
         if (rowptr)
             *rowptr = rows;
@@ -182,7 +177,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
     if (result == -1 && !retval)
         retval = errno;
 
-    /* Done. */
     return retval;
 }
 
