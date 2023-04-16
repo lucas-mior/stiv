@@ -6,6 +6,7 @@
 #define S(x...) #x
 #define CLEAR_ALL 0
 #define CLEAR_PREVIEW 1
+#define CLEAR 1000
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
