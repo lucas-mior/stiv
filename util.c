@@ -25,11 +25,13 @@ int estrtol(char *string) {
     return (int) number;
 }
 
-void *emalloc(size_t size) {
-    void *ptr;
-    if (!(ptr = malloc(size)))
-        error(strerror(errno));
-    return ptr;
+void *ealloc(void *old, size_t size) {
+    void *p;
+    if ((p = realloc(old, size)) == NULL) {
+        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
+        exit(1);
+    }
+    return p;
 }
 
 char *egetenv(char *variable) {
