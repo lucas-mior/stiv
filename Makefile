@@ -22,8 +22,6 @@ all: stiv ueberzug_clear
 .SUFFIXES: .c .o
 
 stiv: $(objs)
-	ctags *.h *.c
-	vtags.sed tags > .tags.vim
 	$(CC) $(cflags) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
 
 ueberzug_clear: ueberzug_clear.o clear.o
@@ -41,7 +39,6 @@ cursor.o: cursor.h
 
 clean:
 	rm -f *.o stiv ueberzug_clear
-	rm tags
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
