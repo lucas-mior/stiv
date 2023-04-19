@@ -4,9 +4,12 @@
 #include <stdbool.h>
 
 #define S(x...) #x
-#define CLEAR_ALL 0
-#define CLEAR_PREVIEW 1
-#define CLEAR 1000
+
+typedef enum ClearOption {
+    CLEAR_ALL,
+    CLEAR_PREVIEW,
+    CLEAR,
+} ClearOption;
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;

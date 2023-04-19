@@ -1,1 +1,1 @@
-void display_clear(int);
+void display_clear(ClearOption);

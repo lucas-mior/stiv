@@ -6,7 +6,7 @@
 #include "clear.h"
 #include "util.h"
 
-void display_clear(int clear_what) {
+void display_clear(ClearOption clear_what) {
     char *ueberzug = NULL;
     char drawed_file[128];
     FILE *UZUG = NULL;
