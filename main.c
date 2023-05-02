@@ -22,6 +22,9 @@ extern int exit_code;
 int exit_code = 1;
 
 static void main_usage(FILE *);
+static void main_parse_args(Options *, int, char *[]);
+static void main_cache_name(Image *);
+static void main_display_img(Image *, Options *);
 
 int main(int argc, char *argv[]) {
     Options opt = {

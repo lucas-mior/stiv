@@ -47,8 +47,4 @@ int getx(void);
 void get_img_size(Image *);
 void reduce_img_size(Image *, double);
 
-static void main_parse_args(Options *, int, char *[]);
-static void main_display_img(Image *, Options *);
-static void main_cache_name(Image *);
-
 #endif /* STIV_H */
