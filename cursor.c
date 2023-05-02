@@ -4,7 +4,7 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "cursor.h"
+#include "stiv.h"
 
 #define RD_EOF -1
 #define RD_EIO -2

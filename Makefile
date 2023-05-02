@@ -29,11 +29,6 @@ ueberzug_clear: ueberzug_clear.o clear.o
 
 $(objs): Makefile stiv.h
 
-image.o: image.h
-main.o: main.h
-util.o: util.h
-cursor.o: cursor.h
-
 .c.o:
 	$(CC) $(cflags) $(cppflags) -c -o $@ $<
 

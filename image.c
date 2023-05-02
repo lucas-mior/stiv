@@ -6,8 +6,6 @@
 #include <Imlib2.h>
 
 #include "stiv.h"
-#include "util.h"
-#include "image.h"
 
 void get_img_size(Image *img) {
     Imlib_Image image;

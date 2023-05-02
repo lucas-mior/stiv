@@ -1,1 +1,0 @@
-int getx(void);

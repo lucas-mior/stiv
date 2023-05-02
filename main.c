@@ -17,11 +17,6 @@
 #include <sys/sysmacros.h>
 
 #include "stiv.h"
-#include "util.h"
-#include "cursor.h"
-#include "image.h"
-#include "clear.h"
-#include "main.h"
 
 extern int exit_code;
 int exit_code = 1;

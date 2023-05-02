@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "stiv.h"
-#include "util.h"
 
 const char *program;
 

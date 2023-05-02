@@ -3,8 +3,6 @@
 #include <string.h>
 
 #include "stiv.h"
-#include "clear.h"
-#include "util.h"
 
 void display_clear(ClearOption clear_what) {
     char *ueberzug = NULL;

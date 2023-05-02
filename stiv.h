@@ -1,7 +1,7 @@
 #ifndef STIV_H
 #define STIV_H
-
 #include <stdbool.h>
+#include <stdio.h>
 
 #define S(x...) #x
 
@@ -35,5 +35,20 @@ typedef struct {
     char cache[100];
     int w, h;
 } Image;
+
+int estrtol(char *);
+void *util_realloc(void *, size_t);
+char *egetenv(char *);
+FILE *efopen(char *, char *);
+bool ends_with(const char *, const char *);
+void display_clear(ClearOption);
+int getx(void);
+
+void get_img_size(Image *);
+void reduce_img_size(Image *, double);
+
+static void parse_args(Options *, int, char *[]);
+static void display_img(Image *, Options *);
+static void cache_name(Image *);
 
 #endif /* STIV_H */
