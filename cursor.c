@@ -44,8 +44,6 @@ static int ewrite(const int fd, const char *const data, const size_t bytes) {
     return 0;
 }
 
-/* Return a new file descriptor to the current TTY.
-*/
 static int current_tty(void) {
     const char *dev;
     int fd;
@@ -69,10 +67,6 @@ static int current_tty(void) {
     return fd;
 }
 
-/* As the tty for current cursor position.
- * This function returns 0 if success, errno code otherwise.
- * Actual errno will be unchanged.
-*/
 static int cursor_position(const int tty, int *const rowptr, int *const colptr) {
     struct termios saved, temporary;
     int retval, result, rows, cols, saved_errno;
@@ -112,7 +106,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
      * will return retval to caller. It's better than goto.
     */
     do {
-
         /* Set modified settings. */
         do {
             result = tcsetattr(tty, TCSANOW, &temporary);
@@ -167,7 +160,6 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
             *colptr = cols;
 
         retval = 0;
-
     } while (0);
 
     /* Restore saved terminal settings. */
