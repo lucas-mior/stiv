@@ -1,10 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <limits.h>
-#include <errno.h>
-#include <string.h>
-
 #include "stiv.h"
 
 const char *program;

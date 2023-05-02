@@ -1,21 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <libgen.h>
-#include <limits.h>
-#include <fcntl.h>
-#include <time.h>
-#include <magic.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <sys/sysmacros.h>
-
 #include "stiv.h"
 
 extern int exit_code;

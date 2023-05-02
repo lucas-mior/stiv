@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "stiv.h"
 
 void display_clear(ClearOption clear_what) {
