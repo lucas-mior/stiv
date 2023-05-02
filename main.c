@@ -75,7 +75,7 @@ void main_usage(FILE *stream) {
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
     fprintf(stream, "Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
-    exit(EXIT_FAILURE);
+    exit((int) stream != stdout);
 }
 
 void main_parse_args(Options *opt, int argc, char *argv[]) {
