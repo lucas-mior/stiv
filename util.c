@@ -9,19 +9,19 @@
 
 const char *program;
 
-int estrtol(char *string) {
-    long number = 0;
-    char *end_pointer;
-    number = strtol(string, &end_pointer, 10);
-	if (number > INT_MAX || number < INT_MIN) {
-        fprintf(stderr, "stroul(\"%s\") failed.", string);
-        exit(1);
-	}
-    if (end_pointer == string) {
-        fprintf(stderr, "stroul(\"%s\") failed.", string);
-        exit(1);
+int32 util_string_int32(const char *string) {
+    char *endptr;
+	const int base = 10;	
+    long x;
+    errno = 0;
+    x = strtol(string, &endptr, base);
+    if ((errno != 0) || (string == endptr) || (*endptr != 0)) {
+        return false;
+    } else if ((x > INT32_MAX) || (x < INT32_MIN)) {
+		fprintf(stderr, "Error converting to integer: %s\n", string);
+		exit(EXIT_FAILURE);
     }
-    return (int) number;
+    return (int32) x;
 }
 
 void *util_realloc(void *old, const size_t size) {

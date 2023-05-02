@@ -105,26 +105,26 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
             opt->print_dim = false;
         }
         // chamado por `lf > pistol > stiv`
-        opt->w = estrtol(argv[2]);
-        opt->h = estrtol(argv[3]) - 1;
-        opt->x = estrtol(argv[4]);
-        opt->y = estrtol(argv[5]) + 1;
+        opt->w = util_string_int32(argv[2]);
+        opt->h = util_string_int32(argv[3]) - 1;
+        opt->x = util_string_int32(argv[4]);
+        opt->y = util_string_int32(argv[5]) + 1;
 
         opt->w -= 2;
         opt->x += 2;
     } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        opt->w = estrtol(columns);
-        opt->h = estrtol(lines);
+        opt->w = util_string_int32(columns);
+        opt->h = util_string_int32(lines);
 
         opt->x = opt->w + (opt->w % 2);
         opt->y = 1;
     } else if ((columns = getenv("COLUMNS"))
             && (lines = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        opt->w = estrtol(columns);
-        opt->h = estrtol(lines);
+        opt->w = util_string_int32(columns);
+        opt->h = util_string_int32(lines);
 
         opt->x = opt->w + 1 + ((opt->w + 1) % 2) + 1;
         opt->y = 1;
@@ -133,8 +133,8 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
         // chamado por `zsh > stiv`
         columns = argv[2];
         lines = argv[3];
-        c = estrtol(columns);
-        l = estrtol(lines);
+        c = util_string_int32(columns);
+        l = util_string_int32(lines);
 
         opt->w = c;
         opt->h = HEIGHT_SHELL;
