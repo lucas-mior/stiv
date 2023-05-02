@@ -21,6 +21,8 @@
 extern int exit_code;
 int exit_code = 1;
 
+static void main_usage(FILE *);
+
 int main(int argc, char *argv[]) {
     Options opt = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
@@ -39,35 +41,35 @@ int main(int argc, char *argv[]) {
 
     img.filename = argv[1];
 
-    parse_args(&opt, argc, argv);
+    main_parse_args(&opt, argc, argv);
 
     get_img_size(&img);
     if (opt.print_dim)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img.w, img.h);
 
     if (img.w > MAX_IMG_WIDTH) {
-        cache_name(&img);
+        main_cache_name(&img);
         reduce_img_size(&img, CACHE_IMG_WIDTH);
     } else if (img.w > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {
-            cache_name(&img);
+            main_cache_name(&img);
             reduce_img_size(&img, CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
     } else if (ends_with(img.filename, "ff")) {
-        cache_name(&img);
+        main_cache_name(&img);
         reduce_img_size(&img, img.w);
     }
 
-    display_img(&img, &opt);
+    main_display_img(&img, &opt);
 
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
 
-__attribute__((noreturn)) static void usage(FILE *stream) {
+void main_usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
@@ -75,16 +77,16 @@ __attribute__((noreturn)) static void usage(FILE *stream) {
     exit(EXIT_FAILURE);
 }
 
-void parse_args(Options *opt, int argc, char *argv[]) {
+void main_parse_args(Options *opt, int argc, char *argv[]) {
     char *lines = NULL;
     char *columns = NULL;
     int l = 0;
     int c = 0;
 
     if (argc == 1) {
-        usage(stderr);
+        main_usage(stderr);
     } else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-        usage(stdout);
+        main_usage(stdout);
     }
 
     if (!strcmp(argv[1], "-c") || !strcmp(argv[1], "--clear")) {
@@ -145,12 +147,12 @@ void parse_args(Options *opt, int argc, char *argv[]) {
 
         return;
     } else {
-        usage(stderr);
+        main_usage(stderr);
     }
     return;
 }
 
-void display_img(Image *img, Options *opt) {
+void main_display_img(Image *img, Options *opt) {
     char *aux = NULL;
     char instance[20] = "preview";
 
@@ -203,7 +205,7 @@ void display_img(Image *img, Options *opt) {
     return;
 }
 
-void cache_name(Image *img) {
+void main_cache_name(Image *img) {
     struct stat file;
 
     if (stat(img->filename, &file) == -1) {
