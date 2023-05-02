@@ -9,6 +9,12 @@
 #define RD_EOF -1
 #define RD_EIO -2
 
+static int eread(const int);
+static int ewrite(const int, const char *const, const size_t);
+static int current_tty(void);
+static int cursor_position(const int, int *const, int *const);
+int getx(void);
+
 static int eread(const int fd) {
     unsigned char buffer[4];
     ssize_t n;
