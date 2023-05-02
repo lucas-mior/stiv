@@ -86,7 +86,7 @@ bool ends_with(const char *, const char *);
 void display_clear(ClearOption);
 int cursor_getx(void);
 
-void get_img_size(Image *);
-void reduce_img_size(Image *, double);
+void image_get_size(Image *);
+void image_reduce_size(Image *, double);
 
 #endif /* STIV_H */

@@ -18,7 +18,7 @@
 
 #include "stiv.h"
 
-void get_img_size(Image *img) {
+void image_get_size(Image *img) {
     Imlib_Image image;
 
     image = imlib_load_image(img->filename);
@@ -32,7 +32,7 @@ void get_img_size(Image *img) {
     return;
 }
 
-void reduce_img_size(Image *img, double new_w) {
+void image_reduce_size(Image *img, double new_w) {
     FILE *cache_img;
     char *cache = NULL;
 
