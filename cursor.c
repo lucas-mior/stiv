@@ -9,13 +9,12 @@
 #define RD_EOF -1
 #define RD_EIO -2
 
-static int eread(const int);
-static int ewrite(const int, const char *const, const size_t);
-static int current_tty(void);
+static int cursor_eread(const int);
+static int cursor_ewrite(const int, const char *const, const size_t);
+static int cursor_current_tty(void);
 static int cursor_position(const int, int *const, int *const);
-int getx(void);
 
-static int eread(const int fd) {
+int cursor_eread(const int fd) {
     unsigned char buffer[4];
     ssize_t n;
 
@@ -33,7 +32,7 @@ static int eread(const int fd) {
     }
 }
 
-static int ewrite(const int fd, const char *const data, const size_t bytes) {
+int cursor_ewrite(const int fd, const char *const data, const size_t bytes) {
     const char *head = data;
     const char *tail = data + bytes;
     ssize_t n;
@@ -51,7 +50,7 @@ static int ewrite(const int fd, const char *const data, const size_t bytes) {
     return 0;
 }
 
-static int current_tty(void) {
+int cursor_current_tty(void) {
     const char *dev;
     int fd;
 
@@ -74,7 +73,7 @@ static int current_tty(void) {
     return fd;
 }
 
-static int cursor_position(const int tty, int *const rowptr, int *const colptr) {
+int cursor_position(const int tty, int *const rowptr, int *const colptr) {
     struct termios saved, temporary;
     int retval, result, rows, cols, saved_errno;
 
@@ -123,7 +122,7 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
         }
 
         /* Request cursor coordinates from the terminal. */
-        retval = ewrite(tty, "\033[6n", 4);
+        retval = cursor_ewrite(tty, "\033[6n", 4);
         if (retval)
             break;
 
@@ -131,30 +130,30 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
         retval = EIO;
 
         /* Expect an ESC. */
-        result = eread(tty);
+        result = cursor_eread(tty);
         if (result != 27)
             break;
 
         /* Expect [ after the ESC. */
-        result = eread(tty);
+        result = cursor_eread(tty);
         if (result != '[')
             break;
 
         rows = 0;
-        result = eread(tty);
+        result = cursor_eread(tty);
         while (result >= '0' && result <= '9') {
             rows = 10 * rows + result - '0';
-            result = eread(tty);
+            result = cursor_eread(tty);
         }
 
         if (result != ';')
             break;
 
         cols = 0;
-        result = eread(tty);
+        result = cursor_eread(tty);
         while (result >= '0' && result <= '9') {
             cols = 10 * cols + result - '0';
-            result = eread(tty);
+            result = cursor_eread(tty);
         }
 
         if (result != 'R')
@@ -179,12 +178,12 @@ static int cursor_position(const int tty, int *const rowptr, int *const colptr) 
     return retval;
 }
 
-int getx(void) {
+int cursor_getx(void) {
     int fd;
     int row = 0;
     int col = 0;
 
-    fd = current_tty();
+    fd = cursor_current_tty();
     if (fd == -1)
         return 1;
 

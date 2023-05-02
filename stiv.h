@@ -42,7 +42,7 @@ char *egetenv(char *);
 FILE *efopen(char *, char *);
 bool ends_with(const char *, const char *);
 void display_clear(ClearOption);
-int getx(void);
+int cursor_getx(void);
 
 void get_img_size(Image *);
 void reduce_img_size(Image *, double);

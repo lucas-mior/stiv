@@ -139,7 +139,7 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
         opt->w = c;
         opt->h = HEIGHT_SHELL;
         opt->x = 0;
-        opt->y = getx();
+        opt->y = cursor_getx();
 
         opt->preview = false;
 
