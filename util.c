@@ -49,7 +49,7 @@ char *egetenv(char *variable) {
     char *pointer;
     if (!(pointer = getenv(variable))) {
         fprintf(stderr, "%s is not set, exiting\n", variable);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     return pointer;
 }
@@ -58,7 +58,7 @@ FILE *efopen(char *filename, char *mode) {
     FILE *file;
     if (!(file = fopen(filename, mode))) {
         fprintf(stderr, "Could not open file %s : %s\n", filename, strerror(errno));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     return file;
 }
