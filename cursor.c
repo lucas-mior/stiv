@@ -12,7 +12,7 @@ static int eread(const int fd) {
     unsigned char buffer[4];
     ssize_t n;
 
-    while (1) {
+    while (true) {
         n = read(fd, buffer, 1);
 
         if (n > (ssize_t) 0)
