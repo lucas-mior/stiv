@@ -22,7 +22,7 @@
 void image_get_size(Image *image) {
     Imlib_Image imlib_image;
 
-    imlib_image = imlib_load_image(image->filename);
+    imlib_image = imlib_load_image(image->basename);
     imlib_context_set_image(imlib_image);
 
     image->w = imlib_image_get_width();
@@ -53,10 +53,10 @@ void image_reduce_size(Image *image, double new_width) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, image->cache, jpg);
-    image->path = strdup(buffer);
+    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
+    image->fullpath = strdup(buffer);
 
-    if ((cache_img = fopen(image->path, "r"))) {
+    if ((cache_img = fopen(image->fullpath, "r"))) {
         fclose(cache_img);
         return;
     }
@@ -64,7 +64,7 @@ void image_reduce_size(Image *image, double new_width) {
         double z = image->w / new_width;
         new_height = round(((double) image->h / z));
 
-        imlib_image = imlib_load_image(image->filename);
+        imlib_image = imlib_load_image(image->basename);
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
         imlib_image = imlib_create_cropped_scaled_image(0, 0, image->w, image->h, 
@@ -80,17 +80,17 @@ void image_reduce_size(Image *image, double new_width) {
             imlib_image_set_format("jpg");
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
-        imlib_save_image_with_error_return(image->path, &err);
+        imlib_save_image_with_error_return(image->fullpath, &err);
         if (err)
             goto dontcache;
 
         imlib_free_image_and_decache();
         return;
     } else {
-        fprintf(stderr, "Error opening %s: %s\n", image->path, strerror(errno));
+        fprintf(stderr, "Error opening %s: %s\n", image->fullpath, strerror(errno));
     }
     dontcache:
-    free(image->path);
-    image->path = NULL;
+    free(image->fullpath);
+    image->fullpath = NULL;
     return;
 }

@@ -73,9 +73,9 @@ typedef struct Options {
 } Options;
 
 typedef struct Image {
-    char *filename;
-    char *path;
-    char cache[100];
+    char *basename;
+    char *fullpath;
+    char *cachename;
     int w, h;
 } Image;
 
