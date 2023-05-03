@@ -74,7 +74,7 @@ void main_usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
-    fprintf(stream, "Be sure to have ueberzug running in the terminal and UZUG env variable set\n");
+    fprintf(stream, "Be sure to have ueberzug running in the terminal and UEBERZUG_FIFO env variable set\n");
     exit((int) (stream != stdout));
 }
 
@@ -159,14 +159,14 @@ void main_display_img(Image *img, Options *opt) {
 
     char drawed_file[128];
     char *ueberzug = NULL;
-    FILE *UZUG, *DRAWED;
+    FILE *UEBERZUG_FIFO, *DRAWED;
 
-    if ((ueberzug = getenv("UZUG")) == NULL) {
-        fprintf(stderr, "UZUG environment variable is not set.\n");
+    if ((ueberzug = getenv("UEBERZUG_FIFO")) == NULL) {
+        fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return;
     }
-    if ((UZUG = fopen(ueberzug, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", UZUG, errno);
+    if ((UEBERZUG_FIFO = fopen(ueberzug, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO, errno);
         return;
     }
 
@@ -192,9 +192,10 @@ void main_display_img(Image *img, Options *opt) {
         }
     }
 
-    fprintf(UZUG, S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
-                     "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
-                     opt->x, opt->y, opt->w, opt->h, img->path);
+    fprintf(UEBERZUG_FIFO, 
+            S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
+               "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
+                    opt->x, opt->y, opt->w, opt->h, img->path);
 
     if (!opt->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");

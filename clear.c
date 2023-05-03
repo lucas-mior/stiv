@@ -49,6 +49,7 @@ void clear_display(int clear_option) {
                 fclose(DRAWED);
         }
     case CLEAR_PREVIEW:
+    default:
         fprintf(ueberzug, S({"action": "remove", "identifier": "preview"}\n));
         break;
     }
