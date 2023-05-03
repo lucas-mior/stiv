@@ -36,8 +36,8 @@ int main(int argc, char *argv[]) {
     Image image = {
         .basename = NULL,
         .fullpath = NULL,
-        .w = 0,
-        .h = 0,
+        .width = 0,
+        .height = 0,
     };
 
     image.basename = argv[1];
@@ -46,12 +46,12 @@ int main(int argc, char *argv[]) {
 
     image_get_size(&image);
     if (options.print_dim)
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image.w, image.h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image.width, image.height);
 
-    if (image.w > MAX_IMG_WIDTH) {
+    if (image.width > MAX_IMG_WIDTH) {
         main_cache_name(&image);
         image_reduce_size(&image, CACHE_IMG_WIDTH);
-    } else if (image.w > MAX_PNG_WIDTH) {
+    } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
         main_cache_name(&image);
-        image_reduce_size(&image, image.w);
+        image_reduce_size(&image, image.width);
     }
 
     main_display_img(&image, &options);
@@ -172,7 +172,7 @@ void main_display_img(Image *image, Options *options) {
 
     if (options->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image->w, image->h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image->width, image->height);
         clear_display(CLEAR_ALL);
     }
 

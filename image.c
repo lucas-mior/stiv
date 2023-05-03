@@ -25,8 +25,8 @@ void image_get_size(Image *image) {
     imlib_image = imlib_load_image(image->basename);
     imlib_context_set_image(imlib_image);
 
-    image->w = imlib_image_get_width();
-    image->h = imlib_image_get_height();
+    image->width = imlib_image_get_width();
+    image->height = imlib_image_get_height();
 
     imlib_free_image();
     /* imlib_free_image_and_decache(); */
@@ -61,13 +61,13 @@ void image_reduce_size(Image *image, double new_width) {
         return;
     }
     if (errno == ENOENT) {
-        double z = image->w / new_width;
-        new_height = round(((double) image->h / z));
+        double z = image->width / new_width;
+        new_height = round(((double) image->height / z));
 
         imlib_image = imlib_load_image(image->basename);
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
-        imlib_image = imlib_create_cropped_scaled_image(0, 0, image->w, image->h, 
+        imlib_image = imlib_create_cropped_scaled_image(0, 0, image->width, image->height, 
                                                         (int) new_width, (int) new_height);
         if (imlib_image == NULL)
             goto dontcache;

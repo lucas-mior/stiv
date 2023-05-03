@@ -76,7 +76,7 @@ typedef struct Image {
     char *basename;
     char *fullpath;
     char *cachename;
-    int w, h;
+    int width, height;
 } Image;
 
 int32 util_string_int32(const char *);
