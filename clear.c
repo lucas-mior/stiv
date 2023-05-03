@@ -19,40 +19,40 @@
 #include <limits.h>
 
 void clear_display(int clear_option) {
-    char *ueberzug = NULL;
+    char *UEBERZUG_FIFO = NULL;
     char drawed_file[PATH_MAX];
-    FILE *UZUG = NULL;
+    FILE *ueberzug = NULL;
     FILE *DRAWED = NULL;
     char line[PATH_MAX];
 
-    if ((ueberzug = getenv("UZUG")) == NULL) {
-        fprintf(stderr, "UZUG environment variable is not set.\n");
+    if ((UEBERZUG_FIFO = getenv("UEBERZUG_FIFO")) == NULL) {
+        fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return;
     }
-    if ((UZUG = fopen(ueberzug, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", UZUG, errno);
+    if ((ueberzug = fopen(UEBERZUG_FIFO, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO, errno);
         return;
     }
 
     switch (clear_option) {
     case CLEAR_DEFAULT:
-        fprintf(UZUG, S({"action": "remove"}\n));
+        fprintf(ueberzug, S({"action": "remove"}\n));
         break;
     case CLEAR_ALL:
-        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
+        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", UEBERZUG_FIFO);
         if ((DRAWED = fopen(drawed_file, "r"))) {
             while (fgets(line, sizeof(line), DRAWED)) {
                 line[strcspn(line, "\n")] = 0;
-                fprintf(UZUG, S({"action": "remove", "identifier": "%s"}\n), line);
+                fprintf(ueberzug, S({"action": "remove", "identifier": "%s"}\n), line);
             }
             if ((DRAWED = freopen(drawed_file, "w", DRAWED)))
                 fclose(DRAWED);
         }
     case CLEAR_PREVIEW:
-        fprintf(UZUG, S({"action": "remove", "identifier": "preview"}\n));
+        fprintf(ueberzug, S({"action": "remove", "identifier": "preview"}\n));
         break;
     }
-    fclose(UZUG);
+    fclose(ueberzug);
 
     return;
 }
