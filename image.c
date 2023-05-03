@@ -39,6 +39,7 @@ void image_reduce_size(Image *img, double new_w) {
 
     const char previewer[] = "previewer/stiv";
     const char jpg[] = "jpg";
+    char buffer[PATH_MAX];
 
     Imlib_Image image;
     Imlib_Load_Error err;
@@ -52,8 +53,8 @@ void image_reduce_size(Image *img, double new_w) {
         exit(EXIT_FAILURE);
     }
 
-    img->path = util_realloc(NULL, 200);
-    snprintf(img->path, 200, "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
+    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
+    img->path = strdup(buffer);
 
     if ((cache_img = fopen(img->path, "r"))) {
         fclose(cache_img);

@@ -16,13 +16,14 @@
 
 #include "stiv.h"
 #include <stdlib.h>
+#include <limits.h>
 
 void clear_display(ClearOption clear_what) {
     char *ueberzug = NULL;
-    char drawed_file[128];
+    char drawed_file[PATH_MAX];
     FILE *UZUG = NULL;
     FILE *DRAWED = NULL;
-    char line[128];
+    char line[PATH_MAX];
 
     if ((ueberzug = getenv("UZUG")) == NULL) {
         fprintf(stderr, "UZUG environment variable is not set.\n");

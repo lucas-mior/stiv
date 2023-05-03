@@ -186,7 +186,8 @@ void main_display_img(Image *img, Options *opt) {
     }
     if (img->path == NULL) {
         if (!(img->path = realpath(img->filename, NULL))) {
-            perror("Exiting.");
+            fprintf(stderr, "Error getting realpath of %s: %s",
+                            img->path, strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
