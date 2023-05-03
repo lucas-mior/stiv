@@ -80,8 +80,6 @@ typedef struct {
 
 int32 util_string_int32(const char *);
 void *util_realloc(void *, size_t);
-char *egetenv(char *);
-FILE *efopen(char *, char *);
 bool ends_with(const char *, const char *);
 void clear_display(ClearOption);
 int cursor_getx(void);
