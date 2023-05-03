@@ -38,11 +38,11 @@
 
 #define S(x...) #x
 
-typedef enum ClearOption {
+enum {
+    CLEAR_DEFAULT,
     CLEAR_ALL,
     CLEAR_PREVIEW,
-    CLEAR,
-} ClearOption;
+};
 
 typedef unsigned char uchar;
 typedef unsigned short ushort;
@@ -81,7 +81,7 @@ typedef struct {
 int32 util_string_int32(const char *);
 void *util_realloc(void *, size_t);
 bool ends_with(const char *, const char *);
-void clear_display(ClearOption);
+void clear_display(int);
 int cursor_getx(void);
 
 void image_get_size(Image *);

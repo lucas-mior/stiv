@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-void clear_display(ClearOption clear_what) {
+void clear_display(int clear_option) {
     char *ueberzug = NULL;
     char drawed_file[PATH_MAX];
     FILE *UZUG = NULL;
@@ -34,8 +34,8 @@ void clear_display(ClearOption clear_what) {
         return;
     }
 
-    switch (clear_what) {
-    case CLEAR:
+    switch (clear_option) {
+    case CLEAR_DEFAULT:
         fprintf(UZUG, S({"action": "remove"}\n));
         break;
     case CLEAR_ALL:
@@ -48,8 +48,7 @@ void clear_display(ClearOption clear_what) {
             if ((DRAWED = freopen(drawed_file, "w", DRAWED)))
                 fclose(DRAWED);
         }
-    // fall through
-    default:
+    case CLEAR_PREVIEW:
         fprintf(UZUG, S({"action": "remove", "identifier": "preview"}\n));
         break;
     }
