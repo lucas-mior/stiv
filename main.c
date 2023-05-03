@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
-        if(!strcmp(magic_file(my_magic, img.filename), "image/png")) {
+        if (!strcmp(magic_file(my_magic, img.filename), "image/png")) {
             main_cache_name(&img);
             image_reduce_size(&img, CACHE_IMG_WIDTH);
         }
@@ -184,7 +184,7 @@ void main_display_img(Image *img, Options *opt) {
             snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
         }
     }
-    if(img->path == NULL) {
+    if (img->path == NULL) {
         if (!(img->path = realpath(img->filename, NULL))) {
             perror("Exiting.");
             exit(EXIT_FAILURE);
