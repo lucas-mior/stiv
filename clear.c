@@ -16,7 +16,7 @@
 
 #include "stiv.h"
 
-void display_clear(ClearOption clear_what) {
+void clear_display(ClearOption clear_what) {
     char *ueberzug = NULL;
     char drawed_file[128];
     FILE *UZUG = NULL;

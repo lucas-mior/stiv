@@ -92,9 +92,9 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
 
     if (!strcmp(argv[1], "-c") || !strcmp(argv[1], "--clear")) {
         if (argc == 3)
-            display_clear(CLEAR_PREVIEW);
+            clear_display(CLEAR_PREVIEW);
         else
-            display_clear(CLEAR_ALL);
+            clear_display(CLEAR_ALL);
         exit(EXIT_FAILURE);
     }
 
@@ -167,7 +167,7 @@ void main_display_img(Image *img, Options *opt) {
     if (opt->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img->w, img->h);
-        display_clear(CLEAR_ALL);
+        clear_display(CLEAR_ALL);
     }
 
     if (!opt->preview) {

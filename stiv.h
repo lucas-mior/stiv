@@ -83,7 +83,7 @@ void *util_realloc(void *, size_t);
 char *egetenv(char *);
 FILE *efopen(char *, char *);
 bool ends_with(const char *, const char *);
-void display_clear(ClearOption);
+void clear_display(ClearOption);
 int cursor_getx(void);
 
 void image_get_size(Image *);
