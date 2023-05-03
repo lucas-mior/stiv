@@ -162,7 +162,7 @@ void main_display_img(Image *img, Options *opt) {
     FILE *UZUG, *DRAWED;
 
     if ((ueberzug = getenv("UZUG")) == NULL) {
-        printf("UZUG environment variable is not set.\n");
+        fprintf(stderr, "UZUG environment variable is not set.\n");
         return;
     }
     if ((UZUG = fopen(ueberzug, "w")) == NULL) {
@@ -215,8 +215,9 @@ void main_display_img(Image *img, Options *opt) {
 void main_cache_name(Image *img) {
     struct stat file;
 
-    if (stat(img->filename, &file) == -1) {
-        perror("Exiting.");
+    if (stat(img->filename, &file) < 0) {
+        fprintf(stderr, "Error calling stat on %s: %s.",
+                        img->filename, strerror(errno));
         exit(EXIT_FAILURE);
     }
 

@@ -25,7 +25,7 @@ void clear_display(ClearOption clear_what) {
     char line[128];
 
     if ((ueberzug = getenv("UZUG")) == NULL) {
-        printf("UZUG environment variable is not set.\n");
+        fprintf(stderr, "UZUG environment variable is not set.\n");
         return;
     }
     if ((UZUG = fopen(ueberzug, "w")) == NULL) {

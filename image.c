@@ -48,7 +48,7 @@ void image_reduce_size(Image *img, double new_w) {
         new_w = CACHE_IMG_WIDTH;
 
     if ((cache = getenv("XDG_CACHE_HOME")) == NULL) {
-        printf("XDG_CACHE_HOME is not set. Exiting...\n");
+        fprintf(stderr, "XDG_CACHE_HOME is not set. Exiting...\n");
         exit(EXIT_FAILURE);
     }
 
