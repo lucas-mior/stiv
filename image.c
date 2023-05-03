@@ -19,21 +19,21 @@
 
 #include "stiv.h"
 
-void image_get_size(Image *img) {
-    Imlib_Image image;
+void image_get_size(Image *image) {
+    Imlib_Image imlib_image;
 
-    image = imlib_load_image(img->filename);
-    imlib_context_set_image(image);
+    imlib_image = imlib_load_image(image->filename);
+    imlib_context_set_image(imlib_image);
 
-    img->w = imlib_image_get_width();
-    img->h = imlib_image_get_height();
+    image->w = imlib_image_get_width();
+    image->h = imlib_image_get_height();
 
     imlib_free_image();
     /* imlib_free_image_and_decache(); */
     return;
 }
 
-void image_reduce_size(Image *img, double new_w) {
+void image_reduce_size(Image *image, double new_w) {
     FILE *cache_img;
     char *cache = NULL;
 
@@ -41,7 +41,7 @@ void image_reduce_size(Image *img, double new_w) {
     const char *jpg = "jpg";
     char buffer[PATH_MAX];
 
-    Imlib_Image image;
+    Imlib_Image imlib_image;
     Imlib_Load_Error err;
 
     double new_h;
@@ -53,25 +53,25 @@ void image_reduce_size(Image *img, double new_w) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, img->cache, jpg);
-    img->path = strdup(buffer);
+    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, image->cache, jpg);
+    image->path = strdup(buffer);
 
-    if ((cache_img = fopen(img->path, "r"))) {
+    if ((cache_img = fopen(image->path, "r"))) {
         fclose(cache_img);
         return;
     } else if (errno == ENOENT) {
-        double z = img->w / new_w;
-        new_h = round(((double) img->h / z));
+        double z = image->w / new_w;
+        new_h = round(((double) image->h / z));
 
-        image = imlib_load_image(img->filename);
-        imlib_context_set_image(image);
+        imlib_image = imlib_load_image(image->filename);
+        imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
-        image = imlib_create_cropped_scaled_image(0, 0, img->w, img->h, 
+        imlib_image = imlib_create_cropped_scaled_image(0, 0, image->w, image->h, 
                                                         (int) new_w, (int) new_h);
-        if (image == NULL)
+        if (imlib_image == NULL)
             goto dontcache;
 
-        imlib_context_set_image(image);
+        imlib_context_set_image(imlib_image);
 
         if (imlib_image_has_alpha()) {
             imlib_image_set_format("png");
@@ -79,7 +79,7 @@ void image_reduce_size(Image *img, double new_w) {
             imlib_image_set_format("jpg");
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
-        imlib_save_image_with_error_return(img->path, &err);
+        imlib_save_image_with_error_return(image->path, &err);
         if (err)
             goto dontcache;
 
@@ -87,7 +87,7 @@ void image_reduce_size(Image *img, double new_w) {
         return;
     }
     dontcache:
-    free(img->path);
-    img->path = NULL;
+    free(image->path);
+    image->path = NULL;
     return;
 }

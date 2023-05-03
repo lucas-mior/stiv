@@ -63,7 +63,7 @@ static const int MAX_IMG_WIDTH = 2048;
 static const int MAX_PNG_WIDTH =  1536;
 static const int HEIGHT_SHELL = 11;
 
-typedef struct {
+typedef struct Options {
     int32 w, h, H;
     int32 x, y;
     bool preview;
@@ -71,7 +71,7 @@ typedef struct {
     bool print_dim;
 } Options;
 
-typedef struct {
+typedef struct Image {
     char *filename;
     char *path;
     char cache[100];

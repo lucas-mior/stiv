@@ -22,6 +22,8 @@ all: stiv ueberzug_clear
 .SUFFIXES: .c .o
 
 stiv: $(objs)
+	ctags --kinds-C=+l *.h *.c
+	vtags.sed tags > .tags.vim
 	$(CC) $(cflags) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
 
 ueberzug_clear: ueberzug_clear.o clear.o
