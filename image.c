@@ -33,7 +33,7 @@ void image_get_size(Image *image) {
     return;
 }
 
-void image_reduce_size(Image *image, double new_w) {
+void image_reduce_size(Image *image, double new_width) {
     FILE *cache_img;
     char *cache = NULL;
 
@@ -44,9 +44,9 @@ void image_reduce_size(Image *image, double new_w) {
     Imlib_Image imlib_image;
     Imlib_Load_Error err;
 
-    double new_h;
-    if (new_w > MAX_IMG_WIDTH)
-        new_w = CACHE_IMG_WIDTH;
+    double new_height;
+    if (new_width > MAX_IMG_WIDTH)
+        new_width = CACHE_IMG_WIDTH;
 
     if ((cache = getenv("XDG_CACHE_HOME")) == NULL) {
         fprintf(stderr, "XDG_CACHE_HOME is not set. Exiting...\n");
@@ -60,14 +60,14 @@ void image_reduce_size(Image *image, double new_w) {
         fclose(cache_img);
         return;
     } else if (errno == ENOENT) {
-        double z = image->w / new_w;
-        new_h = round(((double) image->h / z));
+        double z = image->w / new_width;
+        new_height = round(((double) image->h / z));
 
         imlib_image = imlib_load_image(image->filename);
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
         imlib_image = imlib_create_cropped_scaled_image(0, 0, image->w, image->h, 
-                                                        (int) new_w, (int) new_h);
+                                                        (int) new_width, (int) new_height);
         if (imlib_image == NULL)
             goto dontcache;
 
