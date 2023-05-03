@@ -54,24 +54,6 @@ void *util_calloc(const size_t nmemb, const size_t size) {
     return p;
 }
 
-char *egetenv(char *variable) {
-    char *pointer;
-    if (!(pointer = getenv(variable))) {
-        fprintf(stderr, "%s is not set, exiting\n", variable);
-        exit(EXIT_FAILURE);
-    }
-    return pointer;
-}
-
-FILE *efopen(char *filename, char *mode) {
-    FILE *file;
-    if (!(file = fopen(filename, mode))) {
-        fprintf(stderr, "Could not open file %s : %s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    return file;
-}
-
 bool ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');
     size_t length = 0;

@@ -161,8 +161,14 @@ void main_display_img(Image *img, Options *opt) {
     char *ueberzug = NULL;
     FILE *UZUG, *DRAWED;
 
-    ueberzug = egetenv("UZUG");
-    UZUG = efopen(ueberzug, "w");
+    if ((ueberzug = getenv("UZUG")) == NULL) {
+        printf("UZUG environment variable is not set.\n");
+        return;
+    }
+    if ((UZUG = fopen(ueberzug, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", UZUG, errno);
+        return;
+    }
 
     if (opt->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
@@ -181,7 +187,7 @@ void main_display_img(Image *img, Options *opt) {
     if(img->path == NULL) {
         if (!(img->path = realpath(img->filename, NULL))) {
             perror("Exiting.");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
     }
 
@@ -211,7 +217,7 @@ void main_cache_name(Image *img) {
 
     if (stat(img->filename, &file) == -1) {
         perror("Exiting.");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld",

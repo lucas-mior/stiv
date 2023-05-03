@@ -15,6 +15,7 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #include <Imlib2.h>
+#include <stdlib.h>
 
 #include "stiv.h"
 
@@ -46,7 +47,10 @@ void image_reduce_size(Image *img, double new_w) {
     if (new_w > MAX_IMG_WIDTH)
         new_w = CACHE_IMG_WIDTH;
 
-    cache = getenv("XDG_CACHE_HOME");
+    if ((cache = getenv("XDG_CACHE_HOME")) == NULL) {
+        printf("XDG_CACHE_HOME is not set. Exiting...\n");
+        exit(EXIT_FAILURE);
+    }
 
     img->path = util_realloc(NULL, 200);
     snprintf(img->path, 200, "%s/%s/%s.%s", cache, previewer, img->cache, jpg);

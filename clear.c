@@ -15,6 +15,7 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #include "stiv.h"
+#include <stdlib.h>
 
 void clear_display(ClearOption clear_what) {
     char *ueberzug = NULL;
@@ -23,13 +24,16 @@ void clear_display(ClearOption clear_what) {
     FILE *DRAWED = NULL;
     char line[128];
 
-    ueberzug = egetenv("UZUG");
-
-    if (!(UZUG = fopen(ueberzug, "w"))) {
-        fprintf(stderr, "fopen() failed!\n");
+    if ((ueberzug = getenv("UZUG")) == NULL) {
+        printf("UZUG environment variable is not set.\n");
         return;
     }
-    switch(clear_what) {
+    if ((UZUG = fopen(ueberzug, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", UZUG, errno);
+        return;
+    }
+
+    switch (clear_what) {
     case CLEAR:
         fprintf(UZUG, S({"action": "remove"}\n));
         break;
