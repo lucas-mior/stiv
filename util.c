@@ -25,7 +25,8 @@ int32 util_string_int32(const char *string) {
     errno = 0;
     x = strtol(string, &endptr, base);
     if ((errno != 0) || (string == endptr) || (*endptr != 0)) {
-        return false;
+		fprintf(stderr, "Error converting to integer: %s\n", string);
+		exit(EXIT_FAILURE);
     } else if ((x > INT32_MAX) || (x < INT32_MIN)) {
 		fprintf(stderr, "Error converting to integer: %s\n", string);
 		exit(EXIT_FAILURE);
