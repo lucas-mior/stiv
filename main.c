@@ -33,39 +33,39 @@ int main(int argc, char *argv[]) {
         .print_dim = true,
     };
 
-    Image img = {
+    Image image = {
         .filename = NULL,
         .path = NULL,
         .w = 0,
         .h = 0,
     };
 
-    img.filename = argv[1];
+    image.filename = argv[1];
 
     main_parse_args(&opt, argc, argv);
 
-    image_get_size(&img);
+    image_get_size(&image);
     if (opt.print_dim)
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img.w, img.h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image.w, image.h);
 
-    if (img.w > MAX_IMG_WIDTH) {
-        main_cache_name(&img);
-        image_reduce_size(&img, CACHE_IMG_WIDTH);
-    } else if (img.w > MAX_PNG_WIDTH) {
+    if (image.w > MAX_IMG_WIDTH) {
+        main_cache_name(&image);
+        image_reduce_size(&image, CACHE_IMG_WIDTH);
+    } else if (image.w > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
-        if (!strcmp(magic_file(my_magic, img.filename), "image/png")) {
-            main_cache_name(&img);
-            image_reduce_size(&img, CACHE_IMG_WIDTH);
+        if (!strcmp(magic_file(my_magic, image.filename), "image/png")) {
+            main_cache_name(&image);
+            image_reduce_size(&image, CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
-    } else if (ends_with(img.filename, "ff")) {
-        main_cache_name(&img);
-        image_reduce_size(&img, img.w);
+    } else if (ends_with(image.filename, "ff")) {
+        main_cache_name(&image);
+        image_reduce_size(&image, image.w);
     }
 
-    main_display_img(&img, &opt);
+    main_display_img(&image, &opt);
 
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
@@ -153,7 +153,7 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
     return;
 }
 
-void main_display_img(Image *img, Options *opt) {
+void main_display_img(Image *image, Options *opt) {
     char *aux = NULL;
     char instance[20] = "preview";
 
@@ -172,22 +172,22 @@ void main_display_img(Image *img, Options *opt) {
 
     if (opt->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", img->w, img->h);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image->w, image->h);
         clear_display(CLEAR_ALL);
     }
 
     if (!opt->preview) {
-        if (!(aux = basename(img->filename))) {
-            fprintf(stderr, "basename(%s) : %s\n", img->filename, strerror(errno));
+        if (!(aux = basename(image->filename))) {
+            fprintf(stderr, "basename(%s) : %s\n", image->filename, strerror(errno));
         } else {
             srand((uint) time(NULL));
             snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
         }
     }
-    if (img->path == NULL) {
-        if (!(img->path = realpath(img->filename, NULL))) {
+    if (image->path == NULL) {
+        if (!(image->path = realpath(image->filename, NULL))) {
             fprintf(stderr, "Error getting realpath of %s: %s",
-                            img->path, strerror(errno));
+                            image->path, strerror(errno));
             exit(EXIT_FAILURE);
         }
     }
@@ -195,35 +195,35 @@ void main_display_img(Image *img, Options *opt) {
     fprintf(UEBERZUG_FIFO, 
             S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
-                    opt->x, opt->y, opt->w, opt->h, img->path);
+                    opt->x, opt->y, opt->w, opt->h, image->path);
 
     if (!opt->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");
 
         snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
         if (!(DRAWED = fopen(drawed_file, "a"))) {
-            free(img->path);
-            img->path = NULL;
+            free(image->path);
+            image->path = NULL;
             return;
         }
         fprintf(DRAWED, "%s\n", instance);
     }
 
-    free(img->path);
-    img->path = NULL;
+    free(image->path);
+    image->path = NULL;
     return;
 }
 
-void main_cache_name(Image *img) {
+void main_cache_name(Image *image) {
     struct stat file;
 
-    if (stat(img->filename, &file) < 0) {
+    if (stat(image->filename, &file) < 0) {
         fprintf(stderr, "Error calling stat on %s: %s.",
-                        img->filename, strerror(errno));
+                        image->filename, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    snprintf(img->cache, sizeof(img->cache), "%li_%ld_%ld",
+    snprintf(image->cache, sizeof(image->cache), "%li_%ld_%ld",
              file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
     return;
 }
