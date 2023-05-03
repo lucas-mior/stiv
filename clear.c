@@ -41,7 +41,7 @@ void clear_display(ClearOption clear_what) {
     case CLEAR_ALL:
         snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
         if ((DRAWED = fopen(drawed_file, "r"))) {
-            while (fgets(line, (int) sizeof(line), DRAWED)) {
+            while (fgets(line, sizeof(line), DRAWED)) {
                 line[strcspn(line, "\n")] = 0;
                 fprintf(UZUG, S({"action": "remove", "identifier": "%s"}\n), line);
             }

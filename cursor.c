@@ -38,11 +38,11 @@ int cursor_eread(const int fd) {
     while (true) {
         n = read(fd, buffer, 1);
 
-        if (n > (ssize_t) 0)
+        if (n > 0)
             return buffer[0];
-        else if (n == (ssize_t) 0)
+        else if (n == 0)
             return RD_EOF;
-        else if (n != (ssize_t) -1)
+        else if (n != -1)
             return RD_EIO;
         else if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK)
             return RD_EIO;

@@ -37,8 +37,8 @@ void image_reduce_size(Image *img, double new_w) {
     FILE *cache_img;
     char *cache = NULL;
 
-    const char previewer[] = "previewer/stiv";
-    const char jpg[] = "jpg";
+    const char *previewer = "previewer/stiv";
+    const char *jpg = "jpg";
     char buffer[PATH_MAX];
 
     Imlib_Image image;
