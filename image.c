@@ -59,7 +59,8 @@ void image_reduce_size(Image *image, double new_width) {
     if ((cache_img = fopen(image->path, "r"))) {
         fclose(cache_img);
         return;
-    } else if (errno == ENOENT) {
+    }
+    if (errno == ENOENT) {
         double z = image->w / new_width;
         new_height = round(((double) image->h / z));
 
@@ -85,6 +86,8 @@ void image_reduce_size(Image *image, double new_width) {
 
         imlib_free_image_and_decache();
         return;
+    } else {
+        fprintf(stderr, "Error opening %s: %s\n", image->path, strerror(errno));
     }
     dontcache:
     free(image->path);
