@@ -25,7 +25,7 @@ static void main_cache_name(Image *);
 static void main_display_img(Image *, Options *);
 
 int main(int argc, char *argv[]) {
-    Options opt = {
+    Options options = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,
         .x = 0, .y = 1,
         .preview = true,
@@ -42,10 +42,10 @@ int main(int argc, char *argv[]) {
 
     image.filename = argv[1];
 
-    main_parse_args(&opt, argc, argv);
+    main_parse_args(&options, argc, argv);
 
     image_get_size(&image);
-    if (opt.print_dim)
+    if (options.print_dim)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image.w, image.h);
 
     if (image.w > MAX_IMG_WIDTH) {
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
         image_reduce_size(&image, image.w);
     }
 
-    main_display_img(&image, &opt);
+    main_display_img(&image, &options);
 
     return exit_code; // it should always return error so that programs will call it again to redraw
 }
@@ -78,7 +78,7 @@ void main_usage(FILE *stream) {
     exit((int) (stream != stdout));
 }
 
-void main_parse_args(Options *opt, int argc, char *argv[]) {
+void main_parse_args(Options *options, int argc, char *argv[]) {
     char *lines = NULL;
     char *columns = NULL;
     int l = 0;
@@ -100,32 +100,32 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
 
     if (argc >= 6) {
         if (argc >= 7) {
-            opt->print_dim = false;
+            options->print_dim = false;
         }
         // chamado por `lf > pistol > stiv`
-        opt->w = util_string_int32(argv[2]);
-        opt->h = util_string_int32(argv[3]) - 1;
-        opt->x = util_string_int32(argv[4]);
-        opt->y = util_string_int32(argv[5]) + 1;
+        options->w = util_string_int32(argv[2]);
+        options->h = util_string_int32(argv[3]) - 1;
+        options->x = util_string_int32(argv[4]);
+        options->y = util_string_int32(argv[5]) + 1;
 
-        opt->w -= 2;
-        opt->x += 2;
+        options->w -= 2;
+        options->x += 2;
     } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        opt->w = util_string_int32(columns);
-        opt->h = util_string_int32(lines);
+        options->w = util_string_int32(columns);
+        options->h = util_string_int32(lines);
 
-        opt->x = opt->w + (opt->w % 2);
-        opt->y = 1;
+        options->x = options->w + (options->w % 2);
+        options->y = 1;
     } else if ((columns = getenv("COLUMNS"))
             && (lines = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        opt->w = util_string_int32(columns);
-        opt->h = util_string_int32(lines);
+        options->w = util_string_int32(columns);
+        options->h = util_string_int32(lines);
 
-        opt->x = opt->w + 1 + ((opt->w + 1) % 2) + 1;
-        opt->y = 1;
+        options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
+        options->y = 1;
         exit_code = 0; //skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
@@ -134,16 +134,16 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
         c = util_string_int32(columns);
         l = util_string_int32(lines);
 
-        opt->w = c;
-        opt->h = HEIGHT_SHELL;
-        opt->x = 0;
-        opt->y = cursor_getx();
+        options->w = c;
+        options->h = HEIGHT_SHELL;
+        options->x = 0;
+        options->y = cursor_getx();
 
-        opt->preview = false;
+        options->preview = false;
 
-        if (HEIGHT_SHELL > (l - opt->y)) {
-            opt->y = 1;
-            opt->clear = true;
+        if (HEIGHT_SHELL > (l - options->y)) {
+            options->y = 1;
+            options->clear = true;
         }
 
         return;
@@ -153,7 +153,7 @@ void main_parse_args(Options *opt, int argc, char *argv[]) {
     return;
 }
 
-void main_display_img(Image *image, Options *opt) {
+void main_display_img(Image *image, Options *options) {
     char *aux = NULL;
     char instance[20] = "preview";
 
@@ -170,13 +170,13 @@ void main_display_img(Image *image, Options *opt) {
         return;
     }
 
-    if (opt->clear) {
+    if (options->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image->w, image->h);
         clear_display(CLEAR_ALL);
     }
 
-    if (!opt->preview) {
+    if (!options->preview) {
         if (!(aux = basename(image->filename))) {
             fprintf(stderr, "basename(%s) : %s\n", image->filename, strerror(errno));
         } else {
@@ -195,9 +195,9 @@ void main_display_img(Image *image, Options *opt) {
     fprintf(UEBERZUG_FIFO, 
             S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
-                    opt->x, opt->y, opt->w, opt->h, image->path);
+                    options->x, options->y, options->w, options->h, image->path);
 
-    if (!opt->preview) {
+    if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");
 
         snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
