@@ -19,41 +19,42 @@
 #include <limits.h>
 
 void clear_display(int clear_option) {
-    char *UEBERZUG_FIFO = NULL;
-    char drawed_file[PATH_MAX];
-    FILE *ueberzug = NULL;
-    FILE *DRAWED = NULL;
+    File ueberzug_fifo;
+    File ueberzug_drawed;
     char line[PATH_MAX];
 
-    if ((UEBERZUG_FIFO = getenv("UEBERZUG_FIFO")) == NULL) {
+    if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return;
     }
-    if ((ueberzug = fopen(UEBERZUG_FIFO, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO, errno);
+    if ((ueberzug_fifo.file = fopen(ueberzug_fifo.name, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, errno);
         return;
     }
 
     switch (clear_option) {
     case CLEAR_DEFAULT:
-        fprintf(ueberzug, S({"action": "remove"}\n));
+        fprintf(ueberzug_fifo.file, S({"action": "remove"}\n));
         break;
     case CLEAR_ALL:
-        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", UEBERZUG_FIFO);
-        if ((DRAWED = fopen(drawed_file, "r"))) {
-            while (fgets(line, sizeof(line), DRAWED)) {
+        const char *suffix = ".drawed";
+        size_t length = strlen(ueberzug_fifo.name) + strlen(suffix);
+        ueberzug_drawed.name = util_realloc(NULL, length + 1); 
+        sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
+        if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "r"))) {
+            while (fgets(line, sizeof(line), ueberzug_drawed.file)) {
                 line[strcspn(line, "\n")] = 0;
-                fprintf(ueberzug, S({"action": "remove", "identifier": "%s"}\n), line);
+                fprintf(ueberzug_fifo.file, S({"action": "remove", "identifier": "%s"}\n), line);
             }
-            if ((DRAWED = freopen(drawed_file, "w", DRAWED)))
-                fclose(DRAWED);
+            if ((ueberzug_drawed.file = freopen(ueberzug_drawed.name, "w", ueberzug_drawed.file)))
+                fclose(ueberzug_drawed.file);
         }
     case CLEAR_PREVIEW:
     default:
-        fprintf(ueberzug, S({"action": "remove", "identifier": "preview"}\n));
+        fprintf(ueberzug_fifo.file, S({"action": "remove", "identifier": "preview"}\n));
         break;
     }
-    fclose(ueberzug);
+    fclose(ueberzug_fifo.file);
 
     return;
 }

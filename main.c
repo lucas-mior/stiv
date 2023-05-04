@@ -67,15 +67,16 @@ int main(int argc, char *argv[]) {
     }
 
     main_display_img(&image, &options);
-
-    return exit_code; // it should always return error so that programs will call it again to redraw
+    // it should always return error so that programs will call it again to redraw
+    return exit_code;
 }
 
 void main_usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
-    fprintf(stream, "Be sure to have ueberzug running in the terminal and UEBERZUG_FIFO env variable set\n");
+    fprintf(stream, "Be sure to have ueberzug running in the terminal "
+                    "and UEBERZUG_FIFO env variable set\n");
     exit((int) (stream != stdout));
 }
 
@@ -171,7 +172,8 @@ void main_display_img(Image *image, Options *options) {
 
     if (options->clear) {
         printf("\033[2J\033[H"); // clear terminal and jump to first line
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image->width, image->height);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
+               image->width, image->height);
         clear_display(CLEAR_ALL);
     }
 
@@ -193,14 +195,14 @@ void main_display_img(Image *image, Options *options) {
 
     fprintf(ueberzug_fifo.file, 
             S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
-               "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
-                    options->x, options->y, options->w, options->h, image->fullpath);
+               "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), 
+            instance, options->x, options->y, options->w, options->h, image->fullpath);
 
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");
         const char *suffix = ".drawed";
-
-        ueberzug_drawed.name = util_realloc(NULL, strlen(ueberzug_fifo.name) + strlen(suffix) + 1);
+        size_t length = strlen(ueberzug_fifo.name) + strlen(suffix);
+        ueberzug_drawed.name = util_realloc(NULL, length + 1); 
         sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
         if (!(ueberzug_drawed.file = fopen(ueberzug_drawed.name, "a"))) {
             free(image->fullpath);
