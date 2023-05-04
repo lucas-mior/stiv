@@ -156,8 +156,8 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 void main_display_img(Image *image, Options *options) {
     char instance[20] = "preview";
 
-    File ueberzug_fifo;
-    File ueberzug_drawed;
+    File ueberzug_fifo = {.file = NULL, .fd = -1, .name = NULL};
+    File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
 
     if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");

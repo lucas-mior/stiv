@@ -19,8 +19,8 @@
 #include <limits.h>
 
 void clear_display(int clear_option) {
-    File ueberzug_fifo;
-    File ueberzug_drawed;
+    File ueberzug_fifo = {.file = NULL, .fd = -1, .name = NULL};
+    File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
     char line[PATH_MAX];
 
     if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
