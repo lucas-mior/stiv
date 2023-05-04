@@ -91,7 +91,6 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
         clear_display(CLEAR_PREVIEW);
         exit(EXIT_FAILURE);
     }
-
     if (argc >= 6) {
         if (argc >= 7) {
             options->print_dim = false;
