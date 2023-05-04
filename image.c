@@ -41,9 +41,6 @@ void image_reduce_size(Image *image, double new_width) {
     const char *jpg = "jpg";
     char buffer[PATH_MAX];
 
-    Imlib_Image imlib_image;
-    Imlib_Load_Error err;
-
     double new_height;
     if (new_width > MAX_IMG_WIDTH)
         new_width = CACHE_IMG_WIDTH;
@@ -53,7 +50,8 @@ void image_reduce_size(Image *image, double new_width) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(buffer, sizeof(buffer), "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
+    snprintf(buffer, sizeof(buffer), 
+            "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
     image->fullpath = strdup(buffer);
 
     if ((cache_img = fopen(image->fullpath, "r"))) {
@@ -61,6 +59,9 @@ void image_reduce_size(Image *image, double new_width) {
         return;
     }
     if (errno == ENOENT) {
+        Imlib_Image imlib_image;
+        Imlib_Load_Error err;
+
         double z = image->width / new_width;
         new_height = round(((double) image->height / z));
 
