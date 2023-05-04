@@ -84,17 +84,11 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
     Number lines;
     Number columns;
 
-    if (argc == 1) {
-        main_usage(stderr);
-    } else if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-        main_usage(stdout);
-    }
-
-    if (!strcmp(argv[1], "-c") || !strcmp(argv[1], "--clear")) {
-        if (argc == 3)
-            clear_display(CLEAR_PREVIEW);
-        else
-            clear_display(CLEAR_ALL);
+    if (argc <= 2) {
+        clear_display(CLEAR_ALL);
+        exit(EXIT_FAILURE);
+    } else if (argc == 3) {
+        clear_display(CLEAR_PREVIEW);
         exit(EXIT_FAILURE);
     }
 
