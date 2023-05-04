@@ -157,16 +157,15 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 void main_display_img(Image *image, Options *options) {
     char instance[20] = "preview";
 
-    char drawed_file[128];
-    char *ueberzug = NULL;
-    FILE *UEBERZUG_FIFO, *DRAWED;
+    File ueberzug_fifo;
+    File ueberzug_drawed;
 
-    if ((ueberzug = getenv("UEBERZUG_FIFO")) == NULL) {
+    if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return;
     }
-    if ((UEBERZUG_FIFO = fopen(ueberzug, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO, errno);
+    if ((ueberzug_fifo.file = fopen(ueberzug_fifo.name, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, errno);
         return;
     }
 
@@ -192,23 +191,27 @@ void main_display_img(Image *image, Options *options) {
         exit(EXIT_FAILURE);
     }
 
-    fprintf(UEBERZUG_FIFO, 
+    fprintf(ueberzug_fifo.file, 
             S({"action": "add", "identifier": "%s", "scaler": "fit_contain",
                "x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), instance,
                     options->x, options->y, options->w, options->h, image->fullpath);
 
     if (!options->preview) {
         printf("\n\n\n\n\n\n\n\n\n\n\n");
+        const char *suffix = ".drawed";
 
-        snprintf(drawed_file, sizeof(drawed_file), "%s.drawed", ueberzug);
-        if (!(DRAWED = fopen(drawed_file, "a"))) {
+        ueberzug_drawed.name = util_realloc(NULL, strlen(ueberzug_fifo.name) + strlen(suffix) + 1);
+        sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
+        if (!(ueberzug_drawed.file = fopen(ueberzug_drawed.name, "a"))) {
             free(image->fullpath);
             image->fullpath = NULL;
             return;
         }
-        fprintf(DRAWED, "%s\n", instance);
+        fprintf(ueberzug_drawed.file, "%s\n", instance);
     }
 
+    util_close(&ueberzug_fifo);
+    util_close(&ueberzug_drawed);
     free(image->fullpath);
     image->fullpath = NULL;
     return;
