@@ -79,9 +79,18 @@ typedef struct Image {
     int width, height;
 } Image;
 
+typedef struct File {
+    FILE *file;
+    char *name;
+    int fd;
+} File;
+
 int32 util_string_int32(const char *);
 void *util_realloc(void *, size_t);
 bool ends_with(const char *, const char *);
+void util_close(File *);
+bool util_open(File *, const int);
+
 void clear_display(int);
 int cursor_getx(void);
 
