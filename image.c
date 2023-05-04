@@ -68,8 +68,10 @@ void image_reduce_size(Image *image, double new_width) {
         imlib_image = imlib_load_image(image->basename);
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
-        imlib_image = imlib_create_cropped_scaled_image(0, 0, image->width, image->height, 
-                                                        (int) new_width, (int) new_height);
+        imlib_image = imlib_create_cropped_scaled_image(
+                      0, 0, image->width, image->height, 
+                      (int) new_width, (int) new_height
+                      );
         if (imlib_image == NULL)
             goto dontcache;
 
@@ -88,7 +90,8 @@ void image_reduce_size(Image *image, double new_width) {
         imlib_free_image_and_decache();
         return;
     } else {
-        fprintf(stderr, "Error opening %s: %s\n", image->fullpath, strerror(errno));
+        fprintf(stderr, "Error opening %s: %s\n",
+                        image->fullpath, strerror(errno));
     }
     dontcache:
     free(image->fullpath);

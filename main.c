@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     }
 
     main_display_img(&image, &options);
-    // it should always return error so that programs will call it again to redraw
+    // it should return error so that programs will call it again to redraw
     return exit_code;
 }
 
