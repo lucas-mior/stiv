@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
 
     image_get_size(&image);
     if (options.print_dim)
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n", image.width, image.height);
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
+               image.width, image.height);
 
     if (image.width > MAX_IMG_WIDTH) {
         main_cache_name(&image);
