@@ -154,7 +154,6 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 }
 
 void main_display_img(Image *image, Options *options) {
-    char *aux = NULL;
     char instance[20] = "preview";
 
     char drawed_file[128];
@@ -177,8 +176,10 @@ void main_display_img(Image *image, Options *options) {
     }
 
     if (!options->preview) {
+        char *aux;
         if (!(aux = basename(image->basename))) {
-            fprintf(stderr, "basename(%s) : %s\n", image->basename, strerror(errno));
+            fprintf(stderr, "Error getting basename of %s: %s\n",
+                            image->basename, strerror(errno));
         } else {
             srand((uint) time(NULL));
             snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
