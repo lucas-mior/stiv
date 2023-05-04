@@ -184,12 +184,10 @@ void main_display_img(Image *image, Options *options) {
             snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
         }
     }
-    if (image->fullpath == NULL) {
-        if (!(image->fullpath = realpath(image->basename, NULL))) {
-            fprintf(stderr, "Error getting realpath of %s: %s",
-                            image->fullpath, strerror(errno));
-            exit(EXIT_FAILURE);
-        }
+    if (!(image->fullpath = realpath(image->basename, NULL))) {
+        fprintf(stderr, "Error getting realpath of %s: %s",
+                        image->fullpath, strerror(errno));
+        exit(EXIT_FAILURE);
     }
 
     fprintf(UEBERZUG_FIFO, 
