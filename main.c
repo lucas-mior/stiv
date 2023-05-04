@@ -110,7 +110,7 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 
         options->w -= 2;
         options->x += 2;
-    } else if ((lines.string = getenv("FZF_PREVIEW_COLUMNS"))
+    } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
         options->w = util_string_int32(columns.string);

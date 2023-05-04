@@ -39,6 +39,7 @@ clean:
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	rm -f $(DESTDIR)$(PREFIX)/bin/stiv
 	cp stiv $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/stiv
 	cp ueberzug_clear $(DESTDIR)$(PREFIX)/bin/
