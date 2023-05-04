@@ -85,6 +85,11 @@ typedef struct File {
     int fd;
 } File;
 
+typedef union Number {
+    char *string;
+    int number;
+} Number;
+
 int32 util_string_int32(const char *);
 void *util_realloc(void *, size_t);
 bool ends_with(const char *, const char *);

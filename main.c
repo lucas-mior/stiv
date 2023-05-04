@@ -81,10 +81,8 @@ void main_usage(FILE *stream) {
 }
 
 void main_parse_args(Options *options, int argc, char *argv[]) {
-    char *lines = NULL;
-    char *columns = NULL;
-    int l = 0;
-    int c = 0;
+    Number lines;
+    Number columns;
 
     if (argc == 1) {
         main_usage(stderr);
@@ -112,38 +110,38 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 
         options->w -= 2;
         options->x += 2;
-    } else if ((columns = getenv("FZF_PREVIEW_COLUMNS"))
-            && (lines = getenv("FZF_PREVIEW_LINES"))) {
+    } else if ((lines.string = getenv("FZF_PREVIEW_COLUMNS"))
+            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        options->w = util_string_int32(columns);
-        options->h = util_string_int32(lines);
+        options->w = util_string_int32(columns.string);
+        options->h = util_string_int32(lines.string);
 
         options->x = options->w + (options->w % 2);
         options->y = 1;
-    } else if ((columns = getenv("COLUMNS"))
-            && (lines = getenv("LINES"))) {
+    } else if ((columns.string = getenv("COLUMNS"))
+            && (lines.string = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        options->w = util_string_int32(columns);
-        options->h = util_string_int32(lines);
+        options->w = util_string_int32(columns.string);
+        options->h = util_string_int32(lines.string);
 
         options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
         options->y = 1;
         exit_code = 0; //skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
-        columns = argv[2];
-        lines = argv[3];
-        c = util_string_int32(columns);
-        l = util_string_int32(lines);
+        columns.string = argv[2];
+        lines.string = argv[3];
+        columns.number = util_string_int32(columns.string);
+        lines.number = util_string_int32(lines.string);
 
-        options->w = c;
+        options->w = columns.number;
         options->h = HEIGHT_SHELL;
         options->x = 0;
         options->y = cursor_getx();
 
         options->preview = false;
 
-        if (HEIGHT_SHELL > (l - options->y)) {
+        if (HEIGHT_SHELL > (lines.number - options->y)) {
             options->y = 1;
             options->clear = true;
         }
