@@ -169,8 +169,7 @@ int cursor_getx(void) {
     int row = 0;
     int col = 0;
 
-    fd = cursor_current_tty();
-    if (fd == -1)
+    if ((fd = cursor_current_tty()) < 0)
         return 1;
 
     if (cursor_position(fd, &row, &col))
