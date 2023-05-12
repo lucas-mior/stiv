@@ -6,8 +6,8 @@ VPATH = $(srcdir)
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
-# CC=clang
-CC=gcc
+CC=clang
+# CC=gcc
 cflags = $(CFLAGS)
 cppflags = $(CPPFLAGS)
 

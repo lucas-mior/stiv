@@ -21,6 +21,8 @@
 void clear_display(int clear_option) {
     File ueberzug_fifo = {.file = NULL, .fd = -1, .name = NULL};
     File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
+    const char *suffix = ".drawed";
+    size_t length;
     char line[PATH_MAX];
 
     if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
@@ -28,7 +30,7 @@ void clear_display(int clear_option) {
         return;
     }
     if ((ueberzug_fifo.file = fopen(ueberzug_fifo.name, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, errno);
+        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, strerror(errno));
         return;
     }
 
@@ -37,8 +39,7 @@ void clear_display(int clear_option) {
         fprintf(ueberzug_fifo.file, S({"action": "remove"}\n));
         break;
     case CLEAR_ALL:
-        const char *suffix = ".drawed";
-        size_t length = strlen(ueberzug_fifo.name) + strlen(suffix);
+        length = strlen(ueberzug_fifo.name) + strlen(suffix);
         ueberzug_drawed.name = util_realloc(NULL, length + 1); 
         sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
         if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "r"))) {
