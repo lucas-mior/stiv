@@ -120,7 +120,7 @@ int cursor_position(const int tty, int *const rowptr, int *const colptr) {
         /* Assume coordinate reponse parsing fails. */
         retval = EIO;
 
-        if (cursor_eread(tty) != '\e')
+        if (cursor_eread(tty) != '\033')
             break;
         if (cursor_eread(tty) != '[')
             break;
