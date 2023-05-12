@@ -157,7 +157,7 @@ void main_display_img(Image *image, Options *options) {
         return;
     }
     if ((ueberzug_fifo.file = fopen(ueberzug_fifo.name, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, errno);
+        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, strerror(errno));
         return;
     }
 
