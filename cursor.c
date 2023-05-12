@@ -120,14 +120,9 @@ int cursor_position(const int tty, int *const rowptr, int *const colptr) {
         /* Assume coordinate reponse parsing fails. */
         retval = EIO;
 
-        /* Expect an ESC. */
-        result = cursor_eread(tty);
-        if (result != 27)
+        if (cursor_eread(tty) != '\e')
             break;
-
-        /* Expect [ after the ESC. */
-        result = cursor_eread(tty);
-        if (result != '[')
+        if (cursor_eread(tty) != '[')
             break;
 
         rows = 0;
