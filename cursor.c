@@ -31,13 +31,13 @@ static int cursor_current_tty(void);
 static int cursor_position(const int, int *const, int *const);
 
 int cursor_eread(const int fd) {
-    unsigned char buffer[4];
+    uchar buffer;
     ssize_t n;
 
-    if ((n = read(fd, buffer, 1)) < 1)
+    if ((n = read(fd, &buffer, 1)) < 1)
         return -1;
     else
-        return buffer[0];
+        return buffer;
 }
 
 int cursor_current_tty(void) {
