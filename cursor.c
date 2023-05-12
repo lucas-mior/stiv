@@ -27,7 +27,6 @@
 #define RD_EIO -2
 
 static int cursor_eread(const int);
-static int cursor_ewrite(const int, const char *const, const size_t);
 static int cursor_current_tty(void);
 static int cursor_position(const int, int *const, int *const);
 
@@ -47,24 +46,6 @@ int cursor_eread(const int fd) {
         else if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK)
             return RD_EIO;
     }
-}
-
-int cursor_ewrite(const int fd, const char *const data, const size_t bytes) {
-    const char *head = data;
-    const char *tail = data + bytes;
-    ssize_t n;
-
-    while (head < tail) {
-        n = write(fd, head, (size_t)(tail - head));
-
-        if (n > (ssize_t)0)
-            head += n;
-        else if (n != (ssize_t)(-1))
-            return EIO;
-        else if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK)
-            return errno;
-    }
-    return 0;
 }
 
 int cursor_current_tty(void) {
@@ -139,9 +120,10 @@ int cursor_position(const int tty, int *const rowptr, int *const colptr) {
         }
 
         /* Request cursor coordinates from the terminal. */
-        retval = cursor_ewrite(tty, "\033[6n", 4);
-        if (retval)
+        if (write(tty, "\033[6n", 4) < 4) {
+            retval = -1;
             break;
+        }
 
         /* Assume coordinate reponse parsing fails. */
         retval = EIO;
