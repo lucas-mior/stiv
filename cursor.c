@@ -34,18 +34,10 @@ int cursor_eread(const int fd) {
     unsigned char buffer[4];
     ssize_t n;
 
-    while (true) {
-        n = read(fd, buffer, 1);
-
-        if (n > 0)
-            return buffer[0];
-        else if (n == 0)
-            return RD_EOF;
-        else if (n != -1)
-            return RD_EIO;
-        else if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK)
-            return RD_EIO;
-    }
+    if ((n = read(fd, buffer, 1)) < 1)
+        return -1;
+    else
+        return buffer[0];
 }
 
 int cursor_current_tty(void) {
