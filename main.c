@@ -92,9 +92,6 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     if (argc >= 6) {
-        if (argc >= 7) {
-            options->print_dim = false;
-        }
         // chamado por `lf > pistol > stiv`
         options->w = util_string_int32(argv[2]);
         options->h = util_string_int32(argv[3]) - 1;
@@ -103,6 +100,10 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 
         options->w -= 2;
         options->x += 2;
+        if (argc >= 7) {
+            options->print_dim = false;
+            options->y -= 1;
+        }
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
