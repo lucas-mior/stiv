@@ -15,7 +15,16 @@ ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
 objs = image.o main.o util.o cursor.o clear.o
 
-all: stiv
+all: release
+
+cflags += -std=c99 -D_DEFAULT_SOURCE
+release: cflags += -O2 -Wall -Wextra -Weverything -Wno-unsafe-buffer-usage
+release: stripflag = -s
+release: stiv
+
+debug: cflags += -g -Wall -Wextra -Weverything
+debug: clean
+debug: stiv
 
 .PHONY: all clean install uninstall
 .SUFFIXES:

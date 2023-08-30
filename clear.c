@@ -36,7 +36,7 @@ void clear_display(int clear_option) {
 
     switch (clear_option) {
     case CLEAR_DEFAULT:
-        fprintf(ueberzug_fifo.file, S({"action": "remove"}\n));
+        fprintf(ueberzug_fifo.file, "{\"action\": \"remove\"}\n");
         break;
     case CLEAR_ALL:
         length = strlen(ueberzug_fifo.name) + strlen(suffix);
@@ -46,7 +46,7 @@ void clear_display(int clear_option) {
             while (fgets(line, sizeof(line), ueberzug_drawed.file)) {
                 line[strcspn(line, "\n")] = 0;
                 fprintf(ueberzug_fifo.file,
-                        S({"action": "remove", "identifier": "%s"}\n), line);
+                        "{\"action\": \"remove\", \"identifier\": \"%s\"}\n", line);
             }
             util_close(&ueberzug_drawed);
         }
@@ -56,7 +56,7 @@ void clear_display(int clear_option) {
     case CLEAR_PREVIEW:
     default:
         fprintf(ueberzug_fifo.file,
-                S({"action": "remove", "identifier": "preview"}\n));
+                "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
         break;
     }
     fclose(ueberzug_fifo.file);

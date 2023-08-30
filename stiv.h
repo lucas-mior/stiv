@@ -36,8 +36,6 @@
 #ifndef STIV_H
 #define STIV_H
 
-#define S(x...) #x
-
 enum {
     CLEAR_DEFAULT,
     CLEAR_ALL,

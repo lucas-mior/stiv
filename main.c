@@ -186,10 +186,10 @@ void main_display_img(Image *image, Options *options) {
     }
 
     fprintf(ueberzug_fifo.file, 
-            S({"action": "add", "identifier": "%s",), instance);
-    fprintf(ueberzug_fifo.file, S("scaler": "fit_contain",));
+            "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
+    fprintf(ueberzug_fifo.file, "\"scaler\": \"fit_contain\",");
     fprintf(ueberzug_fifo.file,
-            S("x": %u, "y": %u, "width": %u, "height": %u, "path": "%s"}\n), 
+            "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
             options->x, options->y, options->w, options->h, image->fullpath);
 
     if (!options->preview) {
