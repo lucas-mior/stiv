@@ -18,11 +18,11 @@ objs = image.o main.o util.o cursor.o clear.o
 all: release
 
 cflags += -std=c99 -D_DEFAULT_SOURCE
-release: cflags += -O2 -Wall -Wextra -Weverything -Wno-unsafe-buffer-usage
+release: cflags += -O2 -Weverything -Wno-unsafe-buffer-usage
 release: stripflag = -s
 release: stiv
 
-debug: cflags += -g -Wall -Wextra -Weverything
+debug: cflags += -g -Weverything
 debug: clean
 debug: stiv
 
