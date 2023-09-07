@@ -199,9 +199,10 @@ void main_display_img(Image *image, Options *options) {
             options->x, options->y, options->w, options->h, image->fullpath);
 
     if (!options->preview) {
-        printf("\n\n\n\n\n\n\n\n\n\n\n");
+        size_t length;
         const char *suffix = ".drawed";
-        size_t length = strlen(ueberzug_fifo.name) + strlen(suffix);
+        printf("\n\n\n\n\n\n\n\n\n\n\n");
+        length = strlen(ueberzug_fifo.name) + strlen(suffix);
         ueberzug_drawed.name = util_realloc(NULL, length + 1); 
         sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
         if (!(ueberzug_drawed.file = fopen(ueberzug_drawed.name, "a"))) {

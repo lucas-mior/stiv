@@ -53,6 +53,7 @@ void clear_display(int clear_option) {
         // clean the file
         if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "w")))
             util_close(&ueberzug_drawed);
+    __attribute__((fallthrough));
     case CLEAR_PREVIEW:
     default:
         fprintf(ueberzug_fifo.file,

@@ -16,8 +16,6 @@
 
 #include "stiv.h"
 
-const char *program;
-
 int32 util_string_int32(const char *string) {
     char *endptr;
 	const int base = 10;	
@@ -34,12 +32,20 @@ int32 util_string_int32(const char *string) {
     return (int32) x;
 }
 
+void *util_malloc(const size_t size) {
+    void *p;
+    if ((p = malloc(size)) == NULL) {
+        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
+        exit(EXIT_FAILURE);
+    }
+    return p;
+}
+
 void *util_realloc(void *old, const size_t size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
-        if (old)
-            fprintf(stderr, "Reallocating from: %p\n", old);
+        fprintf(stderr, "Reallocating from: %p\n", old);
         exit(EXIT_FAILURE);
     }
     return p;

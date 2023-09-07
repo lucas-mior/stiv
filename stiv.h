@@ -91,7 +91,9 @@ typedef union Number {
 } Number;
 
 int32 util_string_int32(const char *);
+void *util_malloc(size_t);
 void *util_realloc(void *, size_t);
+void *util_calloc(size_t, size_t);
 bool ends_with(const char *, const char *);
 void util_close(File *);
 bool util_open(File *, const int);
