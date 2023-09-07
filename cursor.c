@@ -23,9 +23,6 @@
 
 #include "stiv.h"
 
-#define RD_EOF -1
-#define RD_EIO -2
-
 static int cursor_eread(const int);
 static int cursor_current_tty(void);
 static int cursor_position(const int, int *const, int *const);
@@ -93,9 +90,9 @@ int cursor_position(const int tty, int *const rowptr, int *const colptr) {
     }
 
     /* Disable ICANON, ECHO, and CREAD. */
-    temporary.c_lflag &= ~ICANON;
-    temporary.c_lflag &= ~ECHO;
-    temporary.c_cflag &= ~CREAD;
+    temporary.c_lflag = temporary.c_lflag & (uint) ~ICANON;
+    temporary.c_lflag = temporary.c_lflag & (uint) ~ECHO;
+    temporary.c_cflag = temporary.c_cflag & (uint) ~CREAD;
 
     /* This loop is only executed once. When broken out,
      * the terminal settings will be restored, and the function

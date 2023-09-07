@@ -68,6 +68,7 @@ typedef struct Options {
     bool preview;
     bool clear;
     bool print_dim;
+    bool unused;
 } Options;
 
 typedef struct Image {
@@ -81,6 +82,7 @@ typedef struct File {
     FILE *file;
     char *name;
     int fd;
+    int unused;
 } File;
 
 typedef union Number {

@@ -15,11 +15,12 @@
 /* along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 #include "stiv.h"
+#include <stdlib.h>
 
 extern int exit_code;
 int exit_code = 1;
 
-static void main_usage(FILE *);
+static void main_usage(FILE *) __attribute__((noreturn));
 static void main_parse_args(Options *, int, char *[]);
 static void main_cache_name(Image *);
 static void main_display_img(Image *, Options *);
@@ -175,8 +176,13 @@ void main_display_img(Image *image, Options *options) {
             fprintf(stderr, "Error getting basename of %s: %s\n",
                             image->basename, strerror(errno));
         } else {
+            int n;
             srand((uint) time(NULL));
-            snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
+            n = snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
+			if (n < 0) {
+				fprintf(stderr, "Error printing instance.\n");
+				exit(EXIT_FAILURE);
+			}
         }
     }
     if (!(image->fullpath = realpath(image->basename, NULL))) {
@@ -216,6 +222,7 @@ void main_display_img(Image *image, Options *options) {
 void main_cache_name(Image *image) {
     struct stat file;
     char buffer[PATH_MAX];
+	int n;
 
     if (stat(image->basename, &file) < 0) {
         fprintf(stderr, "Error calling stat on %s: %s.",
@@ -223,8 +230,12 @@ void main_cache_name(Image *image) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(buffer, sizeof(buffer), "%li_%ld_%ld",
+    n = snprintf(buffer, sizeof(buffer), "%li_%ld_%ld",
              file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+	if (n < 0) {
+		fprintf(stderr, "Error printing cache name.\n");
+		exit(EXIT_FAILURE);
+	}
     image->cachename = strdup(buffer);
     return;
 }

@@ -40,6 +40,7 @@ void image_reduce_size(Image *image, double new_width) {
     const char *previewer = "previewer/stiv";
     const char *jpg = "jpg";
     char buffer[PATH_MAX];
+	int n;
 
     double new_height;
     if (new_width > MAX_IMG_WIDTH)
@@ -50,8 +51,12 @@ void image_reduce_size(Image *image, double new_width) {
         exit(EXIT_FAILURE);
     }
 
-    snprintf(buffer, sizeof(buffer), 
-            "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
+    n = snprintf(buffer, sizeof(buffer), 
+                "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
+	if (n < 0) {
+		fprintf(stderr, "Error printing cache name.\n");
+		exit(EXIT_FAILURE);
+	}
     image->fullpath = strdup(buffer);
 
     if ((cache_img = fopen(image->fullpath, "r"))) {
