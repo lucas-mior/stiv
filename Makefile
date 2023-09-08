@@ -7,9 +7,6 @@ PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
 CC=clang
-# CC=gcc
-cflags = $(CFLAGS)
-cppflags = $(CPPFLAGS)
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
@@ -17,12 +14,11 @@ objs = image.o main.o util.o cursor.o clear.o
 
 all: release
 
-cflags += -std=c99 -D_DEFAULT_SOURCE
-release: cflags += -O2 -Weverything -Wno-unsafe-buffer-usage
-release: stripflag = -s
+CFLAGS += -std=c99 -D_DEFAULT_SOURCE
+release: CFLAGS += -O2 -Weverything -Wno-unsafe-buffer-usage
 release: stiv
 
-debug: cflags += -g -Weverything
+debug: CFLAGS += -g -Weverything
 debug: clean
 debug: stiv
 
@@ -33,12 +29,12 @@ debug: stiv
 stiv: $(objs)
 	ctags --kinds-C=+l *.h *.c
 	vtags.sed tags > .tags.vim
-	$(CC) $(cflags) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
 
 $(objs): Makefile stiv.h
 
 .c.o:
-	$(CC) $(cflags) $(cppflags) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f *.o stiv
