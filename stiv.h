@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <limits.h>
+#include <linux/limits.h>
 #include <magic.h>
 #include <math.h>
 #include <stdbool.h>
@@ -31,6 +32,7 @@
 #include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include <time.h>
 #include <unistd.h>
 

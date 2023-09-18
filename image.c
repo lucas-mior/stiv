@@ -16,7 +16,6 @@
  */
 
 #include <Imlib2.h>
-#include <stdlib.h>
 
 #include "stiv.h"
 
@@ -36,7 +35,7 @@ void image_get_size(Image *image) {
 
 void image_reduce_size(Image *image, double new_width) {
     FILE *cache_img;
-    char *cache = NULL;
+    char *XDG_CACHE_HOME = NULL;
 
     const char *previewer = "previewer/stiv";
     const char *jpg = "jpg";
@@ -47,13 +46,13 @@ void image_reduce_size(Image *image, double new_width) {
     if (new_width > MAX_IMG_WIDTH)
         new_width = CACHE_IMG_WIDTH;
 
-    if ((cache = getenv("XDG_CACHE_HOME")) == NULL) {
+    if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
         fprintf(stderr, "XDG_CACHE_HOME is not set. Exiting...\n");
         exit(EXIT_FAILURE);
     }
 
     n = snprintf(buffer, sizeof(buffer), 
-                "%s/%s/%s.%s", cache, previewer, image->cachename, jpg);
+                "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image->cachename, jpg);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);

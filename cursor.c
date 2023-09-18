@@ -15,13 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unistd.h>
-
-#include <fcntl.h>
-#include <termios.h>
-#include <errno.h>
-#include <stdbool.h>
-
 #include "stiv.h"
 
 static int cursor_eread(const int);

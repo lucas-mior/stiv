@@ -152,15 +152,15 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 void main_display_img(Image *image, Options *options) {
     char instance[20] = "preview";
 
-    File ueberzug_fifo = {.file = NULL, .fd = -1, .name = NULL};
-    File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
+    File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+    File UEBERZUG_DRAWED = {.file = NULL, .fd = -1, .name = NULL};
 
-    if ((ueberzug_fifo.name = getenv("UEBERZUG_FIFO")) == NULL) {
+    if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return;
     }
-    if ((ueberzug_fifo.file = fopen(ueberzug_fifo.name, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", ueberzug_fifo.name, strerror(errno));
+    if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
+        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
         return;
     }
 
@@ -192,10 +192,10 @@ void main_display_img(Image *image, Options *options) {
         exit(EXIT_FAILURE);
     }
 
-    fprintf(ueberzug_fifo.file, 
+    fprintf(UEBERZUG_FIFO.file, 
             "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
-    fprintf(ueberzug_fifo.file, "\"scaler\": \"fit_contain\",");
-    fprintf(ueberzug_fifo.file,
+    fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
+    fprintf(UEBERZUG_FIFO.file,
             "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
             options->x, options->y, options->w, options->h, image->fullpath);
 
@@ -203,19 +203,19 @@ void main_display_img(Image *image, Options *options) {
         size_t length;
         const char *suffix = ".drawed";
         printf("\n\n\n\n\n\n\n\n\n\n\n");
-        length = strlen(ueberzug_fifo.name) + strlen(suffix);
-        ueberzug_drawed.name = util_realloc(NULL, length + 1); 
-        sprintf(ueberzug_drawed.name, "%s.drawed", ueberzug_fifo.name);
-        if (!(ueberzug_drawed.file = fopen(ueberzug_drawed.name, "a"))) {
+        length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
+        UEBERZUG_DRAWED.name = util_realloc(NULL, length + 1); 
+        sprintf(UEBERZUG_DRAWED.name, "%s.drawed", UEBERZUG_FIFO.name);
+        if (!(UEBERZUG_DRAWED.file = fopen(UEBERZUG_DRAWED.name, "a"))) {
             free(image->fullpath);
             image->fullpath = NULL;
             return;
         }
-        fprintf(ueberzug_drawed.file, "%s\n", instance);
+        fprintf(UEBERZUG_DRAWED.file, "%s\n", instance);
     }
 
-    util_close(&ueberzug_fifo);
-    util_close(&ueberzug_drawed);
+    util_close(&UEBERZUG_FIFO);
+    util_close(&UEBERZUG_DRAWED);
     free(image->fullpath);
     image->fullpath = NULL;
     return;
