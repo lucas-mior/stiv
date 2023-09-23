@@ -18,17 +18,6 @@ stiv -h|--help
 ```
 Display help message.
 
-Mandatory arguments to long options are mandatory for short options too.
-
-## Author
-
-Written by Lucas Mior.
-
 ## License
 
-`stiv` is released under the GPLv3+ license. See `LICENSE` for more details.
-
-## See Also
-
-- [link(2)](https://man7.org/linux/man-pages/man2/link.2.html)
-- [symlink(2)](https://man7.org/linux/man-pages/man2/symlink.2.html)
+`stiv` is released under the GNU AFFERO GENERAL PUBLIC LICENSE.
