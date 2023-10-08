@@ -51,7 +51,7 @@ void image_reduce_size(Image *image, double new_width) {
         exit(EXIT_FAILURE);
     }
 
-    n = snprintf(buffer, sizeof(buffer), 
+    n = snprintf(buffer, sizeof (buffer), 
                 "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image->cachename, jpg);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");

@@ -179,7 +179,7 @@ void main_display_img(Image *image, Options *options) {
         } else {
             int n;
             srand((uint) time(NULL));
-            n = snprintf(instance, sizeof(instance), "%d%s", rand(), aux);
+            n = snprintf(instance, sizeof (instance), "%d%s", rand(), aux);
 			if (n < 0) {
 				fprintf(stderr, "Error printing instance.\n");
 				exit(EXIT_FAILURE);
@@ -200,7 +200,7 @@ void main_display_img(Image *image, Options *options) {
             options->x, options->y, options->w, options->h, image->fullpath);
 
     if (!options->preview) {
-        size_t length;
+        usize length;
         const char *suffix = ".drawed";
         printf("\n\n\n\n\n\n\n\n\n\n\n");
         length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
@@ -232,7 +232,7 @@ void main_cache_name(Image *image) {
         exit(EXIT_FAILURE);
     }
 
-    n = snprintf(buffer, sizeof(buffer), "%li_%ld_%ld",
+    n = snprintf(buffer, sizeof (buffer), "%li_%ld_%ld",
              file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");

@@ -33,7 +33,7 @@ int32 util_string_int32(const char *string) {
     return (int32) x;
 }
 
-void *util_malloc(const size_t size) {
+void *util_malloc(const usize size) {
     void *p;
     if ((p = malloc(size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
@@ -42,7 +42,7 @@ void *util_malloc(const size_t size) {
     return p;
 }
 
-void *util_realloc(void *old, const size_t size) {
+void *util_realloc(void *old, const usize size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
@@ -52,7 +52,7 @@ void *util_realloc(void *old, const size_t size) {
     return p;
 }
 
-void *util_calloc(const size_t nmemb, const size_t size) {
+void *util_calloc(const usize nmemb, const usize size) {
     void *p;
     if ((p = calloc(nmemb, size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu members of %zu bytes each.\n",
@@ -64,7 +64,7 @@ void *util_calloc(const size_t nmemb, const size_t size) {
 
 bool ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');
-    size_t length = 0;
+    usize length = 0;
     if (ldot != NULL) {
         length = strlen(end);
         return !strncmp(ldot + 1, end, length);

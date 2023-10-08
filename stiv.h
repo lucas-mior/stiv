@@ -45,6 +45,8 @@ enum {
     CLEAR_PREVIEW,
 };
 
+#ifndef INTEGERS
+#define INTEGERS
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
@@ -59,6 +61,10 @@ typedef uint8_t uint8;
 typedef uint16_t uint16;
 typedef uint32_t uint32;
 typedef uint64_t uint64;
+
+typedef size_t usize;
+typedef ssize_t isize;
+#endif
 
 static const double CACHE_IMG_WIDTH = 1024;
 static const int MAX_IMG_WIDTH = 2048;
@@ -94,9 +100,9 @@ typedef union Number {
 } Number;
 
 int32 util_string_int32(const char *);
-void *util_malloc(size_t);
-void *util_realloc(void *, size_t);
-void *util_calloc(size_t, size_t);
+void *util_malloc(usize);
+void *util_realloc(void *, usize);
+void *util_calloc(usize, usize);
 bool ends_with(const char *, const char *);
 void util_close(File *);
 bool util_open(File *, const int);

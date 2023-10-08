@@ -23,7 +23,7 @@ static int cursor_position(const int, int *const, int *const);
 
 int cursor_eread(const int fd) {
     uchar buffer;
-    ssize_t n;
+    isize n;
 
     if ((n = read(fd, &buffer, 1)) < 1)
         return -1;

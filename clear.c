@@ -21,7 +21,7 @@ void clear_display(int clear_option) {
     File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
     File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
     const char *suffix = ".drawed";
-    size_t length;
+    usize length;
     char line[PATH_MAX];
 
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
@@ -42,7 +42,7 @@ void clear_display(int clear_option) {
         ueberzug_drawed.name = util_realloc(NULL, length + 1); 
         sprintf(ueberzug_drawed.name, "%s.drawed", UEBERZUG_FIFO.name);
         if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "r"))) {
-            while (fgets(line, sizeof(line), ueberzug_drawed.file)) {
+            while (fgets(line, sizeof (line), ueberzug_drawed.file)) {
                 line[strcspn(line, "\n")] = 0;
                 fprintf(UEBERZUG_FIFO.file,
                         "{\"action\": \"remove\", \"identifier\": \"%s\"}\n", line);
