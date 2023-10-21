@@ -15,7 +15,7 @@ objs = image.o main.o util.o cursor.o clear.o
 all: release
 
 CFLAGS += -std=c99 -D_DEFAULT_SOURCE
-release: CFLAGS += -O2 -Weverything -Wno-unsafe-buffer-usage
+release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage
 release: stiv
 
 debug: CFLAGS += -g -Weverything
