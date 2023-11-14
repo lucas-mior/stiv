@@ -10,7 +10,7 @@ CC=clang
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
-objs = image.o main.o util.o cursor.o clear.o
+src = image.c main.c util.c cursor.c clear.c
 
 all: release
 
@@ -26,15 +26,10 @@ debug: stiv
 .SUFFIXES:
 .SUFFIXES: .c .o
 
-stiv: $(objs)
+stiv: $(src) Makefile stiv.h
 	ctags --kinds-C=+l *.h *.c
 	vtags.sed tags > .tags.vim
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(objs) $(ldlibs)
-
-$(objs): Makefile stiv.h
-
-.c.o:
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(src) $(ldlibs)
 
 clean:
 	rm -f *.o stiv
