@@ -57,7 +57,7 @@ void image_reduce_size(Image *image, double new_width) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
-    image->fullpath = strdup(buffer);
+    image->fullpath = util_strdup(buffer);
 
     if ((cache_img = fopen(image->fullpath, "r"))) {
         fclose(cache_img);

@@ -18,8 +18,16 @@
 #include "stiv.h"
 
 void clear_display(int clear_option) {
-    File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
-    File ueberzug_drawed = {.file = NULL, .fd = -1, .name = NULL};
+    File UEBERZUG_FIFO = {
+        .file = NULL,
+        .fd = -1,
+        .name = NULL
+    };
+    File ueberzug_drawed = {
+        .file = NULL,
+        .fd = -1,
+        .name = NULL
+    };
     const char *suffix = ".drawed";
     usize length;
     char line[PATH_MAX];

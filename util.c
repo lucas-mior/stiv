@@ -42,6 +42,19 @@ void *util_malloc(const usize size) {
     return p;
 }
 
+char *util_strdup(const char *str) {
+    void *p;
+    size_t size = strlen(str) + 1;
+
+    if ((p = malloc(size)) == NULL) {
+        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
+        exit(EXIT_FAILURE);
+    }
+    memcpy(p, str, size);
+
+    return p;
+}
+
 void *util_realloc(void *old, const usize size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {

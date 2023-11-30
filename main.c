@@ -99,6 +99,7 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
         options->h = util_string_int32(argv[3]) - 1;
         options->x = util_string_int32(argv[4]);
         options->y = util_string_int32(argv[5]) + 1;
+        options->y += 1; // tmux bugs lf's Y by 1
 
         options->w -= 2;
         options->x += 2;
@@ -238,6 +239,6 @@ void main_cache_name(Image *image) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
-    image->cachename = strdup(buffer);
+    image->cachename = util_strdup(buffer);
     return;
 }

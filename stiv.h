@@ -101,6 +101,7 @@ typedef union Number {
 
 int32 util_string_int32(const char *);
 void *util_malloc(usize);
+char *util_strdup(const char *);
 void *util_realloc(void *, usize);
 void *util_calloc(usize, usize);
 bool ends_with(const char *, const char *);
