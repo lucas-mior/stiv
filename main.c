@@ -17,6 +17,23 @@
 
 #include "stiv.h"
 #include <stdlib.h>
+#include <Imlib2.h>
+
+typedef struct Options {
+    int32 w, h, H;
+    int32 x, y;
+    bool preview;
+    bool clear;
+    bool print_dim;
+    bool unused;
+} Options;
+
+typedef struct Image {
+    char *basename;
+    char *fullpath;
+    char *cachename;
+    int width, height;
+} Image;
 
 extern int exit_code;
 int exit_code = EXIT_FAILURE;
@@ -26,6 +43,90 @@ static void main_parse_args(Options *, int, char *[]);
 static void main_cache_name(Image *);
 static void main_display_img(Image *, Options *);
 
+static void image_get_size(Image *image) {
+    Imlib_Image imlib_image;
+
+    imlib_image = imlib_load_image(image->basename);
+    imlib_context_set_image(imlib_image);
+
+    image->width = imlib_image_get_width();
+    image->height = imlib_image_get_height();
+
+    imlib_free_image();
+    /* imlib_free_image_and_decache(); */
+    return;
+}
+
+static void image_reduce_size(Image *image, double new_width) {
+    FILE *cache_img;
+    char *XDG_CACHE_HOME = NULL;
+
+    const char *previewer = "previewer/stiv";
+    const char *jpg = "jpg";
+    char buffer[PATH_MAX];
+	int n;
+
+    double new_height;
+    if (new_width > MAX_IMG_WIDTH)
+        new_width = CACHE_IMG_WIDTH;
+
+    if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
+        fprintf(stderr, "XDG_CACHE_HOME is not set. Exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+
+    n = snprintf(buffer, sizeof (buffer), 
+                "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image->cachename, jpg);
+	if (n < 0) {
+		fprintf(stderr, "Error printing cache name.\n");
+		exit(EXIT_FAILURE);
+	}
+    image->fullpath = util_strdup(buffer);
+
+    if ((cache_img = fopen(image->fullpath, "r"))) {
+        fclose(cache_img);
+        return;
+    }
+    if (errno == ENOENT) {
+        Imlib_Image imlib_image;
+        Imlib_Load_Error err;
+
+        double z = image->width / new_width;
+        new_height = round(((double) image->height / z));
+
+        imlib_image = imlib_load_image(image->basename);
+        imlib_context_set_image(imlib_image);
+        imlib_context_set_anti_alias(1);
+        imlib_image = imlib_create_cropped_scaled_image(
+                      0, 0, image->width, image->height, 
+                      (int) new_width, (int) new_height
+                      );
+        if (imlib_image == NULL)
+            goto dontcache;
+
+        imlib_context_set_image(imlib_image);
+
+        if (imlib_image_has_alpha()) {
+            imlib_image_set_format("png");
+        } else {
+            imlib_image_set_format("jpg");
+            imlib_image_attach_data_value("quality", NULL, 90, NULL);
+        }
+        imlib_save_image_with_error_return(image->fullpath, &err);
+        if (err)
+            goto dontcache;
+
+        imlib_free_image_and_decache();
+        return;
+    } else {
+        fprintf(stderr, "Error opening %s: %s\n",
+                        image->fullpath, strerror(errno));
+    }
+    dontcache:
+    free(image->fullpath);
+    image->fullpath = NULL;
+    return;
+}
 int main(int argc, char *argv[]) {
     Options options = {
         .w = 100, .h = HEIGHT_SHELL, .H = -1,

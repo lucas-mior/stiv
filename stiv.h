@@ -71,22 +71,6 @@ static const int MAX_IMG_WIDTH = 2048;
 static const int MAX_PNG_WIDTH = 1536;
 static const int HEIGHT_SHELL = 11;
 
-typedef struct Options {
-    int32 w, h, H;
-    int32 x, y;
-    bool preview;
-    bool clear;
-    bool print_dim;
-    bool unused;
-} Options;
-
-typedef struct Image {
-    char *basename;
-    char *fullpath;
-    char *cachename;
-    int width, height;
-} Image;
-
 typedef struct File {
     FILE *file;
     char *name;
@@ -110,8 +94,5 @@ bool util_open(File *, const int);
 
 void clear_display(int);
 int cursor_getx(void);
-
-void image_get_size(Image *);
-void image_reduce_size(Image *, double);
 
 #endif /* STIV_H */

@@ -10,7 +10,7 @@ CC=clang
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
-src = image.c main.c util.c cursor.c clear.c
+src = main.c util.c cursor.c clear.c
 
 all: release
 
