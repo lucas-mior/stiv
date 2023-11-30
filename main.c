@@ -233,8 +233,9 @@ void main_cache_name(Image *image) {
         exit(EXIT_FAILURE);
     }
 
-    n = snprintf(buffer, sizeof (buffer), "%li_%ld_%ld",
-             file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+    n = snprintf(buffer, sizeof (buffer),
+                 "%li_%ld_%ld",
+                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);
