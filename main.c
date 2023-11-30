@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 extern int exit_code;
-int exit_code = 1;
+int exit_code = EXIT_FAILURE;
 
 static void main_usage(FILE *) __attribute__((noreturn));
 static void main_parse_args(Options *, int, char *[]);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     main_display_img(&image, &options);
     // it should return error so that programs will call it again to redraw
-    return exit_code;
+    exit(exit_code);
 }
 
 void main_usage(FILE *stream) {
@@ -123,7 +123,7 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
 
         options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
         options->y = 1;
-        exit_code = 0; //skim won't print anything if we exit with an error
+        exit_code = EXIT_SUCCESS; // skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
         columns.string = argv[2];
