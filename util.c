@@ -87,17 +87,13 @@ bool ends_with(const char *str, const char *end) {
 
 void util_close(File *f) {
     if (f->fd >= 0) {
-        if (close(f->fd) < 0) {
-            fprintf(stderr, "Error closing %s: %s\n",
-                            f->name, strerror(errno));
-        }
+        if (close(f->fd) < 0)
+            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
         f->fd = -1;
     }
     if (f->file != NULL) {
-        if (fclose(f->file) != 0) {
-            fprintf(stderr, "Error closing %s: %s\n",
-                            f->name, strerror(errno));
-        }
+        if (fclose(f->file) != 0)
+            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
         f->file = NULL;
     }
     return;
@@ -105,8 +101,7 @@ void util_close(File *f) {
 
 bool util_open(File *f, const int flag) {
     if ((f->fd = open(f->name, flag)) < 0) {
-        fprintf(stderr, "Error opening %s: %s\n",
-                        f->name, strerror(errno));
+        fprintf(stderr, "Error opening %s: %s\n", f->name, strerror(errno));
         return false;
     } else {
         return true;
