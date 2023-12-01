@@ -43,20 +43,6 @@ static void main_parse_args(Options *, int, char *[]);
 static void main_cache_name(Image *);
 static void main_display_img(Image *, Options *);
 
-static void image_get_size(Image *image) {
-    Imlib_Image imlib_image;
-
-    imlib_image = imlib_load_image(image->basename);
-    imlib_context_set_image(imlib_image);
-
-    image->width = imlib_image_get_width();
-    image->height = imlib_image_get_height();
-
-    imlib_free_image();
-    /* imlib_free_image_and_decache(); */
-    return;
-}
-
 static void image_reduce_size(Image *image, double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
@@ -147,7 +133,19 @@ int main(int argc, char *argv[]) {
 
     main_parse_args(&options, argc, argv);
 
-    image_get_size(&image);
+    {
+        Imlib_Image imlib_image;
+
+        imlib_image = imlib_load_image(image.basename);
+        imlib_context_set_image(imlib_image);
+
+        image.width = imlib_image_get_width();
+        image.height = imlib_image_get_height();
+
+        imlib_free_image();
+        /* imlib_free_image_and_decache(); */
+    }
+
     if (options.print_dim)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
