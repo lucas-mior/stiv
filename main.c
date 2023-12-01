@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     if (argc >= 6) {
-        // chamado por `lf > pistol > stiv`
+        // chamado por `lf > piscou > stiv`
         terminal.width = util_string_int32(argv[2]);
         terminal.height = util_string_int32(argv[3]) - 1;
         terminal.x = util_string_int32(argv[4]);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
         }
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
-        // chamado por `fzf > pistol > stiv`
+        // chamado por `fzf > piscou > stiv`
         terminal.width = util_string_int32(columns.string);
         terminal.height = util_string_int32(lines.string);
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
         terminal.y = 1;
     } else if ((columns.string = getenv("COLUMNS"))
             && (lines.string = getenv("LINES"))) {
-        // chamado por `skim > pistol > stiv`
+        // chamado por `skim > piscou > stiv`
         terminal.width = util_string_int32(columns.string);
         terminal.height = util_string_int32(lines.string);
 
