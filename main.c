@@ -66,7 +66,6 @@ int main(int argc, char *argv[]) {
 
     image.basename = argv[1];
 
-
     if (argc <= 2) {
         clear_display(CLEAR_ALL);
         exit(EXIT_FAILURE);
