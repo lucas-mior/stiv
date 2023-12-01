@@ -56,7 +56,7 @@ int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
-static void image_reduce_size(double);
+static void reduce_image_size(double);
 
 int main(int argc, char *argv[]) {
     Number lines;
@@ -145,19 +145,19 @@ int main(int argc, char *argv[]) {
 
     if (image.width > MAX_IMG_WIDTH) {
         get_cache_name();
-        image_reduce_size(CACHE_IMG_WIDTH);
+        reduce_image_size(CACHE_IMG_WIDTH);
     } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
             get_cache_name();
-            image_reduce_size(CACHE_IMG_WIDTH);
+            reduce_image_size(CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
         get_cache_name();
-        image_reduce_size(image.width);
+        reduce_image_size(image.width);
     }
 
     do {
@@ -267,7 +267,7 @@ void get_cache_name(void) {
     return;
 }
 
-void image_reduce_size(double new_width) {
+void reduce_image_size(double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 
