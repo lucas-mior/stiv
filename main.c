@@ -101,7 +101,9 @@ int main(int argc, char *argv[]) {
 
         terminal.x = terminal.width + 1 + ((terminal.width + 1) % 2) + 1;
         terminal.y = 1;
-        exit_code = EXIT_SUCCESS; // skim won't print anything if we exit with an error
+
+        // skim won't print anything if we exit with an error
+        exit_code = EXIT_SUCCESS;
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
         columns.string = argv[2];
@@ -201,11 +203,11 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        fprintf(UEBERZUG_FIFO.file, 
+        fprintf(UEBERZUG_FIFO.file,
                 "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
         fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
         fprintf(UEBERZUG_FIFO.file,
-                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
+                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n",
                 terminal.x, terminal.y, terminal.width, terminal.height, image.fullpath);
 
         if (!is_preview) {
@@ -213,7 +215,7 @@ int main(int argc, char *argv[]) {
             const char *suffix = ".drawed";
             printf("\n\n\n\n\n\n\n\n\n\n\n");
             length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
-            UEBERZUG_DRAWED.name = util_realloc(NULL, length + 1); 
+            UEBERZUG_DRAWED.name = util_realloc(NULL, length + 1);
             sprintf(UEBERZUG_DRAWED.name, "%s.drawed", UEBERZUG_FIFO.name);
             if (!(UEBERZUG_DRAWED.file = fopen(UEBERZUG_DRAWED.name, "a"))) {
                 free(image.fullpath);
@@ -282,7 +284,7 @@ void image_reduce_size(double new_width) {
         exit(EXIT_FAILURE);
     }
 
-    n = snprintf(buffer, sizeof (buffer), 
+    n = snprintf(buffer, sizeof (buffer),
                 "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image.cachename, jpg);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");
@@ -305,7 +307,7 @@ void image_reduce_size(double new_width) {
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
         imlib_image = imlib_create_cropped_scaled_image(
-                      0, 0, image.width, image.height, 
+                      0, 0, image.width, image.height,
                       (int) new_width, (int) new_height
                       );
         if (imlib_image == NULL)
