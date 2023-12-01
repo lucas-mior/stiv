@@ -22,7 +22,6 @@
 typedef struct Terminal {
     int width;
     int height;
-    int height2;
     int x;
     int y;
 } Terminal;
@@ -30,7 +29,6 @@ typedef struct Terminal {
 static Terminal terminal = {
     .width = 100,
     .height = HEIGHT_SHELL,
-    .height2 = -1,
     .x = 0,
     .y = 1,
 };
