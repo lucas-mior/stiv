@@ -54,8 +54,8 @@ static Image image = {
 extern int exit_code;
 int exit_code = EXIT_FAILURE;
 
-static void main_usage(FILE *) __attribute__((noreturn));
-static void main_cache_name(void);
+static void usage(FILE *) __attribute__((noreturn));
+static void get_cache_name(void);
 static void image_reduce_size(double);
 
 int main(int argc, char *argv[]) {
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
             should_clear = true;
         }
     } else {
-        main_usage(stderr);
+        usage(stderr);
     }
 
     {
@@ -144,19 +144,19 @@ int main(int argc, char *argv[]) {
                image.width, image.height);
 
     if (image.width > MAX_IMG_WIDTH) {
-        main_cache_name();
+        get_cache_name();
         image_reduce_size(CACHE_IMG_WIDTH);
     } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
-            main_cache_name();
+            get_cache_name();
             image_reduce_size(CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
-        main_cache_name();
+        get_cache_name();
         image_reduce_size(image.width);
     }
 
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
     exit(exit_code);
 }
 
-void main_usage(FILE *stream) {
+void usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
@@ -245,7 +245,7 @@ void main_usage(FILE *stream) {
     exit((int) (stream != stdout));
 }
 
-void main_cache_name(void) {
+void get_cache_name(void) {
     struct stat file;
     char buffer[PATH_MAX];
 	int n;
