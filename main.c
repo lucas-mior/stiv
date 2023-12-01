@@ -19,14 +19,25 @@
 #include <stdlib.h>
 #include <Imlib2.h>
 
-typedef struct Options {
-    int32 w, h, H;
-    int32 x, y;
-    bool preview;
-    bool clear;
-    bool print_dim;
-    bool unused;
-} Options;
+typedef struct Terminal {
+    int width;
+    int height;
+    int height2;
+    int x;
+    int y;
+} Terminal;
+
+static Terminal terminal = {
+    .width = 100,
+    .height = HEIGHT_SHELL,
+    .height2 = -1,
+    .x = 0,
+    .y = 1,
+};
+
+static bool is_preview = true;
+static bool should_clear = false;
+static bool print_dimensions = true;
 
 typedef struct Image {
     char *basename;
@@ -35,28 +46,21 @@ typedef struct Image {
     int width, height;
 } Image;
 
+static Image image = {
+    .basename = NULL,
+    .fullpath = NULL,
+    .width = 0,
+    .height = 0,
+};
+
 extern int exit_code;
 int exit_code = EXIT_FAILURE;
 
 static void main_usage(FILE *) __attribute__((noreturn));
-static void main_cache_name(Image *);
-static void image_reduce_size(Image *, double);
+static void main_cache_name(void);
+static void image_reduce_size(double);
 
 int main(int argc, char *argv[]) {
-    Options options = {
-        .w = 100, .h = HEIGHT_SHELL, .H = -1,
-        .x = 0, .y = 1,
-        .preview = true,
-        .clear = false,
-        .print_dim = true,
-    };
-
-    Image image = {
-        .basename = NULL,
-        .fullpath = NULL,
-        .width = 0,
-        .height = 0,
-    };
     Number lines;
     Number columns;
 
@@ -72,34 +76,34 @@ int main(int argc, char *argv[]) {
     }
     if (argc >= 6) {
         // chamado por `lf > pistol > stiv`
-        options.w = util_string_int32(argv[2]);
-        options.h = util_string_int32(argv[3]) - 1;
-        options.x = util_string_int32(argv[4]);
-        options.y = util_string_int32(argv[5]) + 1;
-        options.y += 1; // tmux bugs lf's Y by 1
+        terminal.width = util_string_int32(argv[2]);
+        terminal.height = util_string_int32(argv[3]) - 1;
+        terminal.x = util_string_int32(argv[4]);
+        terminal.y = util_string_int32(argv[5]) + 1;
+        terminal.y += 1; // tmux bugs lf's Y by 1
 
-        options.w -= 2;
-        options.x += 2;
+        terminal.width -= 2;
+        terminal.x += 2;
         if (argc >= 7) {
-            options.print_dim = false;
-            options.y -= 1;
+            print_dimensions = false;
+            terminal.y -= 1;
         }
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > pistol > stiv`
-        options.w = util_string_int32(columns.string);
-        options.h = util_string_int32(lines.string);
+        terminal.width = util_string_int32(columns.string);
+        terminal.height = util_string_int32(lines.string);
 
-        options.x = options.w + (options.w % 2);
-        options.y = 1;
+        terminal.x = terminal.width + (terminal.width % 2);
+        terminal.y = 1;
     } else if ((columns.string = getenv("COLUMNS"))
             && (lines.string = getenv("LINES"))) {
         // chamado por `skim > pistol > stiv`
-        options.w = util_string_int32(columns.string);
-        options.h = util_string_int32(lines.string);
+        terminal.width = util_string_int32(columns.string);
+        terminal.height = util_string_int32(lines.string);
 
-        options.x = options.w + 1 + ((options.w + 1) % 2) + 1;
-        options.y = 1;
+        terminal.x = terminal.width + 1 + ((terminal.width + 1) % 2) + 1;
+        terminal.y = 1;
         exit_code = EXIT_SUCCESS; // skim won't print anything if we exit with an error
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
@@ -108,16 +112,16 @@ int main(int argc, char *argv[]) {
         columns.number = util_string_int32(columns.string);
         lines.number = util_string_int32(lines.string);
 
-        options.w = columns.number;
-        options.h = HEIGHT_SHELL;
-        options.x = 0;
-        options.y = cursor_getx();
+        terminal.width = columns.number;
+        terminal.height = HEIGHT_SHELL;
+        terminal.x = 0;
+        terminal.y = cursor_getx();
 
-        options.preview = false;
+        is_preview = false;
 
-        if (HEIGHT_SHELL > (lines.number - options.y)) {
-            options.y = 1;
-            options.clear = true;
+        if (HEIGHT_SHELL > (lines.number - terminal.y)) {
+            terminal.y = 1;
+            should_clear = true;
         }
     } else {
         main_usage(stderr);
@@ -136,25 +140,25 @@ int main(int argc, char *argv[]) {
         /* imlib_free_image_and_decache(); */
     }
 
-    if (options.print_dim)
+    if (print_dimensions)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
 
     if (image.width > MAX_IMG_WIDTH) {
-        main_cache_name(&image);
-        image_reduce_size(&image, CACHE_IMG_WIDTH);
+        main_cache_name();
+        image_reduce_size(CACHE_IMG_WIDTH);
     } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
-            main_cache_name(&image);
-            image_reduce_size(&image, CACHE_IMG_WIDTH);
+            main_cache_name();
+            image_reduce_size(CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
-        main_cache_name(&image);
-        image_reduce_size(&image, image.width);
+        main_cache_name();
+        image_reduce_size(image.width);
     }
 
     do {
@@ -172,14 +176,14 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (options.clear) {
+        if (should_clear) {
             printf("\033[2J\033[H"); // clear terminal and jump to first line
             printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                    image.width, image.height);
             clear_display(CLEAR_ALL);
         }
 
-        if (!options.preview) {
+        if (!is_preview) {
             char *aux;
             if (!(aux = basename(image.basename))) {
                 fprintf(stderr, "Error getting basename of %s: %s\n",
@@ -205,9 +209,9 @@ int main(int argc, char *argv[]) {
         fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
         fprintf(UEBERZUG_FIFO.file,
                 "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
-                options.x, options.y, options.w, options.h, image.fullpath);
+                terminal.x, terminal.y, terminal.width, terminal.height, image.fullpath);
 
-        if (!options.preview) {
+        if (!is_preview) {
             usize length;
             const char *suffix = ".drawed";
             printf("\n\n\n\n\n\n\n\n\n\n\n");
@@ -241,14 +245,14 @@ void main_usage(FILE *stream) {
     exit((int) (stream != stdout));
 }
 
-void main_cache_name(Image *image) {
+void main_cache_name(void) {
     struct stat file;
     char buffer[PATH_MAX];
 	int n;
 
-    if (stat(image->basename, &file) < 0) {
+    if (stat(image.basename, &file) < 0) {
         fprintf(stderr, "Error calling stat on %s: %s.",
-                        image->basename, strerror(errno));
+                        image.basename, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -259,11 +263,11 @@ void main_cache_name(Image *image) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
-    image->cachename = util_strdup(buffer);
+    image.cachename = util_strdup(buffer);
     return;
 }
 
-void image_reduce_size(Image *image, double new_width) {
+void image_reduce_size(double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 
@@ -282,14 +286,14 @@ void image_reduce_size(Image *image, double new_width) {
     }
 
     n = snprintf(buffer, sizeof (buffer), 
-                "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image->cachename, jpg);
+                "%s/%s/%s.%s", XDG_CACHE_HOME, previewer, image.cachename, jpg);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
-    image->fullpath = util_strdup(buffer);
+    image.fullpath = util_strdup(buffer);
 
-    if ((cache_img = fopen(image->fullpath, "r"))) {
+    if ((cache_img = fopen(image.fullpath, "r"))) {
         fclose(cache_img);
         return;
     }
@@ -297,14 +301,14 @@ void image_reduce_size(Image *image, double new_width) {
         Imlib_Image imlib_image;
         Imlib_Load_Error err;
 
-        double z = image->width / new_width;
-        new_height = round(((double) image->height / z));
+        double z = image.width / new_width;
+        new_height = round(((double) image.height / z));
 
-        imlib_image = imlib_load_image(image->basename);
+        imlib_image = imlib_load_image(image.basename);
         imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
         imlib_image = imlib_create_cropped_scaled_image(
-                      0, 0, image->width, image->height, 
+                      0, 0, image.width, image.height, 
                       (int) new_width, (int) new_height
                       );
         if (imlib_image == NULL)
@@ -318,7 +322,7 @@ void image_reduce_size(Image *image, double new_width) {
             imlib_image_set_format("jpg");
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
-        imlib_save_image_with_error_return(image->fullpath, &err);
+        imlib_save_image_with_error_return(image.fullpath, &err);
         if (err)
             goto dontcache;
 
@@ -326,10 +330,10 @@ void image_reduce_size(Image *image, double new_width) {
         return;
     } else {
         fprintf(stderr, "Error opening %s: %s\n",
-                        image->fullpath, strerror(errno));
+                        image.fullpath, strerror(errno));
     }
     dontcache:
-    free(image->fullpath);
-    image->fullpath = NULL;
+    free(image.fullpath);
+    image.fullpath = NULL;
     return;
 }
