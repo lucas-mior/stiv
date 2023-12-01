@@ -39,7 +39,6 @@ extern int exit_code;
 int exit_code = EXIT_FAILURE;
 
 static void main_usage(FILE *) __attribute__((noreturn));
-static void main_parse_args(Options *, int, char *[]);
 static void main_cache_name(Image *);
 static void image_reduce_size(Image *, double);
 
@@ -58,10 +57,71 @@ int main(int argc, char *argv[]) {
         .width = 0,
         .height = 0,
     };
+    Number lines;
+    Number columns;
 
     image.basename = argv[1];
 
-    main_parse_args(&options, argc, argv);
+
+    if (argc <= 2) {
+        clear_display(CLEAR_ALL);
+        exit(EXIT_FAILURE);
+    } else if (argc == 3) {
+        clear_display(CLEAR_PREVIEW);
+        exit(EXIT_FAILURE);
+    }
+    if (argc >= 6) {
+        // chamado por `lf > pistol > stiv`
+        options.w = util_string_int32(argv[2]);
+        options.h = util_string_int32(argv[3]) - 1;
+        options.x = util_string_int32(argv[4]);
+        options.y = util_string_int32(argv[5]) + 1;
+        options.y += 1; // tmux bugs lf's Y by 1
+
+        options.w -= 2;
+        options.x += 2;
+        if (argc >= 7) {
+            options.print_dim = false;
+            options.y -= 1;
+        }
+    } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
+            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
+        // chamado por `fzf > pistol > stiv`
+        options.w = util_string_int32(columns.string);
+        options.h = util_string_int32(lines.string);
+
+        options.x = options.w + (options.w % 2);
+        options.y = 1;
+    } else if ((columns.string = getenv("COLUMNS"))
+            && (lines.string = getenv("LINES"))) {
+        // chamado por `skim > pistol > stiv`
+        options.w = util_string_int32(columns.string);
+        options.h = util_string_int32(lines.string);
+
+        options.x = options.w + 1 + ((options.w + 1) % 2) + 1;
+        options.y = 1;
+        exit_code = EXIT_SUCCESS; // skim won't print anything if we exit with an error
+    } else if (argc == 4) {
+        // chamado por `zsh > stiv`
+        columns.string = argv[2];
+        lines.string = argv[3];
+        columns.number = util_string_int32(columns.string);
+        lines.number = util_string_int32(lines.string);
+
+        options.w = columns.number;
+        options.h = HEIGHT_SHELL;
+        options.x = 0;
+        options.y = cursor_getx();
+
+        options.preview = false;
+
+        if (HEIGHT_SHELL > (lines.number - options.y)) {
+            options.y = 1;
+            options.clear = true;
+        }
+    } else {
+        main_usage(stderr);
+    }
 
     {
         Imlib_Image imlib_image;
@@ -179,74 +239,6 @@ void main_usage(FILE *stream) {
     fprintf(stream, "Be sure to have ueberzug running in the terminal "
                     "and UEBERZUG_FIFO env variable set\n");
     exit((int) (stream != stdout));
-}
-
-void main_parse_args(Options *options, int argc, char *argv[]) {
-    Number lines;
-    Number columns;
-
-    if (argc <= 2) {
-        clear_display(CLEAR_ALL);
-        exit(EXIT_FAILURE);
-    } else if (argc == 3) {
-        clear_display(CLEAR_PREVIEW);
-        exit(EXIT_FAILURE);
-    }
-    if (argc >= 6) {
-        // chamado por `lf > pistol > stiv`
-        options->w = util_string_int32(argv[2]);
-        options->h = util_string_int32(argv[3]) - 1;
-        options->x = util_string_int32(argv[4]);
-        options->y = util_string_int32(argv[5]) + 1;
-        options->y += 1; // tmux bugs lf's Y by 1
-
-        options->w -= 2;
-        options->x += 2;
-        if (argc >= 7) {
-            options->print_dim = false;
-            options->y -= 1;
-        }
-    } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
-            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
-        // chamado por `fzf > pistol > stiv`
-        options->w = util_string_int32(columns.string);
-        options->h = util_string_int32(lines.string);
-
-        options->x = options->w + (options->w % 2);
-        options->y = 1;
-    } else if ((columns.string = getenv("COLUMNS"))
-            && (lines.string = getenv("LINES"))) {
-        // chamado por `skim > pistol > stiv`
-        options->w = util_string_int32(columns.string);
-        options->h = util_string_int32(lines.string);
-
-        options->x = options->w + 1 + ((options->w + 1) % 2) + 1;
-        options->y = 1;
-        exit_code = EXIT_SUCCESS; // skim won't print anything if we exit with an error
-    } else if (argc == 4) {
-        // chamado por `zsh > stiv`
-        columns.string = argv[2];
-        lines.string = argv[3];
-        columns.number = util_string_int32(columns.string);
-        lines.number = util_string_int32(lines.string);
-
-        options->w = columns.number;
-        options->h = HEIGHT_SHELL;
-        options->x = 0;
-        options->y = cursor_getx();
-
-        options->preview = false;
-
-        if (HEIGHT_SHELL > (lines.number - options->y)) {
-            options->y = 1;
-            options->clear = true;
-        }
-
-        return;
-    } else {
-        main_usage(stderr);
-    }
-    return;
 }
 
 void main_cache_name(Image *image) {
