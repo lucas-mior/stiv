@@ -18,6 +18,11 @@ CFLAGS += -std=c99 -D_DEFAULT_SOURCE
 release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage
 release: stiv
 
+clang: CC=clang
+clang: clean
+clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage
+clang: release
+
 debug: CFLAGS += -g -Weverything
 debug: clean
 debug: stiv
