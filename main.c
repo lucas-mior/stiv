@@ -51,8 +51,7 @@ static Image image = {
     .height = 0,
 };
 
-extern int exit_code;
-int exit_code = EXIT_FAILURE;
+static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
