@@ -41,7 +41,6 @@ int exit_code = EXIT_FAILURE;
 static void main_usage(FILE *) __attribute__((noreturn));
 static void main_parse_args(Options *, int, char *[]);
 static void main_cache_name(Image *);
-static void main_display_img(Image *, Options *);
 
 static void image_reduce_size(Image *image, double new_width) {
     FILE *cache_img;
@@ -167,7 +166,77 @@ int main(int argc, char *argv[]) {
         image_reduce_size(&image, image.width);
     }
 
-    main_display_img(&image, &options);
+    do {
+        char instance[20] = "preview";
+
+        File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+        File UEBERZUG_DRAWED = {.file = NULL, .fd = -1, .name = NULL};
+
+        if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
+            fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
+            break;
+        }
+        if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
+            fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+            break;
+        }
+
+        if (options.clear) {
+            printf("\033[2J\033[H"); // clear terminal and jump to first line
+            printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
+                   image.width, image.height);
+            clear_display(CLEAR_ALL);
+        }
+
+        if (!options.preview) {
+            char *aux;
+            if (!(aux = basename(image.basename))) {
+                fprintf(stderr, "Error getting basename of %s: %s\n",
+                                image.basename, strerror(errno));
+            } else {
+                int n;
+                srand((uint) time(NULL));
+                n = snprintf(instance, sizeof (instance), "%d%s", rand(), aux);
+                if (n < 0) {
+                    fprintf(stderr, "Error printing instance.\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        if (!(image.fullpath = realpath(image.basename, NULL))) {
+            fprintf(stderr, "Error getting realpath of %s: %s",
+                            image.fullpath, strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
+        fprintf(UEBERZUG_FIFO.file, 
+                "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
+        fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
+        fprintf(UEBERZUG_FIFO.file,
+                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
+                options.x, options.y, options.w, options.h, image.fullpath);
+
+        if (!options.preview) {
+            usize length;
+            const char *suffix = ".drawed";
+            printf("\n\n\n\n\n\n\n\n\n\n\n");
+            length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
+            UEBERZUG_DRAWED.name = util_realloc(NULL, length + 1); 
+            sprintf(UEBERZUG_DRAWED.name, "%s.drawed", UEBERZUG_FIFO.name);
+            if (!(UEBERZUG_DRAWED.file = fopen(UEBERZUG_DRAWED.name, "a"))) {
+                free(image.fullpath);
+                image.fullpath = NULL;
+                break;
+            }
+            fprintf(UEBERZUG_DRAWED.file, "%s\n", instance);
+        }
+
+        util_close(&UEBERZUG_FIFO);
+        util_close(&UEBERZUG_DRAWED);
+        free(image.fullpath);
+        image.fullpath = NULL;
+    } while (0);
+
     // it should return error so that programs will call it again to redraw
     exit(exit_code);
 }
@@ -246,78 +315,6 @@ void main_parse_args(Options *options, int argc, char *argv[]) {
     } else {
         main_usage(stderr);
     }
-    return;
-}
-
-void main_display_img(Image *image, Options *options) {
-    char instance[20] = "preview";
-
-    File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
-    File UEBERZUG_DRAWED = {.file = NULL, .fd = -1, .name = NULL};
-
-    if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-        fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
-        return;
-    }
-    if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
-        fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
-        return;
-    }
-
-    if (options->clear) {
-        printf("\033[2J\033[H"); // clear terminal and jump to first line
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
-               image->width, image->height);
-        clear_display(CLEAR_ALL);
-    }
-
-    if (!options->preview) {
-        char *aux;
-        if (!(aux = basename(image->basename))) {
-            fprintf(stderr, "Error getting basename of %s: %s\n",
-                            image->basename, strerror(errno));
-        } else {
-            int n;
-            srand((uint) time(NULL));
-            n = snprintf(instance, sizeof (instance), "%d%s", rand(), aux);
-			if (n < 0) {
-				fprintf(stderr, "Error printing instance.\n");
-				exit(EXIT_FAILURE);
-			}
-        }
-    }
-    if (!(image->fullpath = realpath(image->basename, NULL))) {
-        fprintf(stderr, "Error getting realpath of %s: %s",
-                        image->fullpath, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    fprintf(UEBERZUG_FIFO.file, 
-            "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
-    fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
-    fprintf(UEBERZUG_FIFO.file,
-            "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n", 
-            options->x, options->y, options->w, options->h, image->fullpath);
-
-    if (!options->preview) {
-        usize length;
-        const char *suffix = ".drawed";
-        printf("\n\n\n\n\n\n\n\n\n\n\n");
-        length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
-        UEBERZUG_DRAWED.name = util_realloc(NULL, length + 1); 
-        sprintf(UEBERZUG_DRAWED.name, "%s.drawed", UEBERZUG_FIFO.name);
-        if (!(UEBERZUG_DRAWED.file = fopen(UEBERZUG_DRAWED.name, "a"))) {
-            free(image->fullpath);
-            image->fullpath = NULL;
-            return;
-        }
-        fprintf(UEBERZUG_DRAWED.file, "%s\n", instance);
-    }
-
-    util_close(&UEBERZUG_FIFO);
-    util_close(&UEBERZUG_DRAWED);
-    free(image->fullpath);
-    image->fullpath = NULL;
     return;
 }
 
