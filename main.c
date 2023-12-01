@@ -171,7 +171,8 @@ int main(int argc, char *argv[]) {
             break;
         }
         if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
-            fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+            fprintf(stderr, "Error opening %s: %s",
+                            UEBERZUG_FIFO.name, strerror(errno));
             break;
         }
 
