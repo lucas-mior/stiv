@@ -19,13 +19,11 @@ release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage
 release: stiv
 
 clang: CC=clang
-clang: clean
+clang: clean release
 clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage
-clang: release
 
 debug: CFLAGS += -g -Weverything
-debug: clean
-debug: stiv
+debug: clean stiv
 
 .PHONY: all clean install uninstall
 .SUFFIXES:
