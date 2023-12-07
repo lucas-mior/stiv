@@ -17,7 +17,8 @@
 
 #include "stiv.h"
 
-void clear_display(int clear_option) {
+void
+clear_display(int clear_option) {
     File UEBERZUG_FIFO = {
         .file = NULL,
         .fd = -1,

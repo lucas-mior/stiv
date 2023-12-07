@@ -235,7 +235,8 @@ int main(int argc, char *argv[]) {
     exit(exit_code);
 }
 
-void usage(FILE *stream) {
+void
+usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "       stiv -h | --help\n");
     fprintf(stream, "       stiv -c | --clear 0 | 1\n");
@@ -244,7 +245,8 @@ void usage(FILE *stream) {
     exit((int) (stream != stdout));
 }
 
-void get_cache_name(void) {
+void
+get_cache_name(void) {
     struct stat file;
     char buffer[PATH_MAX];
 	int n;
@@ -266,7 +268,8 @@ void get_cache_name(void) {
     return;
 }
 
-void reduce_image_size(double new_width) {
+void
+reduce_image_size(double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 

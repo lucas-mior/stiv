@@ -21,7 +21,8 @@ static int cursor_eread(const int);
 static int cursor_current_tty(void);
 static int cursor_position(const int, int *const, int *const);
 
-int cursor_eread(const int fd) {
+int
+cursor_eread(const int fd) {
     uchar buffer;
     isize n;
 
@@ -31,7 +32,8 @@ int cursor_eread(const int fd) {
         return buffer;
 }
 
-int cursor_current_tty(void) {
+int
+cursor_current_tty(void) {
     const char *dev;
     int fd;
 
@@ -54,7 +56,8 @@ int cursor_current_tty(void) {
     return fd;
 }
 
-int cursor_position(const int tty, int *const rowptr, int *const colptr) {
+int
+cursor_position(const int tty, int *const rowptr, int *const colptr) {
     struct termios saved, temporary;
     int retval, result, rows, cols, saved_errno;
 
@@ -155,7 +158,8 @@ int cursor_position(const int tty, int *const rowptr, int *const colptr) {
     return retval;
 }
 
-int cursor_getx(void) {
+int
+cursor_getx(void) {
     int fd;
     int row = 0;
     int col = 0;

@@ -17,7 +17,8 @@
 
 #include "stiv.h"
 
-int32 util_string_int32(const char *string) {
+int32
+util_string_int32(const char *string) {
     char *endptr;
 	const int base = 10;	
     long x;
@@ -33,7 +34,8 @@ int32 util_string_int32(const char *string) {
     return (int32) x;
 }
 
-void *util_malloc(const usize size) {
+void *
+util_malloc(const usize size) {
     void *p;
     if ((p = malloc(size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
@@ -42,7 +44,8 @@ void *util_malloc(const usize size) {
     return p;
 }
 
-char *util_strdup(const char *str) {
+char *
+util_strdup(const char *str) {
     void *p;
     size_t size = strlen(str) + 1;
 
@@ -55,7 +58,8 @@ char *util_strdup(const char *str) {
     return p;
 }
 
-void *util_realloc(void *old, const usize size) {
+void *
+util_realloc(void *old, const usize size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
@@ -65,7 +69,8 @@ void *util_realloc(void *old, const usize size) {
     return p;
 }
 
-void *util_calloc(const usize nmemb, const usize size) {
+void *
+util_calloc(const usize nmemb, const usize size) {
     void *p;
     if ((p = calloc(nmemb, size)) == NULL) {
         fprintf(stderr, "Failed to allocate %zu members of %zu bytes each.\n",
@@ -75,7 +80,8 @@ void *util_calloc(const usize nmemb, const usize size) {
     return p;
 }
 
-bool ends_with(const char *str, const char *end) {
+bool
+ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');
     usize length = 0;
     if (ldot != NULL) {
@@ -85,7 +91,8 @@ bool ends_with(const char *str, const char *end) {
     return false;
 }
 
-void util_close(File *f) {
+void
+util_close(File *f) {
     if (f->fd >= 0) {
         if (close(f->fd) < 0)
             fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
@@ -99,7 +106,8 @@ void util_close(File *f) {
     return;
 }
 
-bool util_open(File *f, const int flag) {
+bool
+util_open(File *f, const int flag) {
     if ((f->fd = open(f->name, flag)) < 0) {
         fprintf(stderr, "Error opening %s: %s\n", f->name, strerror(errno));
         return false;
