@@ -10,7 +10,7 @@ CC=clang
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
 
-src = main.c util.c cursor.c clear.c
+src = main.c util.c
 
 all: release
 
@@ -29,10 +29,11 @@ debug: clean stiv
 .SUFFIXES:
 .SUFFIXES: .c .o
 
-stiv: $(src) Makefile stiv.h
+stiv: $(src) Makefile stiv.h clear.c
 	ctags --kinds-C=+l *.h *.c
 	vtags.sed tags > .tags.vim
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(src) $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o stiv_clear clear.c $(ldlibs)
 
 clean:
 	rm -f *.o stiv
@@ -40,10 +41,12 @@ clean:
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	rm -f $(DESTDIR)$(PREFIX)/bin/stiv
+	rm -f $(DESTDIR)$(PREFIX)/bin/stiv_clear
 	cp stiv $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/stiv
+	cp stiv_clear $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/stiv_clear
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
-	sed 's!PREFIX!$(PREFIX)!g; s!VERSION!$(version)!g' stiv.1 > $(DESTDIR)$(MANPREFIX)/man1/stiv.1
 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/stiv.1
 
 uninstall:

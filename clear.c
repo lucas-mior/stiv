@@ -17,57 +17,75 @@
 
 #include "stiv.h"
 
-void
-clear_display(int clear_option) {
+static int is_image(char *);
+
+int
+is_image(char *filename) {
+    do {
+        magic_t magic;
+        const char *mime_type;
+        if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
+            break;
+        }
+        if (magic_load(magic, NULL) != 0) {
+            magic_close(magic);
+            break;
+        }
+
+        if ((mime_type = magic_file(magic, filename)) == NULL) {
+            magic_close(magic);
+            break;
+        }
+        if (!strncmp(mime_type, "image/", 6)) {
+            magic_close(magic);
+            return true;
+        } else if (!strncmp(mime_type, "application/pdf", 6)) {
+            magic_close(magic);
+            return true;
+        }
+        magic_close(magic);
+    } while (0);
+
+    return false;
+}
+
+int
+main(int argc, char **argv) {
     File UEBERZUG_FIFO = {
         .file = NULL,
         .fd = -1,
         .name = NULL
     };
-    File ueberzug_drawed = {
-        .file = NULL,
-        .fd = -1,
-        .name = NULL
-    };
-    const char *suffix = ".drawed";
-    usize length;
-    char line[PATH_MAX];
+    char *last_filename = NULL;
+    char *next_filename = NULL;
+
+    if (argc >= 7) {
+        last_filename = argv[1];
+        next_filename = argv[6];
+    }
+
+    if (last_filename && next_filename) {
+        if (!is_image(last_filename)) {
+            fprintf(stderr, "Last file was not image\n");
+            exit(EXIT_SUCCESS);
+        }
+        if (is_image(next_filename)) {
+            fprintf(stderr, "Next file is image\n");
+            exit(EXIT_SUCCESS);
+        }
+    }
+
 
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
-        return;
+        return 0;
     }
     if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
         fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
-        return;
+        return 0;
     }
 
-    switch (clear_option) {
-    case CLEAR_DEFAULT:
-        fprintf(UEBERZUG_FIFO.file, "{\"action\": \"remove\"}\n");
-        break;
-    case CLEAR_ALL:
-        length = strlen(UEBERZUG_FIFO.name) + strlen(suffix);
-        ueberzug_drawed.name = util_realloc(NULL, length + 1); 
-        sprintf(ueberzug_drawed.name, "%s.drawed", UEBERZUG_FIFO.name);
-        if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "r"))) {
-            while (fgets(line, sizeof (line), ueberzug_drawed.file)) {
-                line[strcspn(line, "\n")] = 0;
-                fprintf(UEBERZUG_FIFO.file,
-                        "{\"action\": \"remove\", \"identifier\": \"%s\"}\n", line);
-            }
-            util_close(&ueberzug_drawed);
-        }
-        // clean the file
-        if ((ueberzug_drawed.file = fopen(ueberzug_drawed.name, "w")))
-            util_close(&ueberzug_drawed);
-    __attribute__((fallthrough));
-    case CLEAR_PREVIEW:
-    default:
-        fprintf(UEBERZUG_FIFO.file,
-                "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
-        break;
-    }
+    fprintf(UEBERZUG_FIFO.file, "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
     fclose(UEBERZUG_FIFO.file);
-    return;
+    return 0;
 }
