@@ -87,7 +87,6 @@ main(int argc, char **argv) {
         }
     }
 
-
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return 0;
