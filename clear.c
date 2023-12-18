@@ -18,6 +18,12 @@
 #include "stiv.h"
 
 static int is_image(char *);
+static int literal_match(const char *, char *);
+
+int literal_match(const char *mime, char *literal) {
+    size_t n = strlen(literal);
+    return strncmp(literal, mime, n);
+}
 
 int
 is_image(char *filename) {
@@ -36,10 +42,16 @@ is_image(char *filename) {
             magic_close(magic);
             break;
         }
-        if (!strncmp(mime_type, "image/", 6)) {
+        if (!literal_match(mime_type, "image/")) {
             magic_close(magic);
             return true;
-        } else if (!strncmp(mime_type, "application/pdf", 6)) {
+        } else if (!literal_match(mime_type, "application/pdf")) {
+            magic_close(magic);
+            return true;
+        } else if (!literal_match(mime_type, "audio/")) {
+            magic_close(magic);
+            return true;
+        } else if (!literal_match(mime_type, "video/")) {
             magic_close(magic);
             return true;
         }
@@ -66,11 +78,11 @@ main(int argc, char **argv) {
 
     if (last_filename && next_filename) {
         if (!is_image(last_filename)) {
-            fprintf(stderr, "Last file was not image\n");
+            fprintf(stderr, "Last file was not image: %s\n", last_filename);
             exit(EXIT_SUCCESS);
         }
         if (is_image(next_filename)) {
-            fprintf(stderr, "Next file is image\n");
+            fprintf(stderr, "Next file is an image: %s\n", next_filename);
             exit(EXIT_SUCCESS);
         }
     }
