@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
             break;
         }
-        if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
+        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK)) < 0) {
             fprintf(stderr, "Error opening %s: %s",
                             UEBERZUG_FIFO.name, strerror(errno));
             break;
@@ -164,10 +164,10 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        fprintf(UEBERZUG_FIFO.file,
+        dprintf(UEBERZUG_FIFO.fd,
                 "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
-        fprintf(UEBERZUG_FIFO.file, "\"scaler\": \"fit_contain\",");
-        fprintf(UEBERZUG_FIFO.file,
+        dprintf(UEBERZUG_FIFO.fd, "\"scaler\": \"fit_contain\",");
+        dprintf(UEBERZUG_FIFO.fd,
                 "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n",
                 terminal.x, terminal.y, terminal.width, terminal.height, image.fullpath);
 
