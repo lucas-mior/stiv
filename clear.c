@@ -80,12 +80,12 @@ main(int argc, char **argv) {
         fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
         return 0;
     }
-    if ((UEBERZUG_FIFO.file = fopen(UEBERZUG_FIFO.name, "w")) == NULL) {
+    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK)) < 0) {
         fprintf(stderr, "Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
         return 0;
     }
 
-    fprintf(UEBERZUG_FIFO.file, "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
-    fclose(UEBERZUG_FIFO.file);
+    dprintf(UEBERZUG_FIFO.fd, "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
+    close(UEBERZUG_FIFO.fd);
     return 0;
 }
