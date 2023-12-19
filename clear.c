@@ -72,8 +72,8 @@ main(int argc, char **argv) {
     char *next_filename = NULL;
 
     if (argc >= 7) {
-        last_filename = argv[1];
-        next_filename = argv[6];
+        last_filename = realpath(argv[1], NULL);
+        next_filename = realpath(argv[6], NULL);
     }
 
     if (last_filename && next_filename) {
