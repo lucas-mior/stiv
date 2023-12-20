@@ -147,18 +147,18 @@ int main(int argc, char *argv[]) {
         File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
         if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-            fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
+            fprintf(stderr, "stiv: UEBERZUG_FIFO environment variable is not set.\n");
             break;
         }
         if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
                                      O_WRONLY | O_NONBLOCK)) < 0) {
-            fprintf(stderr, "Error opening %s: %s",
+            fprintf(stderr, "stiv: Error opening %s: %s",
                             UEBERZUG_FIFO.name, strerror(errno));
             break;
         }
 
         if (!(image.fullpath = realpath(image.basename, NULL))) {
-            fprintf(stderr, "Error getting realpath of %s: %s",
+            fprintf(stderr, "stiv: Error getting realpath of %s: %s",
                             image.fullpath, strerror(errno));
             exit(EXIT_FAILURE);
         }
@@ -194,7 +194,7 @@ get_cache_name(void) {
 	int n;
 
     if (stat(image.basename, &file) < 0) {
-        fprintf(stderr, "Error calling stat on %s: %s.",
+        fprintf(stderr, "stiv: Error calling stat on %s: %s.",
                         image.basename, strerror(errno));
         exit(EXIT_FAILURE);
     }

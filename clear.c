@@ -78,22 +78,22 @@ main(int argc, char **argv) {
 
     if (last_filename && next_filename) {
         if (!is_image(last_filename)) {
-            fprintf(stderr, "Last file was not image: %s\n", last_filename);
+            fprintf(stderr, "stiv_clear: Last file was not image: %s\n", last_filename);
             exit(EXIT_SUCCESS);
         }
         if (is_image(next_filename)) {
-            fprintf(stderr, "Next file is an image: %s\n", next_filename);
+            fprintf(stderr, "stiv_clear: Next file is an image: %s\n", next_filename);
             exit(EXIT_SUCCESS);
         }
     }
 
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-        fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
+        fprintf(stderr, "stiv_clear: UEBERZUG_FIFO environment variable is not set.\n");
         exit(EXIT_FAILURE);
     }
     if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
                                  O_WRONLY | O_NONBLOCK)) < 0) {
-        fprintf(stderr, "Error opening %s: %s",
+        fprintf(stderr, "stiv_clear: Error opening %s: %s",
                         UEBERZUG_FIFO.name, strerror(errno));
         exit(EXIT_FAILURE);
     }
