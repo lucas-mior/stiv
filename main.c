@@ -144,8 +144,6 @@ int main(int argc, char *argv[]) {
     }
 
     do {
-        char *instance = "preview";
-
         File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
         if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
@@ -166,9 +164,8 @@ int main(int argc, char *argv[]) {
         }
 
         dprintf(UEBERZUG_FIFO.fd,
-                "{\"action\": \"add\", \"identifier\": \"%s\",", instance);
-        dprintf(UEBERZUG_FIFO.fd, "\"scaler\": \"fit_contain\",");
-        dprintf(UEBERZUG_FIFO.fd,
+                "{\"action\": \"add\", \"identifier\": \"preview\","
+                "\"scaler\": \"fit_contain\","
                 "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n",
                 terminal.x, terminal.y, terminal.width, terminal.height, image.fullpath);
 
