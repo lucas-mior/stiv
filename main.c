@@ -215,7 +215,7 @@ reduce_image_size(double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 
-    const char *previewer = "previewer/stiv";
+    const char *preview = "preview/stiv";
     char buffer[PATH_MAX];
 	int n;
 
@@ -229,7 +229,7 @@ reduce_image_size(double new_width) {
     }
 
     n = snprintf(buffer, sizeof (buffer),
-                 "%s/%s/%s.jpg", XDG_CACHE_HOME, previewer, image.cachename);
+                 "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
 	if (n < 0) {
 		fprintf(stderr, "Error printing cache name.\n");
 		exit(EXIT_FAILURE);

@@ -29,11 +29,12 @@ debug: clean stiv
 .SUFFIXES:
 .SUFFIXES: .c .o
 
-stiv: $(src) Makefile stiv.h clear.c
+stiv: $(src) Makefile stiv.h clear.c fifo_write_nonblock.c
 	ctags --kinds-C=+l *.h *.c
 	vtags.sed tags > .tags.vim
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(src) $(ldlibs)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o stiv_clear clear.c $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o fifo_write_nonblock fifo_write_nonblock.c $(ldlibs)
 
 clean:
 	rm -f *.o stiv
@@ -46,6 +47,8 @@ install: all
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/stiv
 	cp stiv_clear $(DESTDIR)$(PREFIX)/bin/
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/stiv_clear
+	cp fifo_write_nonblock $(DESTDIR)$(PREFIX)/bin/
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/fifo_write_nonblock
 	mkdir -p $(DESTDIR)$(MANPREFIX)/man1
 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/stiv.1
 
