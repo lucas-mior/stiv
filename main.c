@@ -166,8 +166,9 @@ int main(int argc, char *argv[]) {
         dprintf(UEBERZUG_FIFO.fd,
                 "{\"action\": \"add\", \"identifier\": \"preview\","
                 "\"scaler\": \"fit_contain\","
-                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u, \"path\": \"%s\"}\n",
-                terminal.x, terminal.y, terminal.width, terminal.height, image.fullpath);
+                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u,",
+                terminal.x, terminal.y, terminal.width, terminal.height);
+        dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
         util_close(&UEBERZUG_FIFO);
         free(image.fullpath);
