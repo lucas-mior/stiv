@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
     }
 
     do {
-        char instance[20] = "preview";
+        char *instance = "preview";
 
         File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
@@ -152,7 +152,8 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "UEBERZUG_FIFO environment variable is not set.\n");
             break;
         }
-        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK)) < 0) {
+        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
+                                     O_WRONLY | O_NONBLOCK)) < 0) {
             fprintf(stderr, "Error opening %s: %s",
                             UEBERZUG_FIFO.name, strerror(errno));
             break;
@@ -183,8 +184,6 @@ int main(int argc, char *argv[]) {
 void
 usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
-    fprintf(stream, "       stiv -h | --help\n");
-    fprintf(stream, "       stiv -c | --clear 0 | 1\n");
     fprintf(stream, "Be sure to have ueberzug running in the terminal "
                     "and UEBERZUG_FIFO env variable set\n");
     exit((int) (stream != stdout));
