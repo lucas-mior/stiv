@@ -253,21 +253,10 @@ get_cache_name(void) {
 		exit(EXIT_FAILURE);
 	}
     image.cachename = util_strdup(buffer);
-    return;
-}
 
-void
-cache_image(double new_width) {
-    FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 
     const char *preview = "preview/stiv";
-    char buffer[PATH_MAX];
-	int n;
-
-    double new_height;
-    if (new_width > MAX_IMG_WIDTH)
-        new_width = CACHE_IMG_WIDTH;
 
     if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
         error("XDG_CACHE_HOME is not set. Exiting...\n");
@@ -281,7 +270,12 @@ cache_image(double new_width) {
 		exit(EXIT_FAILURE);
 	}
     image.fullpath = util_strdup(buffer);
+    return;
+}
 
+void
+cache_image(double new_width) {
+    FILE *cache_img;
     if ((cache_img = fopen(image.fullpath, "r"))) {
         fclose(cache_img);
         return;
@@ -289,6 +283,9 @@ cache_image(double new_width) {
     if (errno == ENOENT) {
         Imlib_Image imlib_image;
         Imlib_Load_Error err;
+        double new_height;
+        if (new_width > MAX_IMG_WIDTH)
+            new_width = CACHE_IMG_WIDTH;
 
         double z = image.width / new_width;
         new_height = round(((double) image.height / z));
