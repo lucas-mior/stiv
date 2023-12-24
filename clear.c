@@ -17,12 +17,52 @@
 
 #include "stiv.h"
 
-static int is_image(char *);
-static int literal_match(const char *, char *);
+char *program;
 
-int literal_match(const char *mime, char *literal) {
-    size_t n = strlen(literal);
-    return strncmp(literal, mime, n);
+static int is_image(char *);
+static inline int literal_match(const char *, char *);
+
+int
+main(int argc, char **argv) {
+    File UEBERZUG_FIFO = {
+        .file = NULL,
+        .fd = -1,
+        .name = NULL
+    };
+    char *last_filename = NULL;
+    char *next_filename = NULL;
+    program = basename(argv[0]);
+
+    if (argc >= 7) {
+        last_filename = realpath(argv[1], NULL);
+        next_filename = realpath(argv[6], NULL);
+    }
+
+    if (last_filename && next_filename) {
+        if (!is_image(last_filename)) {
+            error("Last file was not image: %s\n", last_filename);
+            exit(EXIT_SUCCESS);
+        }
+        if (is_image(next_filename)) {
+            error("Next file is an image: %s\n", next_filename);
+            exit(EXIT_SUCCESS);
+        }
+    }
+
+    if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
+        error("UEBERZUG_FIFO environment variable is not set.\n");
+        exit(EXIT_FAILURE);
+    }
+    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
+                                 O_WRONLY | O_NONBLOCK)) < 0) {
+        error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    dprintf(UEBERZUG_FIFO.fd,
+            "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
+    close(UEBERZUG_FIFO.fd);
+    exit(EXIT_SUCCESS);
 }
 
 int
@@ -61,45 +101,7 @@ is_image(char *filename) {
     return false;
 }
 
-int
-main(int argc, char **argv) {
-    File UEBERZUG_FIFO = {
-        .file = NULL,
-        .fd = -1,
-        .name = NULL
-    };
-    char *last_filename = NULL;
-    char *next_filename = NULL;
-
-    if (argc >= 7) {
-        last_filename = realpath(argv[1], NULL);
-        next_filename = realpath(argv[6], NULL);
-    }
-
-    if (last_filename && next_filename) {
-        if (!is_image(last_filename)) {
-            fprintf(stderr, "stiv_clear: Last file was not image: %s\n", last_filename);
-            exit(EXIT_SUCCESS);
-        }
-        if (is_image(next_filename)) {
-            fprintf(stderr, "stiv_clear: Next file is an image: %s\n", next_filename);
-            exit(EXIT_SUCCESS);
-        }
-    }
-
-    if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-        fprintf(stderr, "stiv_clear: UEBERZUG_FIFO environment variable is not set.\n");
-        exit(EXIT_FAILURE);
-    }
-    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
-                                 O_WRONLY | O_NONBLOCK)) < 0) {
-        fprintf(stderr, "stiv_clear: Error opening %s: %s",
-                        UEBERZUG_FIFO.name, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    dprintf(UEBERZUG_FIFO.fd,
-            "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
-    close(UEBERZUG_FIFO.fd);
-    exit(EXIT_SUCCESS);
+int literal_match(const char *mime, char *literal) {
+    size_t n = strlen(literal);
+    return strncmp(literal, mime, n);
 }
