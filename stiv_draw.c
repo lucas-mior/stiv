@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         } else {
             do {
                 Imlib_Image imlib_image;
-                ExifData *ed;
+                ExifData *exif_data;
                 ExifEntry *entry;
                 ExifByteOrder byte_order;
                 int orientation = 0;
@@ -89,16 +89,17 @@ int main(int argc, char *argv[]) {
                 imlib_context_set_image(imlib_image);
                 imlib_image_set_changes_on_disk();
 
-                if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
+                if ((exif_data = exif_data_new_from_file(image.basename)) == NULL) {
                     needs_rotation = false;
                     break;
                 }
-                byte_order = exif_data_get_byte_order(ed);
-                entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+                byte_order = exif_data_get_byte_order(exif_data);
+                entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
+                                               EXIF_TAG_ORIENTATION);
                 if (entry)
                     orientation = exif_get_short(entry->data, byte_order);
 
-                exif_data_unref(ed);
+                exif_data_unref(exif_data);
 
                 switch (orientation) {
                 case 3:
@@ -230,8 +231,7 @@ int main(int argc, char *argv[]) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
                 error("Error getting realpath of %s: %s",
                       image.fullpath, strerror(errno));
-                dprintf(UEBERZUG_FIFO.fd,
-                        "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
+                dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
                 util_close(&UEBERZUG_FIFO);
                 break;
             }

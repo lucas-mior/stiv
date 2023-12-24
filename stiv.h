@@ -90,4 +90,6 @@ void util_close(File *);
 bool util_open(File *, const int);
 void error(char *, ...);
 
+#define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
+
 #endif /* STIV_H */
