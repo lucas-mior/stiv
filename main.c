@@ -303,8 +303,10 @@ cache_image(double new_width) {
                       0, 0, image.width, image.height,
                       (int) new_width, (int) new_height
                       );
-        if (imlib_image == NULL)
+        if (imlib_image == NULL) {
+            fprintf(stderr, "Error in imlib_create_cropped_scaled_image()\n");
             goto dontcache;
+        }
 
         imlib_context_set_image(imlib_image);
 
