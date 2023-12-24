@@ -55,7 +55,7 @@ static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
-static void cache_image(double);
+static int cache_image(double);
 char *program;
 
 int main(int argc, char *argv[]) {
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool needs_rotation = true;
     bool cache = false;
-    program = argv[0];
+    program = basename(argv[0]);
 
     image.basename = argv[1];
 
@@ -117,6 +117,9 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
+    if (cache)
+        exit(EXIT_FAILURE);
+
     get_cache_name();
 
     FILE *cache_img;
@@ -169,18 +172,25 @@ int main(int argc, char *argv[]) {
             image.height = imlib_image_get_height();
 
             if (needs_rotation) {
-                cache_image(MIN(image.width, CACHE_IMG_WIDTH));
+                if (cache_image(MIN(image.width, CACHE_IMG_WIDTH)) < 0)
+                    image.fullpath = NULL;
             } else if (image.width > MAX_IMG_WIDTH) {
-                cache_image(CACHE_IMG_WIDTH);
+                if (cache_image(CACHE_IMG_WIDTH) < 0)
+                    image.fullpath = NULL;
             } else if (image.width > MAX_PNG_WIDTH) {
                 magic_t my_magic;
                 my_magic = magic_open(MAGIC_MIME_TYPE);
                 magic_load(my_magic, NULL);
-                if (!strcmp(magic_file(my_magic, image.basename), "image/png"))
-                    cache_image(CACHE_IMG_WIDTH);
+                if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
+                    if (cache_image(CACHE_IMG_WIDTH) < 0)
+                        image.fullpath = NULL;
+                }
                 magic_close(my_magic);
             } else if (ends_with(image.basename, "ff")) {
-                cache_image(MIN(image.width, CACHE_IMG_WIDTH));
+                if (cache_image(MIN(image.width, CACHE_IMG_WIDTH)) < 0)
+                    image.fullpath = NULL;
+            } else {
+                image.fullpath = NULL;
             }
         }
     }
@@ -188,6 +198,8 @@ int main(int argc, char *argv[]) {
     if (cache)
         exit(EXIT_FAILURE);
 
+    image.width = imlib_image_get_width();
+    image.height = imlib_image_get_height();
     if (print_dimensions) {
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
@@ -279,7 +291,7 @@ get_cache_name(void) {
     return;
 }
 
-void
+int
 cache_image(double new_width) {
     Imlib_Image imlib_image;
     Imlib_Load_Error err;
@@ -298,7 +310,7 @@ cache_image(double new_width) {
                   );
     if (imlib_image == NULL) {
         error("Error in imlib_create_cropped_scaled_image()\n");
-        goto dontcache;
+        return -1;
     }
 
     imlib_context_set_image(imlib_image);
@@ -312,14 +324,9 @@ cache_image(double new_width) {
     imlib_save_image_with_error_return(image.fullpath, &err);
     if (err) {
         error("Error caching image %s: %d\n", image.basename, err);
-        goto dontcache;
+        return -1;
     }
 
     imlib_free_image_and_decache();
-    return;
-
-    dontcache:
-    free(image.fullpath);
-    image.fullpath = NULL;
-    return;
+    return 0;
 }

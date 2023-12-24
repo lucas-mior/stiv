@@ -132,22 +132,22 @@ void error(char *format, ...) {
     buffer[n] = '\0';
     (void) write(STDERR_FILENO, buffer, (usize) n);
 
-#ifdef DEBUGGING
+/* #ifdef DEBUGGING */
     switch (fork()) {
-        char *notifiers[2] = { "dunstify", "notify-send" };
         case -1:
             fprintf(stderr, "Error forking: %s\n", strerror(errno));
             break;
-        case 0:
-            for (uint i = 0; i < LENGTH(notifiers); i += 1) {
+        case 0: {
+            char *notifiers[2] = { "dunstify", "notify-send" };
+            for (uint i = 0; i < 2; i += 1) {
                 execlp(notifiers[i], notifiers[i], "-u", "critical", 
                                      program, buffer, NULL);
             }
             fprintf(stderr, "Error trying to exec dunstify.\n");
             break;
+        }
         default:
             break;
     }
-    exit(EXIT_FAILURE);
-#endif
+/* #endif */
 }
