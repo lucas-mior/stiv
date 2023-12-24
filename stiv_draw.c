@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
         bool needs_rotation;
+        int new_width = 0;
 
         if (errno != ENOENT) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
@@ -87,24 +88,23 @@ int main(int argc, char *argv[]) {
             image.height = imlib_image_get_height();
 
             if (needs_rotation) {
-                if (cache_image(MIN(image.width, CACHE_IMG_WIDTH)) < 0)
-                    image.fullpath = NULL;
+                new_width = MIN(image.width, CACHE_IMG_WIDTH);
             } else if (image.width > MAX_IMG_WIDTH) {
-                if (cache_image(CACHE_IMG_WIDTH) < 0)
-                    image.fullpath = NULL;
+                new_width = CACHE_IMG_WIDTH;
             } else if (image.width > MAX_PNG_WIDTH) {
                 magic_t magic;
                 magic = magic_open(MAGIC_MIME_TYPE);
                 magic_load(magic, NULL);
-                if (!strcmp(magic_file(magic, image.basename), "image/png")) {
-                    if (cache_image(CACHE_IMG_WIDTH) < 0)
-                        image.fullpath = NULL;
-                } else {
-                    image.fullpath = NULL;
-                }
+                if (!strcmp(magic_file(magic, image.basename), "image/png"))
+                    new_width = CACHE_IMG_WIDTH;
+
                 magic_close(magic);
             } else if (ends_with(image.basename, "ff")) {
-                if (cache_image(MIN(image.width, CACHE_IMG_WIDTH)) < 0)
+                new_width = MIN(image.width, CACHE_IMG_WIDTH);
+            }
+
+            if (new_width != 0) {
+                if (cache_image(new_width) < 0)
                     image.fullpath = NULL;
             } else {
                 image.fullpath = NULL;
