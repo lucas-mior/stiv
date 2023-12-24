@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
 
     if (needs_rotation) {
         get_cache_name();
-        cache_image(MIN(image.width, MAX_IMG_WIDTH));
+        cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     } else if (image.width > MAX_IMG_WIDTH) {
         get_cache_name();
         cache_image(CACHE_IMG_WIDTH);
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
         get_cache_name();
-        cache_image(MIN(image.width, MAX_IMG_WIDTH));
+        cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     }
 
     if (cache)
