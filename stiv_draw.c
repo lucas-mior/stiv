@@ -128,16 +128,16 @@ int main(int argc, char *argv[]) {
                 if (cache_image(CACHE_IMG_WIDTH) < 0)
                     image.fullpath = NULL;
             } else if (image.width > MAX_PNG_WIDTH) {
-                magic_t my_magic;
-                my_magic = magic_open(MAGIC_MIME_TYPE);
-                magic_load(my_magic, NULL);
-                if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
+                magic_t magic;
+                magic = magic_open(MAGIC_MIME_TYPE);
+                magic_load(magic, NULL);
+                if (!strcmp(magic_file(magic, image.basename), "image/png")) {
                     if (cache_image(CACHE_IMG_WIDTH) < 0)
                         image.fullpath = NULL;
                 } else {
                     image.fullpath = NULL;
                 }
-                magic_close(my_magic);
+                magic_close(magic);
             } else if (ends_with(image.basename, "ff")) {
                 if (cache_image(MIN(image.width, CACHE_IMG_WIDTH)) < 0)
                     image.fullpath = NULL;
