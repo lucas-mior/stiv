@@ -16,19 +16,21 @@
  */
 
 #include "stiv.h"
+char *program;
 
 int
 main(int argc, char **argv) {
     int fd;
     char *fifo = argv[argc - 1];
+    program = argv[0];
+
     if (argc < 3) {
-        fprintf(stderr, "fifo_write_nonblock: minimum 3 arguments.\n");
+        error("Minimum 3 arguments.\n");
         exit(EXIT_FAILURE);
     }
 
     if ((fd = open(fifo, O_WRONLY | O_NONBLOCK)) < 0) {
-        fprintf(stderr, "fifo_write_nonblock: Error opening %s: %s",
-                        fifo, strerror(errno));
+        error("Error opening %s: %s", fifo, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
