@@ -42,10 +42,10 @@ bin/stiv_draw: $(depends) stiv_draw.c
 	-vtags.sed tags > .tags.vim
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c bin/util.o $(ldlibs)
 
-bin/stiv_clear: $(depends) stiv_draw.c
+bin/stiv_clear: $(depends) stiv_clear.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_clear.c bin/util.o $(ldlibs)
 
-bin/fifo_write_nonblock: $(depends) stiv_draw.c
+bin/fifo_write_nonblock: $(depends) fifo_write_nonblock.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c bin/util.o $(ldlibs)
 
 clean:
