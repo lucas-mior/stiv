@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
     } else if (ends_with(image.basename, "ff")) {
         get_cache_name();
         cache_image(MIN(image.width, MAX_IMG_WIDTH));
-    } 
+    }
 
     do {
         File UEBERZUG_FIFO = {
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        if (image.fullpath == NULL) { 
+        if (image.fullpath == NULL) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
                 fprintf(stderr, "stiv: Error getting realpath of %s: %s",
                                 image.fullpath, strerror(errno));
