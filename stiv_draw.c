@@ -61,7 +61,7 @@ char *program;
 int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
-    int needs_rotation = 1;
+    bool needs_rotation = true;
     bool cache = false;
     program = argv[0];
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
         imlib_context_set_image(imlib_image);
 
         if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
-            needs_rotation = 0;
+            needs_rotation = false;
             break;
         }
         byte_order = exif_data_get_byte_order(ed);
@@ -139,20 +139,8 @@ int main(int argc, char *argv[]) {
         exif_data_unref(ed);
 
         switch (orientation) {
-        case 5:
-            imlib_image_orientate(1);
-            __attribute__((fallthrough));
-        case 2:
-            imlib_image_flip_vertical();
-            break;
         case 3:
             imlib_image_orientate(2);
-            break;
-        case 7:
-            imlib_image_orientate(1);
-            __attribute__((fallthrough));
-        case 4:
-            imlib_image_flip_horizontal();
             break;
         case 6:
             imlib_image_orientate(1);
@@ -161,18 +149,18 @@ int main(int argc, char *argv[]) {
             imlib_image_orientate(3);
             break;
         default:
-            needs_rotation = 0;
+            needs_rotation = false;
             break;
         }
-
     } while (0);
 
     image.width = imlib_image_get_width();
     image.height = imlib_image_get_height();
 
-    if (!cache && print_dimensions)
+    if (!cache && print_dimensions) {
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
+    }
 
     if (needs_rotation) {
         get_cache_name();
