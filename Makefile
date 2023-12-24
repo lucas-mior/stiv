@@ -28,8 +28,8 @@ release: stiv_draw stiv_clear fifo_write_nonblock
 .SUFFIXES: .c .o
 
 stiv_draw: Makefile stiv.h stiv_draw.c
-	ctags --kinds-C=+l *.h *.c
-	vtags.sed tags > .tags.vim
+	-ctags --kinds-C=+l *.h *.c
+	-vtags.sed tags > .tags.vim
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c util.c $(ldlibs)
 
 stiv_clear: Makefile stiv.h stiv_clear.c
