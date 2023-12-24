@@ -232,8 +232,8 @@ int main(int argc, char *argv[]) {
                       image.fullpath, strerror(errno));
                 dprintf(UEBERZUG_FIFO.fd,
                         "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
-                close(UEBERZUG_FIFO.fd);
-                exit(EXIT_FAILURE);
+                util_close(&UEBERZUG_FIFO);
+                break;
             }
         }
 
@@ -246,7 +246,6 @@ int main(int argc, char *argv[]) {
 
         util_close(&UEBERZUG_FIFO);
         free(image.fullpath);
-        image.fullpath = NULL;
     } while (0);
 
     // it should return error so that programs will call it again to redraw
