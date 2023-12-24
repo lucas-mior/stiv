@@ -40,12 +40,6 @@
 #ifndef STIV_H
 #define STIV_H
 
-enum {
-    CLEAR_DEFAULT,
-    CLEAR_ALL,
-    CLEAR_PREVIEW,
-};
-
 #ifndef INTEGERS
 #define INTEGERS
 typedef unsigned char uchar;
