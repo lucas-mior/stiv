@@ -44,7 +44,7 @@ bin/fifo_write_nonblock: $(depends) stiv_draw.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c util.c $(ldlibs)
 
 clean:
-	rm -f *.o stiv_draw stiv_clear fifo_write_nonblock
+	rm -f *.o bin/*
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
