@@ -63,6 +63,8 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool needs_rotation = true;
     bool cache = false;
+    FILE *cache_img;
+
     program = basename(argv[0]);
 
     image.basename = argv[1];
@@ -71,7 +73,6 @@ int main(int argc, char *argv[]) {
 
     get_cache_name();
 
-    FILE *cache_img;
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
         if (errno != ENOENT) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));

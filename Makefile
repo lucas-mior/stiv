@@ -10,12 +10,16 @@ ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm -lexif
 
 all: release
 
-clang: CC=clang
-clang: clean release
+clang: clean
 clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage -Wno-format-nonliteral
+clang:
+	$(MAKE) CC=clang CFLAGS="$(CFLAGS)" release
 
-debug: CFLAGS += -g -Weverything
-debug: clean bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
+debug: clean
+debug: CC=clang
+debug: CFLAGS += -g -Weverything -Wno-unsafe-buffer-usage -Wno-format-nonliteral
+debug:
+	$(MAKE) CC=clang CFLAGS="$(CFLAGS)" bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 
 CFLAGS += -std=c99 -D_DEFAULT_SOURCE
 release: CFLAGS += -O2 -flto -Wall -Wextra
