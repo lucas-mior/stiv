@@ -29,9 +29,12 @@ release: bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 .SUFFIXES:
 .SUFFIXES: .c .o
 
-depends = Makefile stiv.h bin/util.o
+depends = Makefile stiv.h bin/util.o bin
 
-bin/util.o: Makefile stiv.h util.c
+bin:
+	mkdir bin
+
+bin/util.o: Makefile stiv.h util.c bin
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c util.c
 
 bin/stiv_clear_lib.o: $(depends) stiv_clear_lib.c
