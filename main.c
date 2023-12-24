@@ -159,9 +159,10 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        image.width = imlib_image_get_width();
-        image.height = imlib_image_get_height();
     } while (0);
+
+    image.width = imlib_image_get_width();
+    image.height = imlib_image_get_height();
 
     if (print_dimensions)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
