@@ -6,8 +6,6 @@ VPATH = $(srcdir)
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
-CC=clang
-
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm -lexif
 
 all: release
@@ -20,7 +18,7 @@ debug: CFLAGS += -g -Weverything
 debug: clean bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 
 CFLAGS += -std=c99 -D_DEFAULT_SOURCE
-release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage -Wno-format-nonliteral
+release: CFLAGS += -O2 -flto -Wall -Wextra
 release: bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 
 .PHONY: all clean install uninstall
