@@ -116,8 +116,6 @@ int main(int argc, char *argv[]) {
     } else {
         usage(stderr);
     }
-    if (cache)
-        exit(1);
 
     do {
         Imlib_Image imlib_image;
