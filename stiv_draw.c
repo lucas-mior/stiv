@@ -116,6 +116,8 @@ int main(int argc, char *argv[]) {
     } else {
         usage(stderr);
     }
+    if (cache)
+        exit(1);
 
     do {
         Imlib_Image imlib_image;
@@ -126,6 +128,7 @@ int main(int argc, char *argv[]) {
 
         imlib_image = imlib_load_image(image.basename);
         imlib_context_set_image(imlib_image);
+        imlib_image_set_changes_on_disk();
 
         if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
             needs_rotation = false;
@@ -140,19 +143,21 @@ int main(int argc, char *argv[]) {
 
         switch (orientation) {
         case 3:
-            imlib_image_orientate(2);
+            imlib_rotate_image_from_buffer(180, imlib_image);
             break;
         case 6:
-            imlib_image_orientate(1);
+            imlib_rotate_image_from_buffer(270, imlib_image);
             break;
         case 8:
-            imlib_image_orientate(3);
+            imlib_rotate_image_from_buffer(90, imlib_image);
             break;
         default:
             needs_rotation = false;
             break;
         }
     } while (0);
+
+	imlib_image_set_changes_on_disk();
 
     image.width = imlib_image_get_width();
     image.height = imlib_image_get_height();
