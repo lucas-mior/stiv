@@ -204,15 +204,14 @@ int main(int argc, char *argv[]) {
         }
         if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
                                      O_WRONLY | O_NONBLOCK)) < 0) {
-            error("Error opening %s: %s",
-                            UEBERZUG_FIFO.name, strerror(errno));
+            error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
             break;
         }
 
         if (image.fullpath == NULL) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
                 error("Error getting realpath of %s: %s",
-                                image.fullpath, strerror(errno));
+                      image.fullpath, strerror(errno));
                 exit(EXIT_FAILURE);
             }
         }

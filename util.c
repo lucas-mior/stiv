@@ -38,7 +38,7 @@ void *
 util_malloc(const usize size) {
     void *p;
     if ((p = malloc(size)) == NULL) {
-        error("Failed to allocate %zu bytes.\n", size);
+        error("Error allocating %zu bytes.\n", size);
         exit(EXIT_FAILURE);
     }
     return p;
@@ -50,7 +50,7 @@ util_strdup(const char *str) {
     size_t size = strlen(str) + 1;
 
     if ((p = malloc(size)) == NULL) {
-        error("Failed to allocate %zu bytes.\n", size);
+        error("Error allocating %zu bytes.\n", size);
         exit(EXIT_FAILURE);
     }
     memcpy(p, str, size);
@@ -62,7 +62,7 @@ void *
 util_realloc(void *old, const usize size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {
-        error("Failed to allocate %zu bytes.\n", size);
+        error("Error allocating %zu bytes.\n", size);
         error("Reallocating from: %p\n", old);
         exit(EXIT_FAILURE);
     }
@@ -73,8 +73,7 @@ void *
 util_calloc(const usize nmemb, const usize size) {
     void *p;
     if ((p = calloc(nmemb, size)) == NULL) {
-        error("Failed to allocate %zu members of %zu bytes each.\n",
-                        nmemb, size);
+        error("Error allocating %zu members of %zu bytes each.\n", nmemb, size);
         exit(EXIT_FAILURE);
     }
     return p;
