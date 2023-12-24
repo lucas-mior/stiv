@@ -12,7 +12,7 @@ all: release
 
 clang: CC=clang
 clang: clean release
-clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage
+clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage -Wno-format-nonliteral
 
 debug: CFLAGS += -g -Weverything
 debug: clean bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
