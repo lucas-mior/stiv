@@ -119,71 +119,79 @@ int main(int argc, char *argv[]) {
 
     get_cache_name();
 
-    do {
-        Imlib_Image imlib_image;
-        ExifData *ed;
-        ExifEntry *entry;
-        ExifByteOrder byte_order;
-        int orientation = 0;
+    FILE *cache_img;
+    if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
+        if (errno != ENOENT) {
+            error("Error opening %s: %s\n", image.fullpath, strerror(errno));
+            image.fullpath = NULL;
+        } else {
+            do {
+                Imlib_Image imlib_image;
+                ExifData *ed;
+                ExifEntry *entry;
+                ExifByteOrder byte_order;
+                int orientation = 0;
 
-        imlib_image = imlib_load_image(image.basename);
-        imlib_context_set_image(imlib_image);
-        imlib_image_set_changes_on_disk();
+                imlib_image = imlib_load_image(image.basename);
+                imlib_context_set_image(imlib_image);
+                imlib_image_set_changes_on_disk();
 
-        if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
-            needs_rotation = false;
-            break;
+                if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
+                    needs_rotation = false;
+                    break;
+                }
+                byte_order = exif_data_get_byte_order(ed);
+                entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+                if (entry)
+                    orientation = exif_get_short(entry->data, byte_order);
+
+                exif_data_unref(ed);
+
+                switch (orientation) {
+                case 3:
+                    imlib_rotate_image_from_buffer(180, imlib_image);
+                    break;
+                case 6:
+                    imlib_rotate_image_from_buffer(270, imlib_image);
+                    break;
+                case 8:
+                    imlib_rotate_image_from_buffer(90, imlib_image);
+                    break;
+                default:
+                    needs_rotation = false;
+                    break;
+                }
+            } while (0);
+
+            imlib_image_set_changes_on_disk();
+
+            image.width = imlib_image_get_width();
+            image.height = imlib_image_get_height();
+
+            if (needs_rotation) {
+                cache_image(MIN(image.width, CACHE_IMG_WIDTH));
+            } else if (image.width > MAX_IMG_WIDTH) {
+                cache_image(CACHE_IMG_WIDTH);
+            } else if (image.width > MAX_PNG_WIDTH) {
+                magic_t my_magic;
+                my_magic = magic_open(MAGIC_MIME_TYPE);
+                magic_load(my_magic, NULL);
+                if (!strcmp(magic_file(my_magic, image.basename), "image/png"))
+                    cache_image(CACHE_IMG_WIDTH);
+                magic_close(my_magic);
+            } else if (ends_with(image.basename, "ff")) {
+                cache_image(MIN(image.width, CACHE_IMG_WIDTH));
+            }
         }
-        byte_order = exif_data_get_byte_order(ed);
-        entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
-        if (entry)
-            orientation = exif_get_short(entry->data, byte_order);
-
-        exif_data_unref(ed);
-
-        switch (orientation) {
-        case 3:
-            imlib_rotate_image_from_buffer(180, imlib_image);
-            break;
-        case 6:
-            imlib_rotate_image_from_buffer(270, imlib_image);
-            break;
-        case 8:
-            imlib_rotate_image_from_buffer(90, imlib_image);
-            break;
-        default:
-            needs_rotation = false;
-            break;
-        }
-    } while (0);
-
-	imlib_image_set_changes_on_disk();
-
-    image.width = imlib_image_get_width();
-    image.height = imlib_image_get_height();
-
-    if (!cache && print_dimensions) {
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
-               image.width, image.height);
-    }
-
-    if (needs_rotation) {
-        cache_image(MIN(image.width, CACHE_IMG_WIDTH));
-    } else if (image.width > MAX_IMG_WIDTH) {
-        cache_image(CACHE_IMG_WIDTH);
-    } else if (image.width > MAX_PNG_WIDTH) {
-        magic_t my_magic;
-        my_magic = magic_open(MAGIC_MIME_TYPE);
-        magic_load(my_magic, NULL);
-        if (!strcmp(magic_file(my_magic, image.basename), "image/png"))
-            cache_image(CACHE_IMG_WIDTH);
-        magic_close(my_magic);
-    } else if (ends_with(image.basename, "ff")) {
-        cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     }
 
     if (cache)
         exit(EXIT_FAILURE);
+
+    if (print_dimensions) {
+        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
+               image.width, image.height);
+    }
 
     do {
         File UEBERZUG_FIFO = {
@@ -273,51 +281,43 @@ get_cache_name(void) {
 
 void
 cache_image(double new_width) {
-    FILE *cache_img;
-    if ((cache_img = fopen(image.fullpath, "r"))) {
-        fclose(cache_img);
-        return;
+    Imlib_Image imlib_image;
+    Imlib_Load_Error err;
+    double new_height;
+    double z;
+    if (new_width > MAX_IMG_WIDTH)
+        new_width = CACHE_IMG_WIDTH;
+
+    z = image.width / new_width;
+    new_height = round(((double) image.height / z));
+
+    imlib_context_set_anti_alias(1);
+    imlib_image = imlib_create_cropped_scaled_image(
+                  0, 0, image.width, image.height,
+                  (int) new_width, (int) new_height
+                  );
+    if (imlib_image == NULL) {
+        error("Error in imlib_create_cropped_scaled_image()\n");
+        goto dontcache;
     }
-    if (errno == ENOENT) {
-        Imlib_Image imlib_image;
-        Imlib_Load_Error err;
-        double new_height;
-        double z;
-        if (new_width > MAX_IMG_WIDTH)
-            new_width = CACHE_IMG_WIDTH;
 
-        z = image.width / new_width;
-        new_height = round(((double) image.height / z));
+    imlib_context_set_image(imlib_image);
 
-        imlib_context_set_anti_alias(1);
-        imlib_image = imlib_create_cropped_scaled_image(
-                      0, 0, image.width, image.height,
-                      (int) new_width, (int) new_height
-                      );
-        if (imlib_image == NULL) {
-            error("Error in imlib_create_cropped_scaled_image()\n");
-            goto dontcache;
-        }
-
-        imlib_context_set_image(imlib_image);
-
-        if (imlib_image_has_alpha()) {
-            imlib_image_set_format("png");
-        } else {
-            imlib_image_set_format("jpg");
-            imlib_image_attach_data_value("quality", NULL, 90, NULL);
-        }
-        imlib_save_image_with_error_return(image.fullpath, &err);
-        if (err) {
-            error("Error caching image %s: %d\n", image.basename, err);
-            goto dontcache;
-        }
-
-        imlib_free_image_and_decache();
-        return;
+    if (imlib_image_has_alpha()) {
+        imlib_image_set_format("png");
     } else {
-        error("Error opening %s: %s\n", image.fullpath, strerror(errno));
+        imlib_image_set_format("jpg");
+        imlib_image_attach_data_value("quality", NULL, 90, NULL);
     }
+    imlib_save_image_with_error_return(image.fullpath, &err);
+    if (err) {
+        error("Error caching image %s: %d\n", image.basename, err);
+        goto dontcache;
+    }
+
+    imlib_free_image_and_decache();
+    return;
+
     dontcache:
     free(image.fullpath);
     image.fullpath = NULL;
