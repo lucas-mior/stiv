@@ -21,14 +21,14 @@
 #include <Imlib2.h>
 #include <libexif/exif-data.h>
 
-typedef struct Terminal {
+typedef struct Pane {
     int width;
     int height;
     int x;
     int y;
-} Terminal;
+} Pane;
 
-static Terminal terminal = {
+static Pane pane = {
     .width = 100,
     .height = HEIGHT_SHELL,
     .x = 0,
@@ -66,34 +66,34 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 6) {
         // chamado por `lf > piscou > stiv`
-        terminal.width = util_string_int32(argv[2]);
-        terminal.height = util_string_int32(argv[3]) - 1;
-        terminal.x = util_string_int32(argv[4]);
-        terminal.y = util_string_int32(argv[5]) + 1;
-        terminal.y += 1; // tmux bugs lf's Y by 1
+        pane.width = util_string_int32(argv[2]);
+        pane.height = util_string_int32(argv[3]) - 1;
+        pane.x = util_string_int32(argv[4]);
+        pane.y = util_string_int32(argv[5]) + 1;
+        pane.y += 1; // tmux bugs lf's Y by 1
 
-        terminal.width -= 2;
-        terminal.x += 2;
+        pane.width -= 2;
+        pane.x += 2;
         if (argc >= 7) {
             print_dimensions = false;
-            terminal.y -= 1;
+            pane.y -= 1;
         }
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > piscou > stiv`
-        terminal.width = util_string_int32(columns.string);
-        terminal.height = util_string_int32(lines.string);
+        pane.width = util_string_int32(columns.string);
+        pane.height = util_string_int32(lines.string);
 
-        terminal.x = terminal.width + (terminal.width % 2);
-        terminal.y = 1;
+        pane.x = pane.width + (pane.width % 2);
+        pane.y = 1;
     } else if ((columns.string = getenv("COLUMNS"))
             && (lines.string = getenv("LINES"))) {
         // chamado por `skim > piscou > stiv`
-        terminal.width = util_string_int32(columns.string);
-        terminal.height = util_string_int32(lines.string);
+        pane.width = util_string_int32(columns.string);
+        pane.height = util_string_int32(lines.string);
 
-        terminal.x = terminal.width + 1 + ((terminal.width + 1) % 2) + 1;
-        terminal.y = 1;
+        pane.x = pane.width + 1 + ((pane.width + 1) % 2) + 1;
+        pane.y = 1;
 
         // skim won't print anything if we exit with an error
         exit_code = EXIT_SUCCESS;
@@ -104,10 +104,10 @@ int main(int argc, char *argv[]) {
         columns.number = util_string_int32(columns.string);
         lines.number = util_string_int32(lines.string);
 
-        terminal.width = columns.number;
-        terminal.height = HEIGHT_SHELL;
-        terminal.x = 0;
-        terminal.y = 1;
+        pane.width = columns.number;
+        pane.height = HEIGHT_SHELL;
+        pane.x = 0;
+        pane.y = 1;
     } else {
         usage(stderr);
     }
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
                 "{\"action\": \"add\", \"identifier\": \"preview\","
                 "\"scaler\": \"fit_contain\","
                 "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u,",
-                terminal.x, terminal.y, terminal.width, terminal.height);
+                pane.x, pane.y, pane.width, pane.height);
         dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
         util_close(&UEBERZUG_FIFO);
