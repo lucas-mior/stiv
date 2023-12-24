@@ -25,10 +25,10 @@ util_string_int32(const char *string) {
     errno = 0;
     x = strtol(string, &endptr, base);
     if ((errno != 0) || (string == endptr) || (*endptr != 0)) {
-		fprintf(stderr, "Error converting to integer: %s\n", string);
+		error("Error converting to integer: %s\n", string);
 		exit(EXIT_FAILURE);
     } else if ((x > INT32_MAX) || (x < INT32_MIN)) {
-		fprintf(stderr, "Error converting to integer: %s\n", string);
+		error("Error converting to integer: %s\n", string);
 		exit(EXIT_FAILURE);
     }
     return (int32) x;
@@ -38,7 +38,7 @@ void *
 util_malloc(const usize size) {
     void *p;
     if ((p = malloc(size)) == NULL) {
-        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
+        error("Failed to allocate %zu bytes.\n", size);
         exit(EXIT_FAILURE);
     }
     return p;
@@ -50,7 +50,7 @@ util_strdup(const char *str) {
     size_t size = strlen(str) + 1;
 
     if ((p = malloc(size)) == NULL) {
-        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
+        error("Failed to allocate %zu bytes.\n", size);
         exit(EXIT_FAILURE);
     }
     memcpy(p, str, size);
@@ -62,8 +62,8 @@ void *
 util_realloc(void *old, const usize size) {
     void *p;
     if ((p = realloc(old, size)) == NULL) {
-        fprintf(stderr, "Failed to allocate %zu bytes.\n", size);
-        fprintf(stderr, "Reallocating from: %p\n", old);
+        error("Failed to allocate %zu bytes.\n", size);
+        error("Reallocating from: %p\n", old);
         exit(EXIT_FAILURE);
     }
     return p;
@@ -73,7 +73,7 @@ void *
 util_calloc(const usize nmemb, const usize size) {
     void *p;
     if ((p = calloc(nmemb, size)) == NULL) {
-        fprintf(stderr, "Failed to allocate %zu members of %zu bytes each.\n",
+        error("Failed to allocate %zu members of %zu bytes each.\n",
                         nmemb, size);
         exit(EXIT_FAILURE);
     }
@@ -95,12 +95,12 @@ void
 util_close(File *f) {
     if (f->fd >= 0) {
         if (close(f->fd) < 0)
-            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
+            error("Error closing %s: %s\n", f->name, strerror(errno));
         f->fd = -1;
     }
     if (f->file != NULL) {
         if (fclose(f->file) != 0)
-            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
+            error("Error closing %s: %s\n", f->name, strerror(errno));
         f->file = NULL;
     }
     return;
@@ -109,7 +109,7 @@ util_close(File *f) {
 bool
 util_open(File *f, const int flag) {
     if ((f->fd = open(f->name, flag)) < 0) {
-        fprintf(stderr, "Error opening %s: %s\n", f->name, strerror(errno));
+        error("Error opening %s: %s\n", f->name, strerror(errno));
         return false;
     } else {
         return true;
@@ -126,7 +126,7 @@ void error(char *format, ...) {
     va_end(args);
 
     if (n < 0) {
-        fprintf(stderr, "Error in vsnprintf()\n");
+        error("Error in vsnprintf()\n");
         exit(EXIT_FAILURE);
     }
 
@@ -137,14 +137,14 @@ void error(char *format, ...) {
     switch (fork()) {
         char *notifiers[2] = { "dunstify", "notify-send" };
         case -1:
-            fprintf(stderr, "Error forking: %s\n", strerror(errno));
+            error("Error forking: %s\n", strerror(errno));
             break;
         case 0:
             for (uint i = 0; i < LENGTH(notifiers); i += 1) {
                 execlp(notifiers[i], notifiers[i], "-u", "critical", 
                                      program, buffer, NULL);
             }
-            fprintf(stderr, "Error trying to exec dunstify.\n");
+            error("Error trying to exec dunstify.\n");
             break;
         default:
             break;
