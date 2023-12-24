@@ -305,7 +305,7 @@ int
 exif_orientation(void) {
     Imlib_Image imlib_image;
     ExifData *exif_data;
-    ExifEntry *entry;
+    ExifEntry *exif_entry;
     ExifByteOrder byte_order;
     int orientation = 0;
 
@@ -317,10 +317,10 @@ exif_orientation(void) {
         return 0;
 
     byte_order = exif_data_get_byte_order(exif_data);
-    entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
-                                   EXIF_TAG_ORIENTATION);
-    if (entry)
-        orientation = exif_get_short(entry->data, byte_order);
+    exif_entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
+                                        EXIF_TAG_ORIENTATION);
+    if (exif_entry)
+        orientation = exif_get_short(exif_entry->data, byte_order);
 
     exif_data_unref(exif_data);
 
