@@ -18,6 +18,47 @@
 #include "stiv.h"
 #include <stdlib.h>
 #include <Imlib2.h>
+#include <libexif/exif-data.h>
+
+static void exif_auto_orientate(const char *file)
+{
+	ExifData *ed;
+	ExifEntry *entry;
+	int byte_order, orientation = 0;
+
+	if ((ed = exif_data_new_from_file(file)) == NULL)
+		return;
+	byte_order = exif_data_get_byte_order(ed);
+	entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+	if (entry != NULL)
+		orientation = exif_get_short(entry->data, byte_order);
+
+	exif_data_unref(ed);
+
+	switch (orientation) {
+	case 5:
+		imlib_image_orientate(1);
+		/* fall through */
+	case 2:
+		imlib_image_flip_vertical();
+		break;
+	case 3:
+		imlib_image_orientate(2);
+		break;
+	case 7:
+		imlib_image_orientate(1);
+		/* fall through */
+	case 4:
+		imlib_image_flip_horizontal();
+		break;
+	case 6:
+		imlib_image_orientate(1);
+		break;
+	case 8:
+		imlib_image_orientate(3);
+		break;
+	}
+}
 
 typedef struct Terminal {
     int width;
@@ -117,9 +158,7 @@ int main(int argc, char *argv[]) {
 
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
-
-        imlib_free_image();
-        /* imlib_free_image_and_decache(); */
+        exif_auto_orientate(image.basename);
     }
 
     if (print_dimensions)
@@ -144,7 +183,11 @@ int main(int argc, char *argv[]) {
     }
 
     do {
-        File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+        File UEBERZUG_FIFO = {
+            .file = NULL,
+            .fd = -1,
+            .name = NULL
+        };
 
         if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
             fprintf(stderr, "stiv: UEBERZUG_FIFO environment variable is not set.\n");
@@ -247,8 +290,6 @@ reduce_image_size(double new_width) {
         double z = image.width / new_width;
         new_height = round(((double) image.height / z));
 
-        imlib_image = imlib_load_image(image.basename);
-        imlib_context_set_image(imlib_image);
         imlib_context_set_anti_alias(1);
         imlib_image = imlib_create_cropped_scaled_image(
                       0, 0, image.width, image.height,

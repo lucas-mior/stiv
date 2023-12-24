@@ -8,7 +8,7 @@ MANPREFIX = $(PREFIX)/share/man
 
 CC=clang
 
-ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm
+ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm -lexif
 
 src = main.c util.c
 
