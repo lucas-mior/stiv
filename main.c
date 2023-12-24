@@ -20,14 +20,14 @@
 #include <Imlib2.h>
 #include <libexif/exif-data.h>
 
-static void exif_auto_orientate(const char *file)
+static int exif_auto_orientate(const char *file)
 {
 	ExifData *ed;
 	ExifEntry *entry;
 	int byte_order, orientation = 0;
 
 	if ((ed = exif_data_new_from_file(file)) == NULL)
-		return;
+		return 0;
 	byte_order = exif_data_get_byte_order(ed);
 	entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
 	if (entry != NULL)
@@ -35,6 +35,7 @@ static void exif_auto_orientate(const char *file)
 
 	exif_data_unref(ed);
 
+    printf("orientation: %d\n", orientation);
 	switch (orientation) {
 	case 5:
 		imlib_image_orientate(1);
@@ -57,7 +58,10 @@ static void exif_auto_orientate(const char *file)
 	case 8:
 		imlib_image_orientate(3);
 		break;
+    default:
+        return 0;
 	}
+    return 1;
 }
 
 typedef struct Terminal {
@@ -94,11 +98,12 @@ static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
-static void reduce_image_size(double);
+static void cache_image(double);
 
 int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
+    int needs_rotation;
 
     image.basename = argv[1];
 
@@ -158,29 +163,32 @@ int main(int argc, char *argv[]) {
 
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
-        exif_auto_orientate(image.basename);
+        needs_rotation = exif_auto_orientate(image.basename);
     }
 
     if (print_dimensions)
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
 
-    if (image.width > MAX_IMG_WIDTH) {
+    if (needs_rotation) {
         get_cache_name();
-        reduce_image_size(CACHE_IMG_WIDTH);
+        cache_image(image.width);
+    } else if (image.width > MAX_IMG_WIDTH) {
+        get_cache_name();
+        cache_image(CACHE_IMG_WIDTH);
     } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
         if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
             get_cache_name();
-            reduce_image_size(CACHE_IMG_WIDTH);
+            cache_image(CACHE_IMG_WIDTH);
         }
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
         get_cache_name();
-        reduce_image_size(image.width);
-    }
+        cache_image(image.width);
+    } 
 
     do {
         File UEBERZUG_FIFO = {
@@ -254,7 +262,7 @@ get_cache_name(void) {
 }
 
 void
-reduce_image_size(double new_width) {
+cache_image(double new_width) {
     FILE *cache_img;
     char *XDG_CACHE_HOME = NULL;
 
@@ -307,8 +315,10 @@ reduce_image_size(double new_width) {
             imlib_image_attach_data_value("quality", NULL, 90, NULL);
         }
         imlib_save_image_with_error_return(image.fullpath, &err);
-        if (err)
+        if (err) {
+            fprintf(stderr, "Error caching image %s: %d\n", image.basename, err);
             goto dontcache;
+        }
 
         imlib_free_image_and_decache();
         return;
