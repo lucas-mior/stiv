@@ -132,7 +132,7 @@ void error(char *format, ...) {
     buffer[n] = '\0';
     (void) write(STDERR_FILENO, buffer, (usize) n);
 
-/* #ifdef DEBUGGING */
+#ifdef DEBUGGING
     switch (fork()) {
         case -1:
             fprintf(stderr, "Error forking: %s\n", strerror(errno));
@@ -149,5 +149,5 @@ void error(char *format, ...) {
         default:
             break;
     }
-/* #endif */
+#endif
 }
