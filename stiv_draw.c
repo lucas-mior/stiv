@@ -56,67 +56,31 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
 static int cache_image(double);
+static int exif_orientation(void);
 char *program;
 
 int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
-    bool needs_rotation = true;
-    bool cache = false;
+    bool caching = false;
     FILE *cache_img;
 
     program = basename(argv[0]);
 
     image.basename = argv[1];
     if ((argc == 3) && !strcmp(argv[2], "cache"))
-        cache = true;
+        caching = true;
 
     get_cache_name();
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
+        bool needs_rotation;
+
         if (errno != ENOENT) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
             image.fullpath = NULL;
         } else {
-            do {
-                Imlib_Image imlib_image;
-                ExifData *exif_data;
-                ExifEntry *entry;
-                ExifByteOrder byte_order;
-                int orientation = 0;
-
-                imlib_image = imlib_load_image(image.basename);
-                imlib_context_set_image(imlib_image);
-                imlib_image_set_changes_on_disk();
-
-                if ((exif_data = exif_data_new_from_file(image.basename)) == NULL) {
-                    needs_rotation = false;
-                    break;
-                }
-                byte_order = exif_data_get_byte_order(exif_data);
-                entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
-                                               EXIF_TAG_ORIENTATION);
-                if (entry)
-                    orientation = exif_get_short(entry->data, byte_order);
-
-                exif_data_unref(exif_data);
-
-                switch (orientation) {
-                case 3:
-                    imlib_rotate_image_from_buffer(180, imlib_image);
-                    break;
-                case 6:
-                    imlib_rotate_image_from_buffer(270, imlib_image);
-                    break;
-                case 8:
-                    imlib_rotate_image_from_buffer(90, imlib_image);
-                    break;
-                default:
-                    needs_rotation = false;
-                    break;
-                }
-            } while (0);
-
+            needs_rotation = exif_orientation();
             imlib_image_set_changes_on_disk();
 
             image.width = imlib_image_get_width();
@@ -154,7 +118,7 @@ int main(int argc, char *argv[]) {
         image.height = imlib_image_get_height();
     }
 
-    if (cache)
+    if (caching)
         exit(EXIT_FAILURE);
 
     if (print_dimensions) {
@@ -335,4 +299,43 @@ cache_image(double new_width) {
 
     imlib_free_image_and_decache();
     return 0;
+}
+
+int
+exif_orientation(void) {
+    Imlib_Image imlib_image;
+    ExifData *exif_data;
+    ExifEntry *entry;
+    ExifByteOrder byte_order;
+    int orientation = 0;
+
+    imlib_image = imlib_load_image(image.basename);
+    imlib_context_set_image(imlib_image);
+    imlib_image_set_changes_on_disk();
+
+    if ((exif_data = exif_data_new_from_file(image.basename)) == NULL)
+        return 0;
+
+    byte_order = exif_data_get_byte_order(exif_data);
+    entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
+                                   EXIF_TAG_ORIENTATION);
+    if (entry)
+        orientation = exif_get_short(entry->data, byte_order);
+
+    exif_data_unref(exif_data);
+
+    switch (orientation) {
+    case 3:
+        imlib_rotate_image_from_buffer(180, imlib_image);
+        break;
+    case 6:
+        imlib_rotate_image_from_buffer(270, imlib_image);
+        break;
+    case 8:
+        imlib_rotate_image_from_buffer(90, imlib_image);
+        break;
+    default:
+        return false;
+    }
+    return true;
 }
