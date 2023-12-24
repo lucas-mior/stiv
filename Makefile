@@ -37,16 +37,13 @@ bin:
 bin/util.o: Makefile stiv.h util.c bin
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c util.c
 
-bin/stiv_clear_lib.o: $(depends) stiv_clear_lib.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c stiv_clear_lib.c
-
-bin/stiv_draw: $(depends) stiv_draw.c bin/stiv_clear_lib.o
+bin/stiv_draw: $(depends) stiv_draw.c
 	-ctags --kinds-C=+l *.h *.c
 	-vtags.sed tags > .tags.vim
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c bin/stiv_clear_lib.o bin/util.o $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c bin/util.o $(ldlibs)
 
-bin/stiv_clear: $(depends) stiv_draw.c bin/stiv_clear_lib.o
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_clear.c bin/stiv_clear_lib.o bin/util.o $(ldlibs)
+bin/stiv_clear: $(depends) stiv_draw.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_clear.c bin/util.o $(ldlibs)
 
 bin/fifo_write_nonblock: $(depends) stiv_draw.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c bin/util.o $(ldlibs)

@@ -134,6 +134,8 @@ int main(int argc, char *argv[]) {
                 if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
                     if (cache_image(CACHE_IMG_WIDTH) < 0)
                         image.fullpath = NULL;
+                } else {
+                    image.fullpath = NULL;
                 }
                 magic_close(my_magic);
             } else if (ends_with(image.basename, "ff")) {
@@ -228,7 +230,9 @@ int main(int argc, char *argv[]) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
                 error("Error getting realpath of %s: %s",
                       image.fullpath, strerror(errno));
-                stiv_clear(1, (char *[]) {"stiv_clear"});
+                dprintf(UEBERZUG_FIFO.fd,
+                        "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
+                close(UEBERZUG_FIFO.fd);
                 exit(EXIT_FAILURE);
             }
         }
