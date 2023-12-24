@@ -60,8 +60,7 @@ main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    dprintf(UEBERZUG_FIFO.fd,
-            "{\"action\": \"remove\", \"identifier\": \"preview\"}\n");
+    dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
     util_close(&UEBERZUG_FIFO);
     exit(EXIT_SUCCESS);
 }
