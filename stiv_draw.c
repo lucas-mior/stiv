@@ -117,6 +117,8 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
+    get_cache_name();
+
     do {
         Imlib_Image imlib_image;
         ExifData *ed;
@@ -165,7 +167,6 @@ int main(int argc, char *argv[]) {
                image.width, image.height);
     }
 
-    get_cache_name();
     if (needs_rotation) {
         cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     } else if (image.width > MAX_IMG_WIDTH) {
