@@ -95,5 +95,6 @@ bool ends_with(const char *, const char *);
 void util_close(File *);
 bool util_open(File *, const int);
 void error(char *, ...);
+int stiv_clear(int argc, char **argv);
 
 #endif /* STIV_H */

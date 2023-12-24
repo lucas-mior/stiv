@@ -66,59 +66,8 @@ int main(int argc, char *argv[]) {
     program = basename(argv[0]);
 
     image.basename = argv[1];
-
-    if (argc >= 6) {
-        // chamado por `lf > piscou > stiv`
-        pane.width = util_string_int32(argv[2]);
-        pane.height = util_string_int32(argv[3]) - 1;
-        pane.x = util_string_int32(argv[4]);
-        pane.y = util_string_int32(argv[5]) + 1;
-        pane.y += 1; // tmux bugs lf's Y by 1
-
-        pane.width -= 2;
-        pane.x += 2;
-        if (argc >= 7) {
-            print_dimensions = false;
-            pane.y -= 1;
-        }
-    } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
-            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
-        // chamado por `fzf > piscou > stiv`
-        pane.width = util_string_int32(columns.string);
-        pane.height = util_string_int32(lines.string);
-
-        pane.x = pane.width + (pane.width % 2);
-        pane.y = 1;
-    } else if ((columns.string = getenv("COLUMNS"))
-            && (lines.string = getenv("LINES"))) {
-        // chamado por `skim > piscou > stiv`
-        pane.width = util_string_int32(columns.string);
-        pane.height = util_string_int32(lines.string);
-
-        pane.x = pane.width + 1 + ((pane.width + 1) % 2) + 1;
-        pane.y = 1;
-
-        // skim won't print anything if we exit with an error
-        exit_code = EXIT_SUCCESS;
-    } else if (argc == 4) {
-        // chamado por `zsh > stiv`
-        columns.string = argv[2];
-        lines.string = argv[3];
-        columns.number = util_string_int32(columns.string);
-        lines.number = util_string_int32(lines.string);
-
-        pane.width = columns.number;
-        pane.height = HEIGHT_SHELL;
-        pane.x = 0;
-        pane.y = 1;
-    } else if ((argc == 3) && !strcmp(argv[2], "cache")) {
+    if ((argc == 3) && !strcmp(argv[2], "cache"))
         cache = true;
-    } else {
-        usage(stderr);
-    }
-
-    if (cache)
-        exit(EXIT_FAILURE);
 
     get_cache_name();
 
@@ -193,16 +142,68 @@ int main(int argc, char *argv[]) {
                 image.fullpath = NULL;
             }
         }
+    } else {
+        Imlib_Image imlib_image;
+        imlib_image = imlib_load_image(image.basename);
+        imlib_context_set_image(imlib_image);
+        image.width = imlib_image_get_width();
+        image.height = imlib_image_get_height();
     }
 
     if (cache)
         exit(EXIT_FAILURE);
 
-    image.width = imlib_image_get_width();
-    image.height = imlib_image_get_height();
     if (print_dimensions) {
         printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
                image.width, image.height);
+    }
+
+    if (argc >= 6) {
+        // chamado por `lf > piscou > stiv`
+        pane.width = util_string_int32(argv[2]);
+        pane.height = util_string_int32(argv[3]) - 1;
+        pane.x = util_string_int32(argv[4]);
+        pane.y = util_string_int32(argv[5]) + 1;
+        pane.y += 1; // tmux bugs lf's Y by 1
+
+        pane.width -= 2;
+        pane.x += 2;
+        if (argc >= 7) {
+            print_dimensions = false;
+            pane.y -= 1;
+        }
+    } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
+            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
+        // chamado por `fzf > piscou > stiv`
+        pane.width = util_string_int32(columns.string);
+        pane.height = util_string_int32(lines.string);
+
+        pane.x = pane.width + (pane.width % 2);
+        pane.y = 1;
+    } else if ((columns.string = getenv("COLUMNS"))
+            && (lines.string = getenv("LINES"))) {
+        // chamado por `skim > piscou > stiv`
+        pane.width = util_string_int32(columns.string);
+        pane.height = util_string_int32(lines.string);
+
+        pane.x = pane.width + 1 + ((pane.width + 1) % 2) + 1;
+        pane.y = 1;
+
+        // skim won't print anything if we exit with an error
+        exit_code = EXIT_SUCCESS;
+    } else if (argc == 4) {
+        // chamado por `zsh > stiv`
+        columns.string = argv[2];
+        lines.string = argv[3];
+        columns.number = util_string_int32(columns.string);
+        lines.number = util_string_int32(lines.string);
+
+        pane.width = columns.number;
+        pane.height = HEIGHT_SHELL;
+        pane.x = 0;
+        pane.y = 1;
+    } else {
+        usage(stderr);
     }
 
     do {
@@ -226,6 +227,7 @@ int main(int argc, char *argv[]) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
                 error("Error getting realpath of %s: %s",
                       image.fullpath, strerror(errno));
+                stiv_clear(1, (char *[]) {"stiv_clear"});
                 exit(EXIT_FAILURE);
             }
         }

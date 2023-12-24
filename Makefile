@@ -27,21 +27,24 @@ release: bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 .SUFFIXES:
 .SUFFIXES: .c .o
 
-depends = Makefile stiv.h util.c
+depends = Makefile stiv.h bin/util.o
 
-bin/stiv_draw: $(depends) stiv_draw.c
+bin/util.o: Makefile stiv.h util.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c util.c
+
+bin/stiv_clear_lib.o: $(depends) stiv_clear_lib.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c stiv_clear_lib.c
+
+bin/stiv_draw: $(depends) stiv_draw.c bin/stiv_clear_lib.o
 	-ctags --kinds-C=+l *.h *.c
 	-vtags.sed tags > .tags.vim
-	-mkdir -p bin/
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c util.c $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_draw.c bin/stiv_clear_lib.o bin/util.o $(ldlibs)
 
-bin/stiv_clear: $(depends) stiv_draw.c
-	-mkdir -p bin/
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_clear.c util.c $(ldlibs)
+bin/stiv_clear: $(depends) stiv_draw.c bin/stiv_clear_lib.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ stiv_clear.c bin/stiv_clear_lib.o bin/util.o $(ldlibs)
 
 bin/fifo_write_nonblock: $(depends) stiv_draw.c
-	-mkdir -p bin/
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c util.c $(ldlibs)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c bin/util.o $(ldlibs)
 
 clean:
 	rm -f *.o bin/*
