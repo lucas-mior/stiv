@@ -39,7 +39,7 @@ fifo_write_nonblock: Makefile stiv.h stiv_clear.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ fifo_write_nonblock.c util.c $(ldlibs)
 
 clean:
-	rm -f *.o stiv_draw
+	rm -f *.o stiv_draw stiv_clear fifo_write_nonblock
 
 install: all
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
@@ -54,4 +54,5 @@ install: all
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/stiv_draw
-	rm -f $(DESTDIR)$(MANPREFIX)/man1/stiv_draw.1
+	rm -f $(DESTDIR)$(PREFIX)/bin/stiv_clear
+	rm -f $(DESTDIR)$(PREFIX)/bin/fifo_write_nonblock
