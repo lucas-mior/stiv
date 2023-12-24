@@ -167,23 +167,19 @@ int main(int argc, char *argv[]) {
                image.width, image.height);
     }
 
+    get_cache_name();
     if (needs_rotation) {
-        get_cache_name();
         cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     } else if (image.width > MAX_IMG_WIDTH) {
-        get_cache_name();
         cache_image(CACHE_IMG_WIDTH);
     } else if (image.width > MAX_PNG_WIDTH) {
         magic_t my_magic;
         my_magic = magic_open(MAGIC_MIME_TYPE);
         magic_load(my_magic, NULL);
-        if (!strcmp(magic_file(my_magic, image.basename), "image/png")) {
-            get_cache_name();
+        if (!strcmp(magic_file(my_magic, image.basename), "image/png"))
             cache_image(CACHE_IMG_WIDTH);
-        }
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
-        get_cache_name();
         cache_image(MIN(image.width, CACHE_IMG_WIDTH));
     }
 
