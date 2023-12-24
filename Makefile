@@ -14,16 +14,16 @@ src = main.c util.c
 
 all: release
 
-CFLAGS += -std=c99 -D_DEFAULT_SOURCE
-release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage
-release: stiv
-
 clang: CC=clang
 clang: clean release
 clang: CFLAGS += -Weverything -Wno-unsafe-buffer-usage
 
 debug: CFLAGS += -g -Weverything
 debug: clean stiv
+
+CFLAGS += -std=c99 -D_DEFAULT_SOURCE
+release: CFLAGS += -O2 -flto -Weverything -Wno-unsafe-buffer-usage -Wno-format-nonliteral
+release: stiv
 
 .PHONY: all clean install uninstall
 .SUFFIXES:
