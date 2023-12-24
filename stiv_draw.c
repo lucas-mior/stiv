@@ -239,6 +239,8 @@ get_cache_name(void) {
     struct stat file;
     char buffer[PATH_MAX];
 	int n;
+    char *XDG_CACHE_HOME = NULL;
+    const char *preview = "preview/stiv";
 
     if (stat(image.basename, &file) < 0) {
         error("Error calling stat on %s: %s.", image.basename, strerror(errno));
@@ -253,10 +255,6 @@ get_cache_name(void) {
 		exit(EXIT_FAILURE);
 	}
     image.cachename = util_strdup(buffer);
-
-    char *XDG_CACHE_HOME = NULL;
-
-    const char *preview = "preview/stiv";
 
     if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
         error("XDG_CACHE_HOME is not set. Exiting...\n");
@@ -284,10 +282,11 @@ cache_image(double new_width) {
         Imlib_Image imlib_image;
         Imlib_Load_Error err;
         double new_height;
+        double z;
         if (new_width > MAX_IMG_WIDTH)
             new_width = CACHE_IMG_WIDTH;
 
-        double z = image.width / new_width;
+        z = image.width / new_width;
         new_height = round(((double) image.height / z));
 
         imlib_context_set_anti_alias(1);
