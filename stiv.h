@@ -22,6 +22,7 @@
 #include <linux/limits.h>
 #include <magic.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -71,6 +72,8 @@ static const int MAX_IMG_WIDTH = 2048;
 static const int MAX_PNG_WIDTH = 1536;
 static const int HEIGHT_SHELL = 11;
 
+extern char *program;
+
 typedef struct File {
     FILE *file;
     char *name;
@@ -91,8 +94,6 @@ void *util_calloc(usize, usize);
 bool ends_with(const char *, const char *);
 void util_close(File *);
 bool util_open(File *, const int);
-
-void clear_display(int);
-int cursor_getx(void);
+void error(char *, ...);
 
 #endif /* STIV_H */

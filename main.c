@@ -56,11 +56,13 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static void get_cache_name(void);
 static void cache_image(double);
+char *program;
 
 int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
     int needs_rotation = 1;
+    program = argv[0];
 
     image.basename = argv[1];
 
@@ -197,19 +199,19 @@ int main(int argc, char *argv[]) {
         };
 
         if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-            fprintf(stderr, "stiv: UEBERZUG_FIFO environment variable is not set.\n");
+            error("UEBERZUG_FIFO environment variable is not set.\n");
             break;
         }
         if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
                                      O_WRONLY | O_NONBLOCK)) < 0) {
-            fprintf(stderr, "stiv: Error opening %s: %s",
+            error("Error opening %s: %s",
                             UEBERZUG_FIFO.name, strerror(errno));
             break;
         }
 
         if (image.fullpath == NULL) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
-                fprintf(stderr, "stiv: Error getting realpath of %s: %s",
+                error("Error getting realpath of %s: %s",
                                 image.fullpath, strerror(errno));
                 exit(EXIT_FAILURE);
             }
@@ -246,8 +248,7 @@ get_cache_name(void) {
 	int n;
 
     if (stat(image.basename, &file) < 0) {
-        fprintf(stderr, "stiv: Error calling stat on %s: %s.",
-                        image.basename, strerror(errno));
+        error("Error calling stat on %s: %s.", image.basename, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
@@ -255,7 +256,7 @@ get_cache_name(void) {
                  "%li_%ld_%ld",
                  file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 	if (n < 0) {
-		fprintf(stderr, "Error printing cache name.\n");
+		error("Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
     image.cachename = util_strdup(buffer);
@@ -276,14 +277,14 @@ cache_image(double new_width) {
         new_width = CACHE_IMG_WIDTH;
 
     if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
-        fprintf(stderr, "XDG_CACHE_HOME is not set. Exiting...\n");
+        error("XDG_CACHE_HOME is not set. Exiting...\n");
         exit(EXIT_FAILURE);
     }
 
     n = snprintf(buffer, sizeof (buffer),
                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
 	if (n < 0) {
-		fprintf(stderr, "Error printing cache name.\n");
+		error("Error printing cache name.\n");
 		exit(EXIT_FAILURE);
 	}
     image.fullpath = util_strdup(buffer);
@@ -305,7 +306,7 @@ cache_image(double new_width) {
                       (int) new_width, (int) new_height
                       );
         if (imlib_image == NULL) {
-            fprintf(stderr, "Error in imlib_create_cropped_scaled_image()\n");
+            error("Error in imlib_create_cropped_scaled_image()\n");
             goto dontcache;
         }
 
@@ -319,15 +320,14 @@ cache_image(double new_width) {
         }
         imlib_save_image_with_error_return(image.fullpath, &err);
         if (err) {
-            fprintf(stderr, "Error caching image %s: %d\n", image.basename, err);
+            error("Error caching image %s: %d\n", image.basename, err);
             goto dontcache;
         }
 
         imlib_free_image_and_decache();
         return;
     } else {
-        fprintf(stderr, "Error opening %s: %s\n",
-                        image.fullpath, strerror(errno));
+        error("Error opening %s: %s\n", image.fullpath, strerror(errno));
     }
     dontcache:
     free(image.fullpath);
