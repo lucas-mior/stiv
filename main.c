@@ -114,12 +114,13 @@ int main(int argc, char *argv[]) {
 
     do {
         Imlib_Image imlib_image;
+        ExifData *ed;
+        ExifEntry *entry;
+        ExifByteOrder byte_order;
+        int orientation = 0;
 
         imlib_image = imlib_load_image(image.basename);
         imlib_context_set_image(imlib_image);
-        ExifData *ed;
-        ExifEntry *entry;
-        int byte_order, orientation = 0;
 
         if ((ed = exif_data_new_from_file(image.basename)) == NULL) {
             needs_rotation = 0;
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
         switch (orientation) {
         case 5:
             imlib_image_orientate(1);
-            /* fall through */
+            __attribute__((fallthrough));
         case 2:
             imlib_image_flip_vertical();
             break;
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
             break;
         case 7:
             imlib_image_orientate(1);
-            /* fall through */
+            __attribute__((fallthrough));
         case 4:
             imlib_image_flip_horizontal();
             break;
