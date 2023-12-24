@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
         magic_close(my_magic);
     } else if (ends_with(image.basename, "ff")) {
         get_cache_name();
-        cache_image(image.width);
+        cache_image(MIN(image.width, MAX_IMG_WIDTH));
     } 
 
     do {
