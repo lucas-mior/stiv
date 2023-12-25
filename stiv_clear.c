@@ -40,14 +40,10 @@ main(int argc, char **argv) {
     }
 
     if (last_filename && next_filename) {
-        if (!is_image(last_filename)) {
-            error("Last file was not image: %s\n", last_filename);
+        if (!is_image(last_filename))
             exit(EXIT_SUCCESS);
-        }
-        if (is_image(next_filename)) {
-            error("Next file is an image: %s\n", next_filename);
+        if (is_image(next_filename))
             exit(EXIT_SUCCESS);
-        }
     }
 
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
