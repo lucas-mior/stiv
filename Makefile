@@ -7,6 +7,7 @@ PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
 ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm -lexif
+exes = bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 
 all: release
 
@@ -18,11 +19,12 @@ clang:
 debug: clean
 debug: CFLAGS += -g
 debug:
-	$(MAKE) CFLAGS="$(CFLAGS)" bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
+	$(MAKE) CFLAGS="$(CFLAGS)" $(exes)
 
 CFLAGS += -std=c99 -D_DEFAULT_SOURCE
 release: CFLAGS += -O2 -flto -Wall -Wextra
 release: bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
+release: $(exes)
 
 .PHONY: all clean install uninstall release debug clang
 .SUFFIXES:
