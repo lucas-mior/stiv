@@ -21,11 +21,15 @@ char *program;
 int
 main(int argc, char **argv) {
     int fd;
-    char *fifo = argv[argc - 1];
-    program = argv[0];
+    char *string;
+    char *fifo;
+
+    program = basename(argv[0]);
+    string = argv[1];
+    fifo = argv[2];
 
     if (argc < 3) {
-        error("Minimum 3 arguments.\n");
+        error("usage: <string> <fifo>\n", program);
         exit(EXIT_FAILURE);
     }
 
@@ -34,9 +38,7 @@ main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    for (int i = 1; i < (argc - 1); i += 1)
-        dprintf(fd, "%s", argv[1]);
-    dprintf(fd, "\n");
+    dprintf(fd, "%s\n", string);
 
     close(fd);
     exit(EXIT_SUCCESS);
