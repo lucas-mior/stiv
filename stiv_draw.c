@@ -1,5 +1,5 @@
 /* This file is part of stiv.
- * Copyright (C) 2022 Lucas Mior
+ * Copyright (C) 2024 Lucas Mior
 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -203,8 +203,7 @@ int main(int argc, char *argv[]) {
 
         dprintf(UEBERZUG_FIFO.fd,
                 "{\"action\": \"add\", \"identifier\": \"preview\","
-                "\"scaler\": \"fit_contain\","
-                "\"x\": %u, \"y\": %u, \"width\": %u, \"height\": %u,",
+                "\"x\": %u, \"y\": %u, \"max_width\": %u, \"max_height\": %u,",
                 pane.x, pane.y, pane.width, pane.height);
         dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
