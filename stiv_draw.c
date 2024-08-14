@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
         pane.height = util_string_int32(argv[3]) - 1;
         pane.x = util_string_int32(argv[4]);
         pane.y = util_string_int32(argv[5]) + 1;
-        pane.y += 1; // tmux bugs lf's Y by 1
+        /* pane.y += 1; // tmux bugs lf's Y by 1 */
 
         pane.width -= 2;
         pane.x += 2;

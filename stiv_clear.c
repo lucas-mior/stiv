@@ -34,6 +34,11 @@ main(int argc, char **argv) {
     char *next_filename = NULL;
     program = basename(argv[0]);
 
+    // $1 previous file name
+    // $2 width $3 height
+    // $4 horizontal position 
+    // $5 vertical position of preview pane
+    // $6 current filename to be previewed
     if (argc >= 7) {
         last_filename = realpath(argv[1], NULL);
         next_filename = realpath(argv[6], NULL);
