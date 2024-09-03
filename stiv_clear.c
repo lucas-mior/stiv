@@ -71,6 +71,7 @@ is_image(char *filename) {
     do {
         magic_t magic;
         const char *mime_type;
+
         if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
             break;
         }
@@ -83,6 +84,7 @@ is_image(char *filename) {
             magic_close(magic);
             break;
         }
+
         if (!literal_match(mime_type, "image/")) {
             magic_close(magic);
             return true;
