@@ -21,6 +21,8 @@
 #include <Imlib2.h>
 #include <libexif/exif-data.h>
 
+#include "util.c"
+
 typedef struct Pane {
     int width;
     int height;

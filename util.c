@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef UTIL_C
+#define UTIL_C
 #include "stiv.h"
 
 int32
@@ -151,3 +153,5 @@ void error(char *format, ...) {
     }
 #endif
 }
+
+#endif /* UTIL_C */

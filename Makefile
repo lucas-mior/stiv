@@ -6,7 +6,7 @@ VPATH = $(srcdir)
 PREFIX = /usr/local
 MANPREFIX = $(PREFIX)/share/man
 
-ldlibs = $(LDLIBS) -lImlib2 -lmagic -lm -lexif
+ldlibs = $(LDLIBS) 
 exes = bin/stiv_draw bin/stiv_clear bin/fifo_write_nonblock
 
 all: release

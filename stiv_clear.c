@@ -16,6 +16,7 @@
  */
 
 #include "stiv.h"
+#include "util.c"
 
 static int is_image(char *);
 static inline int literal_match(const char *, char *);
