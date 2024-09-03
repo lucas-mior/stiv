@@ -16,6 +16,7 @@
  */
 
 #include "stiv.h"
+#include "util.c"
 char *program;
 
 int

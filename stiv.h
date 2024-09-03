@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef STIV_H
+#define STIV_H
+
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -36,9 +39,6 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
-
-#ifndef STIV_H
-#define STIV_H
 
 #ifndef INTEGERS
 #define INTEGERS
@@ -79,16 +79,6 @@ typedef union Number {
     char *string;
     int number;
 } Number;
-
-int32 util_string_int32(const char *);
-void *util_malloc(usize);
-char *util_strdup(const char *);
-void *util_realloc(void *, usize);
-void *util_calloc(usize, usize);
-bool ends_with(const char *, const char *);
-void util_close(File *);
-bool util_open(File *, const int);
-void error(char *, ...);
 
 #define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
 
