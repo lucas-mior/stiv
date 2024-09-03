@@ -29,7 +29,7 @@ main(int argc, char **argv) {
     fifo = argv[2];
 
     if (argc < 3) {
-        error("usage: <string> <fifo>\n", program);
+        error("usage: %s <string> <fifo>\n", program);
         exit(EXIT_FAILURE);
     }
 
