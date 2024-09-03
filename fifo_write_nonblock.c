@@ -35,7 +35,7 @@ main(int argc, char **argv) {
     }
 
     if ((fd = open(fifo, O_WRONLY | O_NONBLOCK)) < 0) {
-        error("Error opening %s: %s", fifo, strerror(errno));
+        error("Error opening %s: %s\n", fifo, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
