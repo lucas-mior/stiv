@@ -275,10 +275,10 @@ cache_image(double new_width) {
     new_height = round(((double) image.height / z));
 
     imlib_context_set_anti_alias(1);
-    imlib_image = imlib_create_cropped_scaled_image(
-                  0, 0, image.width, image.height,
-                  (int) new_width, (int) new_height
-                  );
+    imlib_image = imlib_create_cropped_scaled_image(0, 0,
+                                                    image.width, image.height,
+                                                    (int)new_width,
+                                                    (int)new_height);
     if (imlib_image == NULL) {
         error("Error in imlib_create_cropped_scaled_image()\n");
         return -1;
