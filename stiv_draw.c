@@ -56,7 +56,6 @@ static Image image = {
 static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
-static void get_cache_name(void);
 static int cache_image(double);
 static int exif_orientation(void);
 char *program;
@@ -73,7 +72,38 @@ int main(int argc, char *argv[]) {
     if ((argc == 3) && !strcmp(argv[2], "cache"))
         caching = true;
 
-    get_cache_name();
+    struct stat file;
+    char buffer[PATH_MAX];
+	int n;
+    char *XDG_CACHE_HOME = NULL;
+    const char *preview = "preview/stiv";
+
+    if (stat(image.basename, &file) < 0) {
+        error("Error calling stat on %s: %s.", image.basename, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    n = snprintf(buffer, sizeof (buffer),
+                 "%li_%ld_%ld",
+                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+	if (n < 0) {
+		error("Error printing cache name.\n");
+		exit(EXIT_FAILURE);
+	}
+    image.cachename = util_strdup(buffer);
+
+    if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
+        error("XDG_CACHE_HOME is not set. Exiting...\n");
+        exit(EXIT_FAILURE);
+    }
+
+    n = snprintf(buffer, sizeof (buffer),
+                 "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
+	if (n < 0) {
+		error("Error printing cache name.\n");
+		exit(EXIT_FAILURE);
+	}
+    image.fullpath = util_strdup(buffer);
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
         bool needs_rotation;
@@ -223,43 +253,6 @@ usage(FILE *stream) {
     fprintf(stream, "Be sure to have ueberzug running in the terminal "
                     "and UEBERZUG_FIFO env variable set\n");
     exit((int) (stream != stdout));
-}
-
-void
-get_cache_name(void) {
-    struct stat file;
-    char buffer[PATH_MAX];
-	int n;
-    char *XDG_CACHE_HOME = NULL;
-    const char *preview = "preview/stiv";
-
-    if (stat(image.basename, &file) < 0) {
-        error("Error calling stat on %s: %s.", image.basename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    n = snprintf(buffer, sizeof (buffer),
-                 "%li_%ld_%ld",
-                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-	if (n < 0) {
-		error("Error printing cache name.\n");
-		exit(EXIT_FAILURE);
-	}
-    image.cachename = util_strdup(buffer);
-
-    if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
-        error("XDG_CACHE_HOME is not set. Exiting...\n");
-        exit(EXIT_FAILURE);
-    }
-
-    n = snprintf(buffer, sizeof (buffer),
-                 "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
-	if (n < 0) {
-		error("Error printing cache name.\n");
-		exit(EXIT_FAILURE);
-	}
-    image.fullpath = util_strdup(buffer);
-    return;
 }
 
 int
