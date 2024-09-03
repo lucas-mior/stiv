@@ -20,10 +20,10 @@
 #include "stiv.h"
 
 static int32 util_string_int32(const char *string);
-static void * util_malloc(const usize size);
-static char * util_strdup(const char *str);
-static void * util_realloc(void *old, const usize size);
-static void * util_calloc(const usize nmemb, const usize size);
+static void *util_malloc(const usize size);
+static char *util_strdup(const char *str);
+static void *util_realloc(void *old, const usize size);
+static void *util_calloc(const usize nmemb, const usize size);
 static bool ends_with(const char *str, const char *end);
 static void util_close(File *f);
 static bool util_open(File *f, const int flag);
