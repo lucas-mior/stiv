@@ -58,6 +58,7 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(double);
 static int exif_orientation(void);
+static int exiftool(char *);
 char *program;
 
 int main(int argc, char *argv[]) {
@@ -206,6 +207,16 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
+    char info_exif[BUFSIZ];
+    int exif = exiftool(argv[1]);
+    ssize_t r = read(exif, info_exif, sizeof(info_exif));
+    int info_lines = 0;
+
+    for (int i = 0; i < r; i += 1) {
+        if (info_exif[i] == '\n')
+            info_lines += 1;
+    }
+
     do {
         File UEBERZUG_FIFO = {
             .file = NULL,
@@ -332,4 +343,42 @@ exif_orientation(void) {
         return false;
     }
     return true;
+}
+
+int exiftool(char *filename) {
+    int pipefd[2];
+    char *argv[3] = { "exiftool", filename, NULL };
+
+    if (pipe(pipefd) < 0) {
+        fprintf(stderr, "Error creating pipe: ");
+        fprintf(stderr, strerror(errno));
+        fprintf(stderr, "\n");
+        return -1;
+    }
+
+    switch (fork()) {
+    case 0:
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+        execvp(argv[0], argv);
+
+        fprintf(stderr, "Error executing ");
+        fprintf(stderr, strerror(errno));
+        fprintf(stderr, ".\n");
+        exit(EXIT_FAILURE);
+    case -1:
+        fprintf(stderr, "Error forking: ");
+        fprintf(stderr, strerror(errno));
+        fprintf(stderr, ".\n");
+
+        close(pipefd[0]);
+        close(pipefd[1]);
+        break;
+    default:
+        close(pipefd[1]);
+        wait(NULL);
+    }
+
+    return pipefd[0];
 }
