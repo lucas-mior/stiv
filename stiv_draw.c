@@ -368,8 +368,7 @@ int exiftool(char *filename) {
 
     if (pipe(pipefd) < 0) {
         fprintf(stderr, "Error creating pipe: ");
-        fprintf(stderr, strerror(errno));
-        fprintf(stderr, "\n");
+        fprintf(stderr, "%s.\n", strerror(errno));
         return -1;
     }
 
@@ -381,13 +380,11 @@ int exiftool(char *filename) {
         execvp(argv[0], argv);
 
         fprintf(stderr, "Error executing ");
-        fprintf(stderr, strerror(errno));
-        fprintf(stderr, ".\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s.\n", strerror(errno));
+        _exit(EXIT_FAILURE);
     case -1:
         fprintf(stderr, "Error forking: ");
-        fprintf(stderr, strerror(errno));
-        fprintf(stderr, ".\n");
+        fprintf(stderr, "%s.\n", strerror(errno));
 
         close(pipefd[0]);
         close(pipefd[1]);
