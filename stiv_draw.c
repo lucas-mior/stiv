@@ -66,6 +66,8 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     FILE *cache_img;
+    char info_exif[BUFSIZ];
+    ssize_t info_size = 0;
 
     program = basename(argv[0]);
 
@@ -207,15 +209,30 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
-    char info_exif[BUFSIZ];
-    int exif = exiftool(argv[1]);
-    ssize_t r = read(exif, info_exif, sizeof(info_exif));
-    int info_lines = 0;
+    do {
+        int info_lines = 0;
+        int exif = exiftool(argv[1]);
+        ssize_t r = read(exif, info_exif, sizeof(info_exif));
+        if (r <= 0) {
+            fprintf(stderr, "Error reading output of exiftool");
+            if (r < 0)
+                fprintf(stderr, ": %s\n", strerror(errno));
+            break;
+        }
 
-    for (int i = 0; i < r; i += 1) {
-        if (info_exif[i] == '\n')
-            info_lines += 1;
-    }
+        info_size = r;
+
+        for (int i = 0; i < info_size; i += 1) {
+            if (info_exif[i] == '\n')
+                info_lines += 1;
+        }
+        info_lines = MIN(info_lines, 15);
+        pane.height = pane.height - info_lines;
+
+        for (int i = 0; i < pane.height; i += 1)
+            printf("\n");
+        fwrite(info_exif, 1, info_size, stdout);
+    } while (false);
 
     do {
         File UEBERZUG_FIFO = {
