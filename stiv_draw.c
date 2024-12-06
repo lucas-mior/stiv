@@ -220,48 +220,9 @@ int main(int argc, char *argv[]) {
             fprintf(stderr, "Error opening pipe for exiftool.\n");
             break;
         }
-        if ((file = fdopen(exif, "rw")) == NULL) {
-            fprintf(stderr, "Error opening file stream from %d: %s\n",
-                            exif, strerror(errno));
-            break;
-        }
 
-        while (fgets(buffer3, sizeof (buffer3), file)) {
-            int n = strlen(buffer3);
-            if (!LITERAL_NCOMPARE(buffer3, "File ", n)) {
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Modification", n - 5))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Access", n - 5))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Inode Change", n - 5))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Permissions", n - 5))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Name", n - 5))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 5, "Type Extension", n - 5))
-                    continue;
-            }
-            if (!LITERAL_NCOMPARE(buffer3, "Image ", n)) {
-                if (!LITERAL_NCOMPARE(buffer3 + 6, "Width", n - 6))
-                    continue;
-                if (!LITERAL_NCOMPARE(buffer3 + 6, "Height", n - 6))
-                    continue;
-            }
-            if (!LITERAL_NCOMPARE(buffer3, "Directory ", n)) {
-                continue;
-            }
-            if (!LITERAL_NCOMPARE(buffer3 + n - 3, ": ", 2)) {
-                continue;
-            }
-
-            memcpy(pointer, buffer3, n);
-            pointer += n;
-            info_lines += 1;
-        }
         info_size = pointer - info_exif;
         info_exif[info_size] = '\0';
-        info_lines = MIN(info_lines, 30);
 
         pane.height = pane.height - info_lines;
 
