@@ -58,7 +58,7 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(double);
 static int exif_orientation(void);
-static int exiftool(char *);
+static int pipe_from_program(char *, char *);
 char *program;
 
 int main(int argc, char *argv[]) {
@@ -210,23 +210,44 @@ int main(int argc, char *argv[]) {
     }
 
     do {
+        int exif;
+        FILE *file;
+        char buffer3[256];
         int info_lines = 0;
-        int exif = exiftool(argv[1]);
-        ssize_t r = read(exif, info_exif, sizeof(info_exif));
-        if (r <= 0) {
-            fprintf(stderr, "Error reading output of exiftool");
-            if (r < 0)
-                fprintf(stderr, ": %s\n", strerror(errno));
+        char *pointer = info_exif;
+
+        if ((exif = pipe_from_program("exiftool", argv[1])) < 0) {
+            fprintf(stderr, "Error opening pipe for exiftool.\n");
+            break;
+        }
+        if ((file = fdopen(exif, "rw")) == NULL) {
+            fprintf(stderr, "Error opening file stream from %d: %s\n",
+                            exif, strerror(errno));
             break;
         }
 
-        info_size = r;
+        while (fgets(buffer3, sizeof (buffer3), file)) {
+            int n = strlen(buffer3);
+            if (!LITERAL_NCOMPARE(buffer3, "File ", n)) {
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Modification", n - 5))
+                    continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Access", n - 5))
+                    continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Inode Change", n - 5))
+                    continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Permissions", n - 5))
+                    continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Name", n - 5))
+                    continue;
+            }
 
-        for (int i = 0; i < info_size; i += 1) {
-            if (info_exif[i] == '\n')
-                info_lines += 1;
+            memcpy(pointer, buffer3, n);
+            pointer += n;
+            info_lines += 1;
         }
-        info_lines = MIN(info_lines, 15);
+        info_size = pointer - info_exif;
+        info_exif[info_size] = '\0';
+
         pane.height = pane.height - info_lines;
 
         for (int i = 0; i < pane.height; i += 1)
@@ -362,9 +383,9 @@ exif_orientation(void) {
     return true;
 }
 
-int exiftool(char *filename) {
+int pipe_from_program(char *executable, char *filename) {
     int pipefd[2];
-    char *argv[3] = { "exiftool", filename, NULL };
+    char *argv[3] = { executable, filename, NULL };
 
     if (pipe(pipefd) < 0) {
         fprintf(stderr, "Error creating pipe: ");
@@ -379,8 +400,7 @@ int exiftool(char *filename) {
         close(pipefd[1]);
         execvp(argv[0], argv);
 
-        fprintf(stderr, "Error executing ");
-        fprintf(stderr, "%s.\n", strerror(errno));
+        fprintf(stderr, "Error executing %s: %s\n", argv[0], strerror(errno));
         _exit(EXIT_FAILURE);
     case -1:
         fprintf(stderr, "Error forking: ");
