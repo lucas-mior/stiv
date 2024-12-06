@@ -239,6 +239,20 @@ int main(int argc, char *argv[]) {
                     continue;
                 if (!LITERAL_NCOMPARE(buffer3 + 5, "Name", n - 5))
                     continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 5, "Type Extension", n - 5))
+                    continue;
+            }
+            if (!LITERAL_NCOMPARE(buffer3, "Image ", n)) {
+                if (!LITERAL_NCOMPARE(buffer3 + 6, "Width", n - 6))
+                    continue;
+                if (!LITERAL_NCOMPARE(buffer3 + 6, "Height", n - 6))
+                    continue;
+            }
+            if (!LITERAL_NCOMPARE(buffer3, "Directory ", n)) {
+                continue;
+            }
+            if (!LITERAL_NCOMPARE(buffer3 + n - 3, ": ", 2)) {
+                continue;
             }
 
             memcpy(pointer, buffer3, n);
@@ -247,6 +261,7 @@ int main(int argc, char *argv[]) {
         }
         info_size = pointer - info_exif;
         info_exif[info_size] = '\0';
+        info_lines = MIN(info_lines, 30);
 
         pane.height = pane.height - info_lines;
 
