@@ -233,13 +233,12 @@ int main(int argc, char *argv[]) {
             if (info_exif[i] == '\n')
                 info_lines += 1;
         }
-
         info_lines = MIN(info_lines, pane.height - 5);
 
         pane.height = pane.height - info_lines;
-
         for (int i = 0; i < pane.height; i += 1)
             printf("\n");
+
         fwrite(info_exif, 1, info_size, stdout);
     } while (false);
 
