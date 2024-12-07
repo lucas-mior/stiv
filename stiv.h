@@ -86,4 +86,6 @@ typedef union Number {
 #define LITERAL_NCOMPARE(STR, LITERAL, M) \
     strncmp(STR, LITERAL, MIN(M, strlen(LITERAL)))
 
+#define LENGTH(X) (sizeof(X)/sizeof(*X))
+
 #endif /* STIV_H */

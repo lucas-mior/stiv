@@ -58,7 +58,7 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(double);
 static int exif_orientation(void);
-static int pipe_from_program(char *, char *, char *);
+static int pipe_from_program(char *[], char *);
 char *program;
 
 int main(int argc, char *argv[]) {
@@ -212,8 +212,15 @@ int main(int argc, char *argv[]) {
         int exif;
         int info_lines = 0;
         char info_exif[BUFSIZ];
+        char *argv1[] = {
+            "exiftool",
+            "-G",
+            "-s",
+            argv[1],
+            NULL
+        };
 
-        if ((exif = pipe_from_program("exiftool", argv[1], "exif.awk")) < 0) {
+        if ((exif = pipe_from_program(argv1, "exif.awk")) < 0) {
             fprintf(stderr, "Error opening pipe for exiftool.\n");
             break;
         }
@@ -370,10 +377,9 @@ exif_orientation(void) {
     return true;
 }
 
-int pipe_from_program(char *executable1, char *filename, char *executable2) {
+int pipe_from_program(char *argv1[], char *executable2) {
     int pipefd1[2]; // Pipe between the first program and the second program
     int pipefd2[2]; // Pipe between the second program and the parent process
-    char *argv1[3] = { executable1, filename, NULL };
     char *argv2[3] = { executable2, NULL };
 
     if (pipe(pipefd1) < 0 || pipe(pipefd2) < 0) {
