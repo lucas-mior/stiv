@@ -62,7 +62,7 @@ typedef enum ImageType {
 static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
-static int cache_image(double);
+static int cache_image(void);
 static int exif_orientation(void);
 static int pipe_from_program(char *[], char *);
 char *program;
@@ -115,7 +115,6 @@ int main(int argc, char *argv[]) {
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
         bool needs_rotation;
-        double new_width = 0;
 
         if (errno != ENOENT) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
@@ -139,7 +138,7 @@ int main(int argc, char *argv[]) {
                 error("Error loading magic: %s.\n", magic_error(magic));
                 exit(EXIT_FAILURE);
             }
-            if ((mime_type = magic_file(magic, image.basename)) == NULL) {
+            if ((mime_type = (char *) magic_file(magic, image.basename)) == NULL) {
                 error("Error in magic_file: %s.\n", magic_error(magic));
                 exit(EXIT_FAILURE);
             }
@@ -150,21 +149,12 @@ int main(int argc, char *argv[]) {
 
             magic_close(magic);
 
-            if (needs_rotation) {
-                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
-            } else if (image.width > MAX_IMG_WIDTH) {
-                new_width = MAX_CACHE_WIDTH;
-            } else if (image.width > MAX_PNG_WIDTH) {
-                if (image_type == IMAGE_TYPE_PNG)
-                    new_width = MAX_CACHE_WIDTH;
-            } else if (ends_with(image.basename, "ff")) {
-                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
-            } else if (image_type == IMAGE_TYPE_WEBP) {
-                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
-            }
-
-            if ((int) new_width) {
-                if (cache_image(new_width) < 0)
+            if (needs_rotation 
+                || (image.width > MAX_IMG_WIDTH)
+                || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
+                || (ends_with(image.basename, "ff"))
+                || (image_type == IMAGE_TYPE_WEBP)) {
+                if (cache_image() < 0)
                     image.fullpath = NULL;
             } else {
                 image.fullpath = NULL;
@@ -325,16 +315,18 @@ usage(FILE *stream) {
 }
 
 int
-cache_image(double new_width) {
+cache_image(void) {
     Imlib_Image imlib_image;
     Imlib_Load_Error err;
+    int new_width = image.width;
     double new_height;
-    double z;
-    if (new_width > MAX_IMG_WIDTH)
-        new_width = MAX_CACHE_WIDTH;
+    double resize_ratio;
 
-    z = image.width / new_width;
-    new_height = round(((double) image.height / z));
+    while (new_width > MAX_CACHE_WIDTH)
+        new_width /= 2;
+
+    resize_ratio = (double)image.width / (double)new_width;
+    new_height = round(((double)image.height / resize_ratio));
 
     imlib_context_set_anti_alias(1);
     imlib_image = imlib_create_cropped_scaled_image(0, 0,
