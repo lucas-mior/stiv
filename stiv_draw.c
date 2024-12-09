@@ -53,6 +53,12 @@ static Image image = {
     .height = 0,
 };
 
+typedef enum ImageType {
+    IMAGE_TYPE_PNG,
+    IMAGE_TYPE_WEBP,
+    IMAGE_TYPE_OTHER,
+} ImageType;
+
 static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
@@ -115,25 +121,45 @@ int main(int argc, char *argv[]) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
             image.fullpath = NULL;
         } else {
+            char *mime_type;
+            magic_t magic;
+            ImageType image_type = IMAGE_TYPE_OTHER;
+
             needs_rotation = exif_orientation();
             imlib_image_set_changes_on_disk();
 
             image.width = imlib_image_get_width();
             image.height = imlib_image_get_height();
 
+            if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
+                error("Error opening magic: %s\n", strerror(errno));
+                exit(EXIT_FAILURE);
+            }
+            if (magic_load(magic, NULL) < 0) {
+                error("Error loading magic: %s.\n", magic_error(magic));
+                exit(EXIT_FAILURE);
+            }
+            if ((mime_type = magic_file(magic, image.basename)) == NULL) {
+                error("Error in magic_file: %s.\n", magic_error(magic));
+                exit(EXIT_FAILURE);
+            }
+            if (!strcmp(mime_type, "image/png"))
+                image_type = IMAGE_TYPE_PNG;
+            if (!strcmp(mime_type, "image/webp"))
+                image_type = IMAGE_TYPE_WEBP;
+
+            magic_close(magic);
+
             if (needs_rotation) {
                 new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
             } else if (image.width > MAX_IMG_WIDTH) {
                 new_width = CACHE_IMG_WIDTH;
             } else if (image.width > MAX_PNG_WIDTH) {
-                magic_t magic;
-                magic = magic_open(MAGIC_MIME_TYPE);
-                magic_load(magic, NULL);
-                if (!strcmp(magic_file(magic, image.basename), "image/png"))
+                if (image_type == IMAGE_TYPE_PNG)
                     new_width = CACHE_IMG_WIDTH;
-
-                magic_close(magic);
             } else if (ends_with(image.basename, "ff")) {
+                new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
+            } else if (image_type == IMAGE_TYPE_WEBP) {
                 new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
             }
 
@@ -214,7 +240,7 @@ int main(int argc, char *argv[]) {
         char info_exif[BUFSIZ];
         char *argv1[] = {
             "exiftool",
-            "-G",
+            /* "-G", */
             "-s",
             argv[1],
             NULL
