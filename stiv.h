@@ -61,7 +61,7 @@ typedef size_t usize;
 typedef ssize_t isize;
 #endif
 
-static const double CACHE_IMG_WIDTH = 1024;
+static const double MAX_CACHE_WIDTH = 1024;
 static const int MAX_IMG_WIDTH = 2048;
 static const int MAX_PNG_WIDTH = 1536;
 static const int HEIGHT_SHELL = 11;

@@ -151,16 +151,16 @@ int main(int argc, char *argv[]) {
             magic_close(magic);
 
             if (needs_rotation) {
-                new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
+                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
             } else if (image.width > MAX_IMG_WIDTH) {
-                new_width = CACHE_IMG_WIDTH;
+                new_width = MAX_CACHE_WIDTH;
             } else if (image.width > MAX_PNG_WIDTH) {
                 if (image_type == IMAGE_TYPE_PNG)
-                    new_width = CACHE_IMG_WIDTH;
+                    new_width = MAX_CACHE_WIDTH;
             } else if (ends_with(image.basename, "ff")) {
-                new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
+                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
             } else if (image_type == IMAGE_TYPE_WEBP) {
-                new_width = MIN(image.width, (int) CACHE_IMG_WIDTH);
+                new_width = MIN(image.width, (int) MAX_CACHE_WIDTH);
             }
 
             if ((int) new_width) {
@@ -331,7 +331,7 @@ cache_image(double new_width) {
     double new_height;
     double z;
     if (new_width > MAX_IMG_WIDTH)
-        new_width = CACHE_IMG_WIDTH;
+        new_width = MAX_CACHE_WIDTH;
 
     z = image.width / new_width;
     new_height = round(((double) image.height / z));
