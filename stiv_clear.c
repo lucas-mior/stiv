@@ -18,7 +18,7 @@
 #include "stiv.h"
 #include "util.c"
 
-static int is_image(char *);
+static int is_image_preview(char *);
 static inline int literal_match(const char *, char *);
 
 char *program;
@@ -46,9 +46,9 @@ main(int argc, char **argv) {
     }
 
     if (last_filename && next_filename) {
-        if (!is_image(last_filename))
+        if (!is_image_preview(last_filename))
             exit(EXIT_SUCCESS);
-        if (is_image(next_filename))
+        if (is_image_preview(next_filename))
             exit(EXIT_SUCCESS);
     }
 
@@ -68,7 +68,7 @@ main(int argc, char **argv) {
 }
 
 int
-is_image(char *filename) {
+is_image_preview(char *filename) {
     do {
         magic_t magic;
         const char *mime_type;
