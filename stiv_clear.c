@@ -20,6 +20,7 @@
 
 static int is_image_preview(char *);
 static inline int literal_match(const char *, char *);
+static magic_t magic;
 
 char *program;
 
@@ -43,6 +44,15 @@ main(int argc, char **argv) {
     if (argc >= 7) {
         last_filename = realpath(argv[1], NULL);
         next_filename = realpath(argv[6], NULL);
+    }
+
+    if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
+        error("Error in magic_open(MAGIC_MIME_TYPE): %s\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    if (magic_load(magic, NULL) != 0) {
+        error("Error in magic_load(): %s\n", magic_error(magic));
+        exit(EXIT_FAILURE);
     }
 
     if (last_filename && next_filename) {
@@ -69,38 +79,19 @@ main(int argc, char **argv) {
 
 int
 is_image_preview(char *filename) {
-    do {
-        magic_t magic;
-        const char *mime_type;
+    const char *mime_type;
 
-        if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
-            break;
-        }
-        if (magic_load(magic, NULL) != 0) {
-            magic_close(magic);
-            break;
-        }
+    if ((mime_type = magic_file(magic, filename)) == NULL)
+        return false;
 
-        if ((mime_type = magic_file(magic, filename)) == NULL) {
-            magic_close(magic);
-            break;
-        }
-
-        if (!literal_match(mime_type, "image/")) {
-            magic_close(magic);
-            return true;
-        } else if (!literal_match(mime_type, "application/pdf")) {
-            magic_close(magic);
-            return true;
-        } else if (!literal_match(mime_type, "audio/")) {
-            magic_close(magic);
-            return true;
-        } else if (!literal_match(mime_type, "video/")) {
-            magic_close(magic);
-            return true;
-        }
-        magic_close(magic);
-    } while (0);
+    if (!literal_match(mime_type, "image/"))
+        return true;
+    if (!literal_match(mime_type, "application/pdf"))
+        return true;
+    if (!literal_match(mime_type, "audio/"))
+        return true;
+    if (!literal_match(mime_type, "video/"))
+        return true;
 
     return false;
 }

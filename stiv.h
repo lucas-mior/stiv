@@ -81,11 +81,6 @@ typedef union Number {
 } Number;
 
 #define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
-#define LITERAL_COMPARE(STR, LITERAL) \
-    strncmp(STR, LITERAL, strlen(LITERAL))
-#define LITERAL_NCOMPARE(STR, LITERAL, M) \
-    strncmp(STR, LITERAL, MIN(M, strlen(LITERAL)))
-
 #define LENGTH(X) (sizeof(X)/sizeof(*X))
 
 #endif /* STIV_H */

@@ -224,46 +224,46 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
-    do {
-        int exif;
-        int info_lines = 0;
-        char info_exif[BUFSIZ];
-        char *argv1[] = {
-            "exiftool",
-            /* "-G", */
-            "-s",
-            argv[1],
-            NULL
-        };
+    /* do { */
+    /*     int exif; */
+    /*     int info_lines = 0; */
+    /*     char info_exif[BUFSIZ]; */
+    /*     char *argv1[] = { */
+    /*         "exiftool", */
+    /*         /1* "-G", *1/ */
+    /*         "-s", */
+    /*         argv[1], */
+    /*         NULL */
+    /*     }; */
 
-        if ((exif = pipe_from_program(argv1, "exif.awk")) < 0) {
-            fprintf(stderr, "Error opening pipe for exiftool.\n");
-            break;
-        }
+    /*     if ((exif = pipe_from_program(argv1, "exif.awk")) < 0) { */
+    /*         fprintf(stderr, "Error opening pipe for exiftool.\n"); */
+    /*         break; */
+    /*     } */
 
-        ssize_t r = read(exif, info_exif, sizeof(info_exif));
-        if (r <= 0) {
-            fprintf(stderr, "Error reading from pipe");
-            if (r < 0)
-                fprintf(stderr, ": %s", strerror(errno));
-            break;
-        }
+    /*     ssize_t r = read(exif, info_exif, sizeof(info_exif)); */
+    /*     if (r <= 0) { */
+    /*         fprintf(stderr, "Error reading from pipe"); */
+    /*         if (r < 0) */
+    /*             fprintf(stderr, ": %s", strerror(errno)); */
+    /*         break; */
+    /*     } */
 
-        info_size = r;
-        info_exif[info_size] = '\0';
+    /*     info_size = r; */
+    /*     info_exif[info_size] = '\0'; */
 
-        for (int i = 0; i < info_size; i += 1) {
-            if (info_exif[i] == '\n')
-                info_lines += 1;
-        }
-        info_lines = MIN(info_lines, pane.height - 5);
+    /*     for (int i = 0; i < info_size; i += 1) { */
+    /*         if (info_exif[i] == '\n') */
+    /*             info_lines += 1; */
+    /*     } */
+    /*     info_lines = MIN(info_lines, pane.height - 5); */
 
-        pane.height = pane.height - info_lines;
-        for (int i = 0; i < pane.height; i += 1)
-            printf("\n");
+    /*     pane.height = pane.height - info_lines; */
+    /*     for (int i = 0; i < pane.height; i += 1) */
+    /*         printf("\n"); */
 
-        fwrite(info_exif, 1, info_size, stdout);
-    } while (false);
+    /*     fwrite(info_exif, 1, info_size, stdout); */
+    /* } while (false); */
 
     do {
         File UEBERZUG_FIFO = {
