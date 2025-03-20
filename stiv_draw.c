@@ -64,7 +64,6 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
-static int pipe_from_program(char *[], char *);
 char *program;
 
 int main(int argc, char *argv[]) {
@@ -72,7 +71,6 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     FILE *cache_img;
-    ssize_t info_size = 0;
 
     program = basename(argv[0]);
 
@@ -224,47 +222,6 @@ int main(int argc, char *argv[]) {
         usage(stderr);
     }
 
-    /* do { */
-    /*     int exif; */
-    /*     int info_lines = 0; */
-    /*     char info_exif[BUFSIZ]; */
-    /*     char *argv1[] = { */
-    /*         "exiftool", */
-    /*         /1* "-G", *1/ */
-    /*         "-s", */
-    /*         argv[1], */
-    /*         NULL */
-    /*     }; */
-
-    /*     if ((exif = pipe_from_program(argv1, "exif.awk")) < 0) { */
-    /*         fprintf(stderr, "Error opening pipe for exiftool.\n"); */
-    /*         break; */
-    /*     } */
-
-    /*     ssize_t r = read(exif, info_exif, sizeof(info_exif)); */
-    /*     if (r <= 0) { */
-    /*         fprintf(stderr, "Error reading from pipe"); */
-    /*         if (r < 0) */
-    /*             fprintf(stderr, ": %s", strerror(errno)); */
-    /*         break; */
-    /*     } */
-
-    /*     info_size = r; */
-    /*     info_exif[info_size] = '\0'; */
-
-    /*     for (int i = 0; i < info_size; i += 1) { */
-    /*         if (info_exif[i] == '\n') */
-    /*             info_lines += 1; */
-    /*     } */
-    /*     info_lines = MIN(info_lines, pane.height - 5); */
-
-    /*     pane.height = pane.height - info_lines; */
-    /*     for (int i = 0; i < pane.height; i += 1) */
-    /*         printf("\n"); */
-
-    /*     fwrite(info_exif, 1, info_size, stdout); */
-    /* } while (false); */
-
     do {
         File UEBERZUG_FIFO = {
             .file = NULL,
@@ -393,57 +350,4 @@ exif_orientation(void) {
         return false;
     }
     return true;
-}
-
-int pipe_from_program(char *argv1[], char *executable2) {
-    int pipefd1[2]; // Pipe between the first program and the second program
-    int pipefd2[2]; // Pipe between the second program and the parent process
-    char *argv2[3] = { executable2, NULL };
-
-    if (pipe(pipefd1) < 0 || pipe(pipefd2) < 0) {
-        fprintf(stderr, "Error creating pipes: %s\n", strerror(errno));
-        return -1;
-    }
-
-    switch (fork()) {
-    case 0: // Child process for the first program
-        close(pipefd1[0]); // Close read end of first pipe
-        dup2(pipefd1[1], STDOUT_FILENO); // Redirect stdout to the write end of the first pipe
-        close(pipefd1[1]); // Close original write end of first pipe
-        close(pipefd2[0]); // Close unused second pipe
-        close(pipefd2[1]);
-        execvp(argv1[0], argv1);
-
-        fprintf(stderr, "Error executing %s: %s\n", argv1[0], strerror(errno));
-        _exit(EXIT_FAILURE);
-    case -1:
-        fprintf(stderr, "Error forking for first program: %s\n", strerror(errno));
-        return -1;
-    }
-
-    switch (fork()) {
-    case 0: // Child process for the second program
-        close(pipefd1[1]); // Close write end of first pipe
-        dup2(pipefd1[0], STDIN_FILENO); // Redirect stdin to the read end of the first pipe
-        close(pipefd1[0]); // Close original read end of first pipe
-        close(pipefd2[0]); // Close read end of second pipe
-        dup2(pipefd2[1], STDOUT_FILENO); // Redirect stdout to the write end of the second pipe
-        close(pipefd2[1]); // Close original write end of second pipe
-        execvp(argv2[0], argv2);
-
-        fprintf(stderr, "Error executing %s: %s\n", argv2[0], strerror(errno));
-        _exit(EXIT_FAILURE);
-    case -1:
-        fprintf(stderr, "Error forking for second program: %s\n", strerror(errno));
-        return -1;
-    }
-
-    close(pipefd1[0]); // Close unused read end of first pipe
-    close(pipefd1[1]); // Close unused write end of first pipe
-    close(pipefd2[1]); // Close write end of second pipe
-
-    wait(NULL);
-    wait(NULL);
-
-    return pipefd2[0]; // Return the read end of the second pipe
 }
