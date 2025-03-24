@@ -65,27 +65,8 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
+static char * snprintf2(char *, size_t, char *, ...);
 char *program;
-
-char *
-snprintf2(char *buffer, int size, char *format, ...) {
-    int n;
-    va_list args;
-
-    va_start(args, format);
-    n = snprintf(buffer, size, format, args);
-    va_end(args);
-
-    if (n >= size) {
-        error("Error in snprintf: Too long string.\n");
-        exit(EXIT_FAILURE);
-    }
-    if (n < 0) {
-        error("Error printing cache name.\n");
-        exit(EXIT_FAILURE);
-    }
-    return buffer;
-}
 
 int main(int argc, char *argv[]) {
     Number lines;
@@ -364,4 +345,24 @@ exif_orientation(void) {
         return false;
     }
     return true;
+}
+
+char *
+snprintf2(char *buffer, size_t size, char *format, ...) {
+    int n;
+    va_list args;
+
+    va_start(args, format);
+    n = snprintf(buffer, size, format, args);
+    va_end(args);
+
+    if (n >= (int)size) {
+        error("Error in snprintf: Too long string.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (n < 0) {
+        error("Error printing cache name.\n");
+        exit(EXIT_FAILURE);
+    }
+    return buffer;
 }
