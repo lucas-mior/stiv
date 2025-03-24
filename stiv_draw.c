@@ -73,7 +73,6 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     FILE *cache_img;
-    struct stat file;
     char *XDG_CACHE_HOME = NULL;
     const char *preview = "preview/stiv";
 
@@ -83,14 +82,15 @@ int main(int argc, char *argv[]) {
     if ((argc == 3) && !strcmp(argv[2], "cache"))
         caching = true;
 
-
-    if (stat(image.basename, &file) < 0) {
-        error("Error calling stat on %s: %s.", image.basename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
     {
+        struct stat file;
         char buffer[PATH_MAX];
+
+        if (stat(image.basename, &file) < 0) {
+            error("Error calling stat on %s: %s.", image.basename, strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+
         snprintf2(buffer, sizeof(buffer), 
                   "%li_%ld_%ld",
                   file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
