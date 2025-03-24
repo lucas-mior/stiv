@@ -64,7 +64,7 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
-static char * snprintf2(char *, size_t, char *, ...);
+static char *snprintf2(char *, size_t, char *, ...);
 char *program;
 
 int main(int argc, char *argv[]) {
