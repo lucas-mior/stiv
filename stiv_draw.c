@@ -43,7 +43,8 @@ typedef struct Image {
     char *basename;
     char *fullpath;
     char *cachename;
-    int width, height;
+    int width;
+    int height;
 } Image;
 
 static Image image = {
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
             image.fullpath = NULL;
         } else {
-            char *mime_type;
+            const char *mime_type;
             magic_t magic;
             ImageType image_type = IMAGE_TYPE_OTHER;
 
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]) {
                 error("Error loading magic: %s.\n", magic_error(magic));
                 exit(EXIT_FAILURE);
             }
-            if ((mime_type = (char *) magic_file(magic, image.basename)) == NULL) {
+            if ((mime_type = magic_file(magic, image.basename)) == NULL) {
                 error("Error in magic_file: %s.\n", magic_error(magic));
                 exit(EXIT_FAILURE);
             }
@@ -170,7 +171,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
 
     if (print_dimensions) {
-        printf("\033[01;31m%u\033[0;mx\033[01;31m%u\033[0;m\n",
+        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n",
                image.width, image.height);
     }
 
@@ -251,7 +252,7 @@ int main(int argc, char *argv[]) {
 
         dprintf(UEBERZUG_FIFO.fd,
                 "{\"action\": \"add\", \"identifier\": \"preview\","
-                "\"x\": %u, \"y\": %u, \"max_width\": %u, \"max_height\": %u,",
+                "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
                 pane.x, pane.y, pane.width, pane.height);
         dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
