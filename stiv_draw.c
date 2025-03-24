@@ -73,7 +73,6 @@ int main(int argc, char *argv[]) {
     bool caching = false;
     FILE *cache_img;
     struct stat file;
-    char buffer[PATH_MAX];
     int n;
     char *XDG_CACHE_HOME = NULL;
     const char *preview = "preview/stiv";
@@ -90,27 +89,30 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    n = snprintf(buffer, sizeof (buffer),
-                 "%li_%ld_%ld",
-                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-    if (n < 0) {
-        error("Error printing cache name.\n");
-        exit(EXIT_FAILURE);
-    }
-    image.cachename = util_strdup(buffer);
+    {
+        char buffer[PATH_MAX];
+        n = snprintf(buffer, sizeof (buffer),
+                     "%li_%ld_%ld",
+                     file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+        if (n < 0) {
+            error("Error printing cache name.\n");
+            exit(EXIT_FAILURE);
+        }
+        image.cachename = util_strdup(buffer);
 
-    if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
-        error("XDG_CACHE_HOME is not set. Exiting...\n");
-        exit(EXIT_FAILURE);
-    }
+        if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
+            error("XDG_CACHE_HOME is not set. Exiting...\n");
+            exit(EXIT_FAILURE);
+        }
 
-    n = snprintf(buffer, sizeof (buffer),
-                 "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
-    if (n < 0) {
-        error("Error printing cache name.\n");
-        exit(EXIT_FAILURE);
+        n = snprintf(buffer, sizeof (buffer),
+                     "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
+        if (n < 0) {
+            error("Error printing cache name.\n");
+            exit(EXIT_FAILURE);
+        }
+        image.fullpath = util_strdup(buffer);
     }
-    image.fullpath = util_strdup(buffer);
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
         bool needs_rotation;
