@@ -73,8 +73,6 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     FILE *cache_img;
-    char *XDG_CACHE_HOME = NULL;
-    const char *preview = "preview/stiv";
 
     program = basename(argv[0]);
 
@@ -83,6 +81,8 @@ int main(int argc, char *argv[]) {
         caching = true;
 
     {
+        const char *preview = "preview/stiv";
+        char *XDG_CACHE_HOME = NULL;
         struct stat file;
         char buffer[PATH_MAX];
 
