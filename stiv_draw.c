@@ -67,13 +67,32 @@ static int cache_image(void);
 static int exif_orientation(void);
 char *program;
 
+char *
+snprintf2(char *buffer, int size, char *format, ...) {
+    int n;
+    va_list args;
+
+    va_start(args, format);
+    n = snprintf(buffer, size, format, args);
+    va_end(args);
+
+    if (n >= size) {
+        error("Error in snprintf: Too long string.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (n < 0) {
+        error("Error printing cache name.\n");
+        exit(EXIT_FAILURE);
+    }
+    return buffer;
+}
+
 int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
     bool caching = false;
     FILE *cache_img;
     struct stat file;
-    int n;
     char *XDG_CACHE_HOME = NULL;
     const char *preview = "preview/stiv";
 
@@ -91,13 +110,9 @@ int main(int argc, char *argv[]) {
 
     {
         char buffer[PATH_MAX];
-        n = snprintf(buffer, sizeof (buffer),
-                     "%li_%ld_%ld",
-                     file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-        if (n < 0) {
-            error("Error printing cache name.\n");
-            exit(EXIT_FAILURE);
-        }
+        snprintf2(buffer, sizeof(buffer), 
+                  "%li_%ld_%ld",
+                  file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
         image.cachename = util_strdup(buffer);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
@@ -105,12 +120,8 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        n = snprintf(buffer, sizeof (buffer),
-                     "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
-        if (n < 0) {
-            error("Error printing cache name.\n");
-            exit(EXIT_FAILURE);
-        }
+        snprintf2(buffer, sizeof (buffer),
+                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
         image.fullpath = util_strdup(buffer);
     }
 
