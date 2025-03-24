@@ -71,6 +71,11 @@ int main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     FILE *cache_img;
+    struct stat file;
+    char buffer[PATH_MAX];
+    int n;
+    char *XDG_CACHE_HOME = NULL;
+    const char *preview = "preview/stiv";
 
     program = basename(argv[0]);
 
@@ -78,11 +83,6 @@ int main(int argc, char *argv[]) {
     if ((argc == 3) && !strcmp(argv[2], "cache"))
         caching = true;
 
-    struct stat file;
-    char buffer[PATH_MAX];
-	int n;
-    char *XDG_CACHE_HOME = NULL;
-    const char *preview = "preview/stiv";
 
     if (stat(image.basename, &file) < 0) {
         error("Error calling stat on %s: %s.", image.basename, strerror(errno));
@@ -92,10 +92,10 @@ int main(int argc, char *argv[]) {
     n = snprintf(buffer, sizeof (buffer),
                  "%li_%ld_%ld",
                  file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-	if (n < 0) {
-		error("Error printing cache name.\n");
-		exit(EXIT_FAILURE);
-	}
+    if (n < 0) {
+        error("Error printing cache name.\n");
+        exit(EXIT_FAILURE);
+    }
     image.cachename = util_strdup(buffer);
 
     if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
@@ -105,10 +105,10 @@ int main(int argc, char *argv[]) {
 
     n = snprintf(buffer, sizeof (buffer),
                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
-	if (n < 0) {
-		error("Error printing cache name.\n");
-		exit(EXIT_FAILURE);
-	}
+    if (n < 0) {
+        error("Error printing cache name.\n");
+        exit(EXIT_FAILURE);
+    }
     image.fullpath = util_strdup(buffer);
 
     if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
