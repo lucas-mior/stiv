@@ -112,8 +112,6 @@ int main(int argc, char *argv[]) {
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
     } else {
-        bool needs_rotation;
-
         if (errno != ENOENT) {
             error("Error opening %s: %s\n", image.fullpath, strerror(errno));
             image.fullpath = NULL;
@@ -121,8 +119,7 @@ int main(int argc, char *argv[]) {
             const char *mime_type;
             magic_t magic;
             ImageType image_type = IMAGE_TYPE_OTHER;
-
-            needs_rotation = exif_orientation();
+            bool needs_rotation = exif_orientation();
             imlib_image_set_changes_on_disk();
 
             image.width = imlib_image_get_width();
