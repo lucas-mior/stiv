@@ -87,7 +87,8 @@ int main(int argc, char *argv[]) {
         char buffer[PATH_MAX];
 
         if (stat(image.basename, &file) < 0) {
-            error("Error calling stat on %s: %s.", image.basename, strerror(errno));
+            error("Error calling stat on %s: %s.",
+                  image.basename, strerror(errno));
             exit(EXIT_FAILURE);
         }
 
