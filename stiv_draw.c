@@ -106,7 +106,13 @@ int main(int argc, char *argv[]) {
         image.fullpath = util_strdup(buffer);
     }
 
-    if ((cache_img = fopen(image.fullpath, "r")) == NULL) {
+    if ((cache_img = fopen(image.fullpath, "r"))) {
+        Imlib_Image imlib_image;
+        imlib_image = imlib_load_image(image.basename);
+        imlib_context_set_image(imlib_image);
+        image.width = imlib_image_get_width();
+        image.height = imlib_image_get_height();
+    } else {
         bool needs_rotation;
 
         if (errno != ENOENT) {
@@ -153,12 +159,6 @@ int main(int argc, char *argv[]) {
                 image.fullpath = NULL;
             }
         }
-    } else {
-        Imlib_Image imlib_image;
-        imlib_image = imlib_load_image(image.basename);
-        imlib_context_set_image(imlib_image);
-        image.width = imlib_image_get_width();
-        image.height = imlib_image_get_height();
     }
 
     if (caching)
