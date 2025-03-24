@@ -111,49 +111,47 @@ int main(int argc, char *argv[]) {
         imlib_context_set_image(imlib_image);
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
+    } else if (errno != ENOENT) {
+        error("Error opening %s: %s\n", image.fullpath, strerror(errno));
+        image.fullpath = NULL;
     } else {
-        if (errno != ENOENT) {
-            error("Error opening %s: %s\n", image.fullpath, strerror(errno));
-            image.fullpath = NULL;
-        } else {
-            const char *mime_type;
-            magic_t magic;
-            ImageType image_type = IMAGE_TYPE_OTHER;
-            bool needs_rotation = exif_orientation();
-            imlib_image_set_changes_on_disk();
+        const char *mime_type;
+        magic_t magic;
+        ImageType image_type = IMAGE_TYPE_OTHER;
+        bool needs_rotation = exif_orientation();
+        imlib_image_set_changes_on_disk();
 
-            image.width = imlib_image_get_width();
-            image.height = imlib_image_get_height();
+        image.width = imlib_image_get_width();
+        image.height = imlib_image_get_height();
 
-            if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
-                error("Error opening magic: %s\n", strerror(errno));
-                exit(EXIT_FAILURE);
-            }
-            if (magic_load(magic, NULL) < 0) {
-                error("Error loading magic: %s.\n", magic_error(magic));
-                exit(EXIT_FAILURE);
-            }
-            if ((mime_type = magic_file(magic, image.basename)) == NULL) {
-                error("Error in magic_file: %s.\n", magic_error(magic));
-                exit(EXIT_FAILURE);
-            }
-            if (!strcmp(mime_type, "image/png"))
-                image_type = IMAGE_TYPE_PNG;
-            if (!strcmp(mime_type, "image/webp"))
-                image_type = IMAGE_TYPE_WEBP;
+        if ((magic = magic_open(MAGIC_MIME_TYPE)) == NULL) {
+            error("Error opening magic: %s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        }
+        if (magic_load(magic, NULL) < 0) {
+            error("Error loading magic: %s.\n", magic_error(magic));
+            exit(EXIT_FAILURE);
+        }
+        if ((mime_type = magic_file(magic, image.basename)) == NULL) {
+            error("Error in magic_file: %s.\n", magic_error(magic));
+            exit(EXIT_FAILURE);
+        }
+        if (!strcmp(mime_type, "image/png"))
+            image_type = IMAGE_TYPE_PNG;
+        if (!strcmp(mime_type, "image/webp"))
+            image_type = IMAGE_TYPE_WEBP;
 
-            magic_close(magic);
+        magic_close(magic);
 
-            if (needs_rotation 
-                || (image.width > MAX_IMG_WIDTH)
-                || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
-                || (ends_with(image.basename, "ff"))
-                || (image_type == IMAGE_TYPE_WEBP)) {
-                if (cache_image() < 0)
-                    image.fullpath = NULL;
-            } else {
+        if (needs_rotation 
+            || (image.width > MAX_IMG_WIDTH)
+            || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
+            || (ends_with(image.basename, "ff"))
+            || (image_type == IMAGE_TYPE_WEBP)) {
+            if (cache_image() < 0)
                 image.fullpath = NULL;
-            }
+        } else {
+            image.fullpath = NULL;
         }
     }
 
