@@ -42,7 +42,6 @@ static bool print_dimensions = true;
 typedef struct Image {
     char *basename;
     char *fullpath;
-    char *cachename;
     int width;
     int height;
 } Image;
@@ -95,7 +94,6 @@ int main(int argc, char *argv[]) {
         snprintf2(buffer, sizeof(buffer), 
                   "%li_%ld_%ld",
                   file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
-        image.cachename = util_strdup(buffer);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
@@ -103,7 +101,7 @@ int main(int argc, char *argv[]) {
         }
 
         snprintf2(buffer, sizeof (buffer),
-                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, image.cachename);
+                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
         image.fullpath = util_strdup(buffer);
     }
 
