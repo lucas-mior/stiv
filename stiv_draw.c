@@ -91,17 +91,16 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        snprintf2(buffer, sizeof(buffer), 
-                  "%li_%ld_%ld",
-                  file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+        SNPRINTF(buffer, 
+                 "%li_%ld_%ld",
+                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
             exit(EXIT_FAILURE);
         }
 
-        snprintf2(buffer, sizeof(buffer),
-                  "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
+        SNPRINTF(buffer, "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
         image.fullpath = util_strdup(buffer);
     }
 
@@ -350,12 +349,12 @@ snprintf2(char *buffer, size_t size, char *format, ...) {
     n = snprintf(buffer, size, format, args);
     va_end(args);
 
-    if (n >= (int)size) {
-        error("Error in snprintf: Too long string.\n");
-        exit(EXIT_FAILURE);
-    }
     if (n < 0) {
         error("Error printing cache name.\n");
+        exit(EXIT_FAILURE);
+    }
+    if (n >= (int)size) {
+        error("Error in snprintf: Too long string.\n");
         exit(EXIT_FAILURE);
     }
     return buffer;

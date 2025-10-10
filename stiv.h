@@ -82,5 +82,7 @@ typedef union Number {
 
 #define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
 #define LENGTH(X) (sizeof(X)/sizeof(*X))
+#define SNPRINTF(BUFFER, FORMAT, ...) \
+    snprintf2(BUFFER, sizeof(BUFFER), FORMAT, __VA_ARGS__)
 
 #endif /* STIV_H */
