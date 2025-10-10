@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        snprintf2(buffer, sizeof (buffer),
+        snprintf2(buffer, sizeof(buffer),
                   "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
         image.fullpath = util_strdup(buffer);
     }
