@@ -85,4 +85,21 @@ typedef union Number {
 #define SNPRINTF(BUFFER, FORMAT, ...) \
     snprintf2(BUFFER, sizeof(BUFFER), FORMAT, __VA_ARGS__)
 
+static void util_close(File *f);
+static bool util_open(File *f, const int flag);
+void
+util_close(File *f) {
+    if (f->fd >= 0) {
+        if (close(f->fd) < 0)
+            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
+        f->fd = -1;
+    }
+   if (f->file != NULL) {
+        if (fclose(f->file) != 0)
+            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
+        f->file = NULL;
+   }
+   return;
+}
+
 #endif /* STIV_H */

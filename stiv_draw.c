@@ -64,8 +64,19 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
-static char *snprintf2(char *, size_t, char *, ...);
+
 char *program;
+
+bool
+ends_with(const char *str, const char *end) {
+    const char *ldot = strrchr(str, '.');
+    usize length = 0;
+    if (ldot != NULL) {
+        length = strlen(end);
+        return !strncmp(ldot + 1, end, length);
+     }
+    return false;
+}
 
 int main(int argc, char *argv[]) {
     Number lines;
@@ -101,7 +112,7 @@ int main(int argc, char *argv[]) {
         }
 
         SNPRINTF(buffer, "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
-        image.fullpath = util_strdup(buffer);
+        image.fullpath = xstrdup(buffer);
     }
 
     if ((cache_img = fopen(image.fullpath, "r"))) {
@@ -164,10 +175,10 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 6) {
         // chamado por `lf > piscou > stiv`
-        pane.width = util_string_int32(argv[2]);
-        pane.height = util_string_int32(argv[3]) - 1;
-        pane.x = util_string_int32(argv[4]);
-        pane.y = util_string_int32(argv[5]) + 1;
+        pane.width = atoi(argv[2]);
+        pane.height = atoi(argv[3]) - 1;
+        pane.x = atoi(argv[4]);
+        pane.y = atoi(argv[5]) + 1;
         /* pane.y += 1; // tmux bugs lf's Y by 1 */
 
         pane.width -= 2;
@@ -179,16 +190,16 @@ int main(int argc, char *argv[]) {
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
             && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > piscou > stiv`
-        pane.width = util_string_int32(columns.string);
-        pane.height = util_string_int32(lines.string);
+        pane.width = atoi(columns.string);
+        pane.height = atoi(lines.string);
 
         pane.x = pane.width + (pane.width % 2);
         pane.y = 1;
     } else if ((columns.string = getenv("COLUMNS"))
             && (lines.string = getenv("LINES"))) {
         // chamado por `skim > piscou > stiv`
-        pane.width = util_string_int32(columns.string);
-        pane.height = util_string_int32(lines.string);
+        pane.width = atoi(columns.string);
+        pane.height = atoi(lines.string);
 
         pane.x = pane.width + 1 + ((pane.width + 1) % 2) + 1;
         pane.y = 1;
@@ -199,8 +210,8 @@ int main(int argc, char *argv[]) {
         // chamado por `zsh > stiv`
         columns.string = argv[2];
         lines.string = argv[3];
-        columns.number = util_string_int32(columns.string);
-        lines.number = util_string_int32(lines.string);
+        columns.number = atoi(columns.string);
+        lines.number = atoi(lines.string);
 
         pane.width = columns.number;
         pane.height = HEIGHT_SHELL;
@@ -338,24 +349,4 @@ exif_orientation(void) {
         return false;
     }
     return true;
-}
-
-char *
-snprintf2(char *buffer, size_t size, char *format, ...) {
-    int n;
-    va_list args;
-
-    va_start(args, format);
-    n = snprintf(buffer, size, format, args);
-    va_end(args);
-
-    if (n < 0) {
-        error("Error printing cache name.\n");
-        exit(EXIT_FAILURE);
-    }
-    if (n >= (int)size) {
-        error("Error in snprintf: Too long string.\n");
-        exit(EXIT_FAILURE);
-    }
-    return buffer;
 }
