@@ -64,6 +64,7 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
+static bool ends_with(const char *str, const char *end);
 
 char *program;
 

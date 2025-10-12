@@ -30,6 +30,7 @@ program3="stiv_draw"
 
 CFLAGS="$CFLAGS -std=c99 -D_DEFAULT_SOURCE "
 CFLAGS="$CFLAGS -Wextra -Wall -Wno-unused-macros -Wno-unused-function"
+CFLAGS="$CFLAGS -Wno-constant-logical-operand"
 LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif "
 
 CC=${CC:-cc}
