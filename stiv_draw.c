@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     Number lines;
     Number columns;
     bool caching = false;
-    FILE *cache_img;
+    int cache_img;
 
     program = basename(argv[0]);
 
@@ -116,9 +116,9 @@ int main(int argc, char *argv[]) {
         image.fullpath = xstrdup(buffer);
     }
 
-    if ((cache_img = fopen(image.fullpath, "r"))) {
+    if ((cache_img = open(image.fullpath, O_RDONLY)) >= 0) {
         Imlib_Image imlib_image;
-        imlib_image = imlib_load_image(image.basename);
+        imlib_image = imlib_load_image_fd(cache_img, image.basename);
         imlib_context_set_image(imlib_image);
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
