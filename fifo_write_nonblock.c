@@ -39,8 +39,14 @@ main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    dprintf(fd, "%s\n", string);
+    if (dprintf(fd, "%s\n", string) < 0) {
+        error("Error in dprintf: %s.\n", strerror(errno));
+        exit(EXIT_FAILURE);
+    }
 
-    close(fd);
+    if (close(fd) < 0) {
+        error("Error closing %s: %s.\n", fifo, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
     exit(EXIT_SUCCESS);
 }
