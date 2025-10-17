@@ -75,11 +75,12 @@ ends_with(const char *str, const char *end) {
     if (ldot != NULL) {
         length = strlen(end);
         return !strncmp(ldot + 1, end, length);
-     }
+    }
     return false;
 }
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[]) {
     Number lines;
     Number columns;
     bool caching = false;
@@ -88,8 +89,9 @@ int main(int argc, char *argv[]) {
     program = basename(argv[0]);
 
     image.basename = argv[1];
-    if ((argc == 3) && !strcmp(argv[2], "cache"))
+    if ((argc == 3) && !strcmp(argv[2], "cache")) {
         caching = true;
+    }
 
     {
         const char *preview = "preview/stiv";
@@ -98,14 +100,13 @@ int main(int argc, char *argv[]) {
         char buffer[PATH_MAX];
 
         if (stat(image.basename, &file) < 0) {
-            error("Error calling stat on %s: %s.",
-                  image.basename, strerror(errno));
+            error("Error calling stat on %s: %s.", image.basename,
+                  strerror(errno));
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, 
-                 "%li_%ld_%ld",
-                 file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+        SNPRINTF(buffer, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec,
+                 file.st_mtim.tv_nsec);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
@@ -147,31 +148,34 @@ int main(int argc, char *argv[]) {
             error("Error in magic_file: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
-        if (!strcmp(mime_type, "image/png"))
+        if (!strcmp(mime_type, "image/png")) {
             image_type = IMAGE_TYPE_PNG;
-        if (!strcmp(mime_type, "image/webp"))
+        }
+        if (!strcmp(mime_type, "image/webp")) {
             image_type = IMAGE_TYPE_WEBP;
+        }
 
         magic_close(magic);
 
-        if (needs_rotation 
-            || (image.width > MAX_IMG_WIDTH)
+        if (needs_rotation || (image.width > MAX_IMG_WIDTH)
             || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
             || (ends_with(image.basename, "ff"))
             || (image_type == IMAGE_TYPE_WEBP)) {
-            if (cache_image() < 0)
+            if (cache_image() < 0) {
                 image.fullpath = NULL;
+            }
         } else {
             image.fullpath = NULL;
         }
     }
 
-    if (caching)
+    if (caching) {
         exit(EXIT_FAILURE);
+    }
 
     if (print_dimensions) {
-        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n",
-               image.width, image.height);
+        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n", image.width,
+               image.height);
     }
 
     if (argc >= 6) {
@@ -189,7 +193,7 @@ int main(int argc, char *argv[]) {
             pane.y -= 1;
         }
     } else if ((columns.string = getenv("FZF_PREVIEW_COLUMNS"))
-            && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
+               && (lines.string = getenv("FZF_PREVIEW_LINES"))) {
         // chamado por `fzf > piscou > stiv`
         pane.width = atoi(columns.string);
         pane.height = atoi(lines.string);
@@ -197,7 +201,7 @@ int main(int argc, char *argv[]) {
         pane.x = pane.width + (pane.width % 2);
         pane.y = 1;
     } else if ((columns.string = getenv("COLUMNS"))
-            && (lines.string = getenv("LINES"))) {
+               && (lines.string = getenv("LINES"))) {
         // chamado por `skim > piscou > stiv`
         pane.width = atoi(columns.string);
         pane.height = atoi(lines.string);
@@ -223,26 +227,22 @@ int main(int argc, char *argv[]) {
     }
 
     do {
-        File UEBERZUG_FIFO = {
-            .file = NULL,
-            .fd = -1,
-            .name = NULL
-        };
+        File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
         if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
             error("UEBERZUG_FIFO environment variable is not set.\n");
             break;
         }
-        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
-                                     O_WRONLY | O_NONBLOCK)) < 0) {
+        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
+            < 0) {
             error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
             break;
         }
 
         if (image.fullpath == NULL) {
             if (!(image.fullpath = realpath(image.basename, NULL))) {
-                error("Error getting realpath of %s: %s",
-                      image.fullpath, strerror(errno));
+                error("Error getting realpath of %s: %s", image.fullpath,
+                      strerror(errno));
                 dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
                 util_close(&UEBERZUG_FIFO);
                 break;
@@ -268,7 +268,7 @@ usage(FILE *stream) {
     fprintf(stream, "usage: stiv IMAGE W H [X Y]\n");
     fprintf(stream, "Be sure to have ueberzug running in the terminal "
                     "and UEBERZUG_FIFO env variable set\n");
-    exit((int) (stream != stdout));
+    exit((int)(stream != stdout));
 }
 
 int
@@ -279,17 +279,16 @@ cache_image(void) {
     double new_height;
     double resize_ratio;
 
-    while (new_width > MAX_CACHE_WIDTH)
+    while (new_width > MAX_CACHE_WIDTH) {
         new_width /= 2;
+    }
 
     resize_ratio = (double)image.width / (double)new_width;
     new_height = round(((double)image.height / resize_ratio));
 
     imlib_context_set_anti_alias(1);
-    imlib_image = imlib_create_cropped_scaled_image(0, 0,
-                                                    image.width, image.height,
-                                                    (int)new_width,
-                                                    (int)new_height);
+    imlib_image = imlib_create_cropped_scaled_image(
+        0, 0, image.width, image.height, (int)new_width, (int)new_height);
     if (imlib_image == NULL) {
         error("Error in imlib_create_cropped_scaled_image()\n");
         return -1;
@@ -325,14 +324,16 @@ exif_orientation(void) {
     imlib_context_set_image(imlib_image);
     imlib_image_set_changes_on_disk();
 
-    if ((exif_data = exif_data_new_from_file(image.basename)) == NULL)
+    if ((exif_data = exif_data_new_from_file(image.basename)) == NULL) {
         return 0;
+    }
 
     byte_order = exif_data_get_byte_order(exif_data);
     exif_entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
                                         EXIF_TAG_ORIENTATION);
-    if (exif_entry)
+    if (exif_entry) {
         orientation = exif_get_short(exif_entry->data, byte_order);
+    }
 
     exif_data_unref(exif_data);
 

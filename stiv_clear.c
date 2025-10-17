@@ -26,11 +26,7 @@ char *program;
 
 int
 main(int argc, char **argv) {
-    File UEBERZUG_FIFO = {
-        .file = NULL,
-        .fd = -1,
-        .name = NULL
-    };
+    File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
     char *last_filename = NULL;
     char *next_filename = NULL;
@@ -38,7 +34,7 @@ main(int argc, char **argv) {
 
     // $1 previous file name
     // $2 width $3 height
-    // $4 horizontal position 
+    // $4 horizontal position
     // $5 vertical position of preview pane
     // $6 current filename to be previewed
     if (argc >= 7) {
@@ -56,18 +52,20 @@ main(int argc, char **argv) {
     }
 
     if (last_filename && next_filename) {
-        if (!is_image_preview(last_filename))
+        if (!is_image_preview(last_filename)) {
             exit(EXIT_SUCCESS);
-        if (is_image_preview(next_filename))
+        }
+        if (is_image_preview(next_filename)) {
             exit(EXIT_SUCCESS);
+        }
     }
 
     if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
         error("UEBERZUG_FIFO environment variable is not set.\n");
         exit(EXIT_FAILURE);
     }
-    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name,
-                                 O_WRONLY | O_NONBLOCK)) < 0) {
+    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
+        < 0) {
         error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
         exit(EXIT_FAILURE);
     }
@@ -81,22 +79,28 @@ int
 is_image_preview(char *filename) {
     const char *mime_type;
 
-    if ((mime_type = magic_file(magic, filename)) == NULL)
+    if ((mime_type = magic_file(magic, filename)) == NULL) {
         return false;
+    }
 
-    if (!literal_match(mime_type, "image/"))
+    if (!literal_match(mime_type, "image/")) {
         return true;
-    if (!literal_match(mime_type, "application/pdf"))
+    }
+    if (!literal_match(mime_type, "application/pdf")) {
         return true;
-    if (!literal_match(mime_type, "audio/"))
+    }
+    if (!literal_match(mime_type, "audio/")) {
         return true;
-    if (!literal_match(mime_type, "video/"))
+    }
+    if (!literal_match(mime_type, "video/")) {
         return true;
+    }
 
     return false;
 }
 
-int literal_match(const char *mime, char *literal) {
+int
+literal_match(const char *mime, char *literal) {
     size_t n = strlen(literal);
     return strncmp(literal, mime, n);
 }
