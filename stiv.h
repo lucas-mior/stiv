@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STIV_H
+#if !defined(STIV_H)
 #define STIV_H
 
 #include <errno.h>
@@ -40,7 +40,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#ifndef INTEGERS
+#if !defined(INTEGERS)
 #define INTEGERS
 typedef unsigned char uchar;
 typedef unsigned short ushort;
