@@ -1,22 +1,5 @@
 #!/bin/sh
 
-testing () {
-    for src in *.c; do
-        [ "$src" = "$main" ] && continue
-        printf "Testing $src...\n"
-
-        flags="$(awk '/flags:/ { $1=$2=""; print $0 }' "$src")"
-        set -x
-        if $CC $CPPFLAGS $CFLAGS $src -o $src.exe $flags; then
-            ./$src.exe
-        else
-            printf "Failed to compile ${RED} $src ${RES}, is main() defined?\n"
-        fi
-
-        set +x 
-    done
-}
-
 target="${1:-build}"
 PREFIX="${PREFIX:-/usr/local}"
 DESTDIR="${DESTDIR:-/}"
@@ -59,9 +42,6 @@ case "$target" in
     rm -f ${DESTDIR}${PREFIX}/bin/${program2}
     rm -f ${DESTDIR}${PREFIX}/bin/${program3}
     ;;
-"test")
-    testing
-    ;;
 "install")
     if [ ! -f $program1 ] || [ ! -f $program2 ] || [ ! -f $program3 ]; then
         build
@@ -80,6 +60,6 @@ case "$target" in
     $CC $CPPFLAGS $CFLAGS -o ${program3} "$main3" $LDFLAGS
     ;;
 *)
-    echo "usage: $0 [ uninstall / test / install / build / debug / benchmark ]"
+    echo "usage: $0 [ uninstall / install / build / debug / benchmark ]"
     ;;
 esac
