@@ -36,6 +36,13 @@
 #include <sys/wait.h>
 #endif
 
+#if defined(__INCLUDE_LEVEL__) && __INCLUDE_LEVEL__ == 0
+#define TESTING_util 1
+char *program = __FILE__;
+#elif !defined(TESTING_util)
+#define TESTING_util 0
+#endif
+
 #if !defined(SIZEKB)
 #define SIZEKB(X) ((size_t)(X)*1024ul)
 #define SIZEMB(X) ((size_t)(X)*1024ul*1024ul)
@@ -49,9 +56,9 @@
 #define SNPRINTF(BUFFER, FORMAT, ...)                                          \
     snprintf2(BUFFER, sizeof(BUFFER), FORMAT, __VA_ARGS__)
 #endif
-#if !defined(ARRAY_STRING)
-#define ARRAY_STRING(BUFFER, SEP, ARRAY, LENGTH)                               \
-    array_string(BUFFER, sizeof(BUFFER), SEP, ARRAY, LENGTH)
+#if !defined(STRING_FROM_STRINGS)
+#define STRING_FROM_STRINGS(BUFFER, SEP, ARRAY, LENGTH)                        \
+    string_from_strings(BUFFER, sizeof(BUFFER), SEP, ARRAY, LENGTH)
 #endif
 
 #if !defined(DEBUGGING)
@@ -111,12 +118,13 @@ static char *xstrdup(char *);
 static int32 snprintf2(char *, size_t, char *, ...);
 static void error(char *, ...);
 static void fatal(int) __attribute__((noreturn));
-static void array_string(char *, int32, char *, char **, int32);
+static void string_from_strings(char *, int32, char *, char **, int32);
 static int32 util_copy_file(const char *, const char *);
 static int32 util_string_int32(int32 *, const char *);
 static int util_command(const int, char **);
 static uint32 util_nthreads(void);
-static void util_die_notify(const char *, ...) __attribute__((noreturn));
+static void util_die_notify(char *, const char *, ...)
+    __attribute__((noreturn));
 static void util_segv_handler(int32) __attribute__((noreturn));
 static void send_signal(const char *, const int);
 static char *itoa2(long, char *);
@@ -374,8 +382,8 @@ util_command(const int argc, char **argv) {
 #endif
 
 void
-array_string(char *buffer, int32 size, char *sep, char **array,
-             int32 array_length) {
+string_from_strings(char *buffer, int32 size, char *sep, char **array,
+                    int32 array_length) {
     int32 n = 0;
 
     for (int32 i = 0; i < (array_length - 1); i += 1) {
@@ -433,12 +441,12 @@ error(char *format, ...) {
 
 void
 fatal(int status) {
-#if defined(DEBUGGING)
-    (void)status;
-    abort();
-#else
-    exit(status);
-#endif
+    if (DEBUGGING) {
+        (void)status;
+        abort();
+    } else {
+        exit(status);
+    }
 }
 
 void
@@ -448,7 +456,7 @@ util_segv_handler(int32 unused) {
 
     (void)write(STDERR_FILENO, message, strlen(message));
     for (uint i = 0; i < LENGTH(notifiers); i += 1) {
-        execlp(notifiers[i], notifiers[i], "-u", "critical", "clipsim", message,
+        execlp(notifiers[i], notifiers[i], "-u", "critical", program, message,
                NULL);
     }
     _exit(EXIT_FAILURE);
@@ -471,7 +479,7 @@ util_string_int32(int32 *number, const char *string) {
 }
 
 void
-util_die_notify(const char *format, ...) {
+util_die_notify(char *program_name, const char *format, ...) {
     int32 n;
     va_list args;
     char buffer[BUFSIZ];
@@ -491,8 +499,8 @@ util_die_notify(const char *format, ...) {
     buffer[n] = '\0';
     (void)write(STDERR_FILENO, buffer, (usize)n + 1);
     for (uint i = 0; i < LENGTH(notifiers); i += 1) {
-        execlp(notifiers[i], notifiers[i], "-u", "critical", "clipsim", buffer,
-               NULL);
+        execlp(notifiers[i], notifiers[i], "-u", "critical", program_name,
+               buffer, NULL);
     }
     fatal(EXIT_FAILURE);
 }
@@ -570,8 +578,6 @@ send_signal(const char *executable, const int32 signal_number) {
         return;
     }
 
-    error("looking for %s -> %d\n", executable, signal_number);
-
     while ((process = readdir(processes))) {
         char buffer[256];
         char command[256];
@@ -597,6 +603,7 @@ send_signal(const char *executable, const int32 signal_number) {
         if ((cmdline = open(buffer, O_RDONLY)) < 0) {
             if (errno != ENOENT || DEBUGGING) {
                 error("Error opening %s: %s.\n", buffer, strerror(errno));
+                continue;
             }
             if (errno != ENOENT) {
                 fatal(EXIT_FAILURE);
@@ -606,12 +613,13 @@ send_signal(const char *executable, const int32 signal_number) {
         errno = 0;
         if ((r = read(cmdline, command, sizeof(command))) <= 0) {
             if (DEBUGGING) {
-                error("Error reading from %s");
+                error("Error reading from %s", buffer);
                 if (r < 0) {
-                    error(": %s", buffer, strerror(errno));
+                    error(": %s", strerror(errno));
                 }
                 error(".\n");
             }
+            (void)r;
             close(cmdline);
             continue;
         }
@@ -699,7 +707,7 @@ atoi2(char *str) {
     return atoi(str);
 }
 
-#if __INCLUDE_LEVEL__ == 0
+#if TESTING_util
 #include <assert.h>
 
 int
