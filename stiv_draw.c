@@ -66,8 +66,6 @@ static int cache_image(void);
 static int exif_orientation(void);
 static bool ends_with(const char *str, const char *end);
 
-char *program;
-
 bool
 ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');

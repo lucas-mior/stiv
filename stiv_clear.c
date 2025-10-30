@@ -22,8 +22,6 @@ static int is_image_preview(char *);
 static inline int literal_match(const char *, char *);
 static magic_t magic;
 
-char *program;
-
 int
 main(int argc, char **argv) {
     File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};

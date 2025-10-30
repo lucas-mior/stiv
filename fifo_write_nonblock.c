@@ -17,7 +17,6 @@
 
 #include "stiv.h"
 #include "util.c"
-char *program;
 
 int
 main(int argc, char **argv) {
