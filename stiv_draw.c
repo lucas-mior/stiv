@@ -64,10 +64,9 @@ static int exit_code = EXIT_FAILURE;
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
-static bool ends_with(const char *str, const char *end);
 
-bool
-ends_with(const char *str, const char *end) {
+static bool
+ends_with(char *str, char *end) {
     const char *ldot = strrchr(str, '.');
     int64 length = 0;
     if (ldot != NULL) {
