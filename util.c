@@ -317,6 +317,17 @@ strnlen64(char *string, int64 size) {
 }
 
 INLINE int
+strncmp64(char *left, char *right, int64 size) {
+    int result;
+    if (size == 0) {
+        return 0;
+    }
+    assert((uint64)size <= SIZE_MAX);
+    result = strncmp((const char *)left, (const char *)right, (size_t)size);
+    return result;
+}
+
+INLINE int
 memcmp64(void *left, void *right, int64 size) {
     int result;
     if (size == 0) {
@@ -329,7 +340,7 @@ memcmp64(void *left, void *right, int64 size) {
 
 #define X64(func, TYPE_MAX, TYPE) \
     INLINE int64 \
-CAT(func, 64)(int fd, char *buffer, int64 size) { \
+CAT(func, 64)(int fd, void *buffer, int64 size) { \
     ssize_t w; \
     assert(size >= 0); \
     assert((uint64)size <= TYPE_MAX); \
@@ -344,6 +355,23 @@ X64(read, UINT_MAX, uint)
 X64(write, SIZE_MAX, size_t)
 X64(read, SIZE_MAX, size_t)
 #endif
+
+#undef X64
+
+#define X64(func) \
+    INLINE int64 \
+CAT(func, 64)(void *buffer, int64 size, int64 n, FILE *file) {\
+    size_t rw; \
+    assert(size >= 0); \
+    assert(n >= 0); \
+    assert((uint64)size <= SIZE_MAX); \
+    assert((uint64)n <= SIZE_MAX); \
+    rw = func(buffer, (size_t)size, (size_t)n, file); \
+    return (int64)rw; \
+}
+
+X64(fwrite)
+X64(fread)
 
 #undef X64
 

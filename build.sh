@@ -11,29 +11,29 @@ program1="fifo_write_nonblock"
 program2="stiv_clear"
 program3="stiv_draw"
 
-CFLAGS="$CFLAGS -std=c99 -D_DEFAULT_SOURCE "
+CFLAGS="$CFLAGS -std=c99 -D_DEFAULT_SOURCE"
 CFLAGS="$CFLAGS -Wextra -Wall -Wno-unused-macros -Wno-unused-function"
 CFLAGS="$CFLAGS -Wno-constant-logical-operand"
-LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif "
+LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif"
 
 CC=${CC:-cc}
 if [ $CC = "clang" ]; then
-    CFLAGS="$CFLAGS -Weverything "
-    CFLAGS="$CFLAGS -Wno-unsafe-buffer-usage -Wno-format-nonliteral "
-    CFLAGS="$CFLAGS -Wno-disabled-macro-expansion "
+    CFLAGS="$CFLAGS -Weverything"
+    CFLAGS="$CFLAGS -Wno-unsafe-buffer-usage -Wno-format-nonliteral"
+    CFLAGS="$CFLAGS -Wno-disabled-macro-expansion"
     CFLAGS="$CFLAGS -Wno-implicit-void-ptr-cast"
 fi
 
 if [ "$target" = "debug" ]; then
-    CFLAGS="$CFLAGS -g -fsanitize=undefined "
-    CPPFLAGS="$CPPFLAGS "
+    CFLAGS="$CFLAGS -g -fsanitize=undefined"
+    CPPFLAGS="$CPPFLAGS"
 else
     CFLAGS="$CFLAGS -g -O2 -flto"
-    CPPFLAGS="$CPPFLAGS "
+    CPPFLAGS="$CPPFLAGS"
 fi
 
 if [ "$target" = "benchmark" ]; then
-    CPPFLAGS="$CPPFLAGS "
+    CPPFLAGS="$CPPFLAGS"
 fi
 
 case "$target" in

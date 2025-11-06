@@ -19,7 +19,7 @@
 #include "util.c"
 
 static int is_image_preview(char *);
-static inline int literal_match(const char *, char *);
+static inline int literal_match(char *, char *);
 static magic_t magic;
 
 int
@@ -98,7 +98,7 @@ is_image_preview(char *filename) {
 }
 
 int
-literal_match(const char *mime, char *literal) {
+literal_match(char *mime, char *literal) {
     int64 n = strlen64(literal);
-    return strncmp(literal, mime, (size_t)n);
+    return strncmp64(literal, mime, n);
 }

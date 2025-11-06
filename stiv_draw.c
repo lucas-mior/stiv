@@ -71,7 +71,7 @@ ends_with(char *str, char *end) {
     int64 length = 0;
     if (ldot != NULL) {
         length = strlen64(end);
-        return !strncmp(ldot + 1, end, (size_t)length);
+        return !strncmp64(ldot + 1, end, length);
     }
     return false;
 }
@@ -285,7 +285,7 @@ cache_image(void) {
 
     imlib_context_set_anti_alias(1);
     imlib_image = imlib_create_cropped_scaled_image(
-        0, 0, image.width, image.height, (int)new_width, (int)new_height);
+        0, 0, image.width, image.height, new_width, (int)new_height);
     if (imlib_image == NULL) {
         error("Error in imlib_create_cropped_scaled_image()\n");
         return -1;
