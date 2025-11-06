@@ -75,11 +75,13 @@ main(int argc, char **argv) {
 
 int
 is_image_preview(char *filename) {
-    const char *mime_type;
+    const char *result;
+    char mime_type[128];
 
-    if ((mime_type = magic_file(magic, filename)) == NULL) {
+    if ((result = magic_file(magic, filename)) == NULL) {
         return false;
     }
+    strncpy(mime_type, result, sizeof(mime_type) - 1);
 
     if (!literal_match(mime_type, "image/")) {
         return true;

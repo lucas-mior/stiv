@@ -67,7 +67,7 @@ static int exif_orientation(void);
 
 static bool
 ends_with(char *str, char *end) {
-    const char *ldot = strrchr(str, '.');
+    char *ldot = strrchr(str, '.');
     int64 length = 0;
     if (ldot != NULL) {
         length = strlen64(end);

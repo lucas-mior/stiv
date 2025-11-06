@@ -323,7 +323,7 @@ strncmp64(char *left, char *right, int64 size) {
         return 0;
     }
     assert((uint64)size <= SIZE_MAX);
-    result = strncmp((const char *)left, (const char *)right, (size_t)size);
+    result = strncmp(left, right, (size_t)size);
     return result;
 }
 
