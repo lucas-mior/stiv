@@ -99,6 +99,6 @@ is_image_preview(char *filename) {
 
 int
 literal_match(const char *mime, char *literal) {
-    size_t n = strlen(literal);
-    return strncmp(literal, mime, n);
+    int64 n = strlen64(literal);
+    return strncmp(literal, mime, (size_t)n);
 }

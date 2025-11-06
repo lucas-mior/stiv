@@ -69,10 +69,10 @@ static bool ends_with(const char *str, const char *end);
 bool
 ends_with(const char *str, const char *end) {
     const char *ldot = strrchr(str, '.');
-    usize length = 0;
+    int64 length = 0;
     if (ldot != NULL) {
-        length = strlen(end);
-        return !strncmp(ldot + 1, end, length);
+        length = strlen64(end);
+        return !strncmp(ldot + 1, end, (size_t)length);
     }
     return false;
 }
@@ -103,8 +103,8 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, "%li_%ld_%ld", file.st_size, file.st_mtim.tv_sec,
-                 file.st_mtim.tv_nsec);
+        SNPRINTF(buffer, "%li_%lld_%lld", file.st_size, (llong)file.st_mtim.tv_sec,
+                 (llong)file.st_mtim.tv_nsec);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
