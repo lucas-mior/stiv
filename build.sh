@@ -11,7 +11,7 @@ program1="fifo_write_nonblock"
 program2="stiv_clear"
 program3="stiv_draw"
 
-CFLAGS="$CFLAGS -std=c99 -D_DEFAULT_SOURCE"
+CFLAGS="$CFLAGS -std=c11 -D_DEFAULT_SOURCE"
 CFLAGS="$CFLAGS -Wextra -Wall -Wno-unused-macros -Wno-unused-function"
 CFLAGS="$CFLAGS -Wno-constant-logical-operand"
 LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif"
@@ -19,7 +19,10 @@ LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif"
 CC=${CC:-cc}
 if [ $CC = "clang" ]; then
     CFLAGS="$CFLAGS -Weverything"
-    CFLAGS="$CFLAGS -Wno-unsafe-buffer-usage -Wno-format-nonliteral"
+    CFLAGS="$CFLAGS -Wno-unsafe-buffer-usage"
+    CFLAGS="$CFLAGS -Wno-format-nonliteral"
+    CFLAGS="$CFLAGS -Wno-format-pedantic"
+    CFLAGS="$CFLAGS -Wno-pre-c11-compat"
     CFLAGS="$CFLAGS -Wno-disabled-macro-expansion"
     CFLAGS="$CFLAGS -Wno-implicit-void-ptr-cast"
 fi

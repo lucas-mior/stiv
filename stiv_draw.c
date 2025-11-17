@@ -102,8 +102,8 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, "%li_%lld_%lld", file.st_size, (llong)file.st_mtim.tv_sec,
-                 (llong)file.st_mtim.tv_nsec);
+        SNPRINTF(buffer, "%li_%lld_%lld", file.st_size,
+                 (llong)file.st_mtim.tv_sec, (llong)file.st_mtim.tv_nsec);
 
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
@@ -301,7 +301,7 @@ cache_image(void) {
     }
     imlib_save_image_with_error_return(image.fullpath, &err);
     if (err) {
-        error("Error caching image %s: %d\n", image.basename, err);
+        error("Error caching image %s: %u\n", image.basename, err);
         return -1;
     }
 
