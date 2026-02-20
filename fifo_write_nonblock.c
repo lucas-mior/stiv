@@ -20,15 +20,24 @@
 int
 main(int argc, char **argv) {
     int fd;
-    char *string;
-    char *fifo;
+    char *string = NULL;
+    char *fifo = NULL;
 
     program = basename(argv[0]);
-    string = argv[1];
-    fifo = argv[2];
 
-    if (argc < 3) {
-        error("usage: %s <string> <fifo>\n", program);
+    for (int i = 1; i < argc; i += 1) {
+        if (strncmp(argv[i], "string=", 7) == 0) {
+            string = argv[i] + 7;
+        } else if (strncmp(argv[i], "fifo=", 5) == 0) {
+            fifo = argv[i] + 5;
+        } else {
+            error("%s: Invalid argument: %s\n", program, argv[i]);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    if ((string == NULL) || (fifo == NULL)) {
+        error("usage: %s string=<string> fifo=<fifo>\n", program);
         exit(EXIT_FAILURE);
     }
 
