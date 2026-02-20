@@ -22,7 +22,7 @@ parse_option(char **parsed, char *arg, char *name, int32 length) {
     char name_equal[256];
     SNPRINTF(name_equal, "%s=", name);
 
-    if (strncmp(arg, name_equal, length + 1) == 0) {
+    if (strncmp64(arg, name_equal, length + 1) == 0) {
         *parsed = arg + length + 1;
         return true;
     }
@@ -30,7 +30,7 @@ parse_option(char **parsed, char *arg, char *name, int32 length) {
 }
 
 #define PARSE_OPTION(arg, name) \
-    if (parse_option(name, arg, #name, strlen(#name))) { \
+    if (parse_option(&name, arg, #name, strlen(#name))) { \
         continue; \
     }
 
@@ -49,9 +49,8 @@ main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("string=%s\n", string);
-    printf("fifo=%s\n", fifo);
-    exit(0);
+    printf("string=%s=\n", string);
+    printf("fifo=%s=\n", fifo);
 
     if ((string == NULL) || (fifo == NULL)) {
         error("usage: %s string=<string> fifo=<fifo>\n", program);
