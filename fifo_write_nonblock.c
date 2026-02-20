@@ -17,6 +17,23 @@
 
 #include "util.c"
 
+static bool
+parse_option(char **parsed, char *arg, char *name, int32 length) {
+    char name_equal[256];
+    SNPRINTF(name_equal, "%s=", name);
+
+    if (strncmp(arg, name_equal, length + 1) == 0) {
+        *parsed = arg + length + 1;
+        return true;
+    }
+    return false;
+}
+
+#define PARSE_OPTION(arg, name) \
+    if (parse_option(name, arg, #name, strlen(#name))) { \
+        continue; \
+    }
+
 int
 main(int argc, char **argv) {
     int fd;
@@ -26,15 +43,15 @@ main(int argc, char **argv) {
     program = basename(argv[0]);
 
     for (int i = 1; i < argc; i += 1) {
-        if (strncmp(argv[i], "string=", 7) == 0) {
-            string = argv[i] + 7;
-        } else if (strncmp(argv[i], "fifo=", 5) == 0) {
-            fifo = argv[i] + 5;
-        } else {
-            error("%s: Invalid argument: %s\n", program, argv[i]);
-            exit(EXIT_FAILURE);
-        }
+        PARSE_OPTION(argv[i], string)
+        PARSE_OPTION(argv[i], fifo)
+        error("%s: Invalid argument: %s\n", program, argv[i]);
+        exit(EXIT_FAILURE);
     }
+
+    printf("string=%s\n", string);
+    printf("fifo=%s\n", fifo);
+    exit(0);
 
     if ((string == NULL) || (fifo == NULL)) {
         error("usage: %s string=<string> fifo=<fifo>\n", program);
