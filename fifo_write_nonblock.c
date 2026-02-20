@@ -49,8 +49,10 @@ main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    printf("string=%s=\n", string);
-    printf("fifo=%s=\n", fifo);
+    if (DEBUGGING) {
+        printf("string=%s=\n", string);
+        printf("fifo=%s=\n", fifo);
+    }
 
     if ((string == NULL) || (fifo == NULL)) {
         error("usage: %s string=<string> fifo=<fifo>\n", program);
