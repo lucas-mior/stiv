@@ -105,19 +105,17 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, "%li_%lld_%lld", file.st_size,
-                 (llong)file.st_mtim.tv_sec, (llong)file.st_mtim.tv_nsec);
-
         if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
             error("XDG_CACHE_HOME is not set. Exiting...\n");
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
+        SNPRINTF(buffer, "%s/%s/%li_%lld_%lld.jpg", XDG_CACHE_HOME, preview,
+                 file.st_size, (llong)file.st_mtim.tv_sec,
+                 (llong)file.st_mtim.tv_nsec);
+
         image.fullpath = xstrdup(buffer);
     }
-
-    PRINTLN(image.fullpath);
 
     if ((cache_img = open(image.fullpath, O_RDONLY)) >= 0) {
         Imlib_Image imlib_image;
