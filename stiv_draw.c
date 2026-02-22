@@ -40,14 +40,14 @@ static Pane pane = {
 static bool print_dimensions = true;
 
 typedef struct Image {
-    char *basename;
+    char *path;
     char *fullpath;
     int width;
     int height;
 } Image;
 
 static Image image = {
-    .basename = NULL,
+    .path = NULL,
     .fullpath = NULL,
     .width = 0,
     .height = 0,
@@ -85,7 +85,7 @@ main(int argc, char *argv[]) {
 
     program = basename(argv[0]);
 
-    image.basename = argv[1];
+    image.path = argv[1];
     if ((argc == 3) && !strcmp(argv[2], "cache")) {
         caching = true;
     }
@@ -100,9 +100,8 @@ main(int argc, char *argv[]) {
         struct stat file;
         char buffer[PATH_MAX];
 
-        if (stat(image.basename, &file) < 0) {
-            error("Error calling stat on %s: %s.", image.basename,
-                  strerror(errno));
+        if (stat(image.path, &file) < 0) {
+            error("Error calling stat on %s: %s.", image.path, strerror(errno));
             exit(EXIT_FAILURE);
         }
 
@@ -122,7 +121,7 @@ main(int argc, char *argv[]) {
 
     if ((cache_img = open(image.fullpath, O_RDONLY)) >= 0) {
         Imlib_Image imlib_image;
-        imlib_image = imlib_load_image_fd(cache_img, image.basename);
+        imlib_image = imlib_load_image_fd(cache_img, image.path);
         imlib_context_set_image(imlib_image);
         image.width = imlib_image_get_width();
         image.height = imlib_image_get_height();
@@ -147,7 +146,7 @@ main(int argc, char *argv[]) {
             error("Error loading magic: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
-        if ((mime_type = magic_file(magic, image.basename)) == NULL) {
+        if ((mime_type = magic_file(magic, image.path)) == NULL) {
             error("Error in magic_file: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
@@ -162,7 +161,7 @@ main(int argc, char *argv[]) {
 
         if (needs_rotation || (image.width > MAX_IMG_WIDTH)
             || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
-            || (ends_with(image.basename, "ff"))
+            || (ends_with(image.path, "ff"))
             || (image_type == IMAGE_TYPE_WEBP)) {
             if (cache_image() < 0) {
                 image.fullpath = NULL;
@@ -243,7 +242,7 @@ main(int argc, char *argv[]) {
         }
 
         if (image.fullpath == NULL) {
-            if (!(image.fullpath = realpath(image.basename, NULL))) {
+            if (!(image.fullpath = realpath(image.path, NULL))) {
                 error("Error getting realpath of %s: %s", image.fullpath,
                       strerror(errno));
                 dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
@@ -307,7 +306,7 @@ cache_image(void) {
     }
     imlib_save_image_with_error_return(image.fullpath, &err);
     if (err) {
-        error("Error caching image\n%s at %s:\n%s\n", image.basename,
+        error("Error caching image\n%s at %s:\n%s\n", image.path,
               image.fullpath, imlib_strerror(err));
         return -1;
     }
@@ -324,11 +323,11 @@ exif_orientation(void) {
     ExifByteOrder byte_order;
     int orientation = 0;
 
-    imlib_image = imlib_load_image(image.basename);
+    imlib_image = imlib_load_image(image.path);
     imlib_context_set_image(imlib_image);
     imlib_image_set_changes_on_disk();
 
-    if ((exif_data = exif_data_new_from_file(image.basename)) == NULL) {
+    if ((exif_data = exif_data_new_from_file(image.path)) == NULL) {
         return 0;
     }
 
