@@ -90,6 +90,10 @@ main(int argc, char *argv[]) {
         caching = true;
     }
 
+    if (argc <= 1) {
+        usage(stderr);
+    }
+
     {
         const char *preview = "preview/stiv";
         char *XDG_CACHE_HOME = NULL;
@@ -113,6 +117,8 @@ main(int argc, char *argv[]) {
         SNPRINTF(buffer, "%s/%s/%s.jpg", XDG_CACHE_HOME, preview, buffer);
         image.fullpath = xstrdup(buffer);
     }
+
+    PRINTLN(image.fullpath);
 
     if ((cache_img = open(image.fullpath, O_RDONLY)) >= 0) {
         Imlib_Image imlib_image;
@@ -301,7 +307,8 @@ cache_image(void) {
     }
     imlib_save_image_with_error_return(image.fullpath, &err);
     if (err) {
-        error("Error caching image %s: %u\n", image.basename, err);
+        error("Error caching image\n%s at %s:\n%s\n", image.basename,
+              image.fullpath, imlib_strerror(err));
         return -1;
     }
 
