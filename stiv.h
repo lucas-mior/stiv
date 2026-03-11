@@ -78,9 +78,6 @@ typedef union Number {
 } Number;
 
 #define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
-#define LENGTH(X) (int64)(sizeof(X)/sizeof(*X))
-#define SNPRINTF(BUFFER, FORMAT, ...) \
-    snprintf2(BUFFER, sizeof(BUFFER), FORMAT, __VA_ARGS__)
 
 static void util_close(File *f);
 static bool util_open(File *f, const int flag);
