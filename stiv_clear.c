@@ -101,6 +101,6 @@ is_image_preview(char *filename) {
 
 int
 literal_match(char *mime, char *literal) {
-    int64 n = strlen64(literal);
+    int64 n = strlen32(literal);
     return strncmp64(literal, mime, n);
 }

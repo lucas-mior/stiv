@@ -70,7 +70,7 @@ ends_with(char *str, char *end) {
     char *ldot = strrchr(str, '.');
     int64 length = 0;
     if (ldot != NULL) {
-        length = strlen64(end);
+        length = strlen32(end);
         return !strncmp64(ldot + 1, end, length);
     }
     return false;
