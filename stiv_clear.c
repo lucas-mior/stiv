@@ -19,7 +19,6 @@
 #include "util.c"
 
 static int is_image_preview(char *);
-static inline int literal_match(char *, char *);
 static magic_t magic;
 
 int
@@ -83,24 +82,18 @@ is_image_preview(char *filename) {
     }
     strncpy(mime_type, result, sizeof(mime_type) - 1);
 
-    if (!literal_match(mime_type, "image/")) {
+    if (literal_match(mime_type, "image/")) {
         return true;
     }
-    if (!literal_match(mime_type, "application/pdf")) {
+    if (literal_match(mime_type, "application/pdf")) {
         return true;
     }
-    if (!literal_match(mime_type, "audio/")) {
+    if (literal_match(mime_type, "audio/")) {
         return true;
     }
-    if (!literal_match(mime_type, "video/")) {
+    if (literal_match(mime_type, "video/")) {
         return true;
     }
 
     return false;
-}
-
-int
-literal_match(char *mime, char *literal) {
-    int64 n = strlen32(literal);
-    return strncmp64(literal, mime, n);
 }

@@ -385,6 +385,12 @@ strncmp64(char *left, char *right, int64 size) {
 }
 
 INLINE int
+literal_match(char *string, char *literal) {
+    int64 n = strlen32(literal);
+    return strncmp64(literal, string, n) == 0;
+}
+
+INLINE int
 memcmp64(void *left, void *right, int64 size) {
     int result;
     if (size == 0) {
