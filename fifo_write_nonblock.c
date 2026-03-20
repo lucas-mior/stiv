@@ -18,11 +18,11 @@
 #include "util.c"
 
 static bool
-parse_option(char **parsed, char *arg, char *name, int32 length) {
+parse_option(char **parsed, char *arg, char *option_name) {
     char name_equal[256];
-    SNPRINTF(name_equal, "%s=", name);
+    int32 length = SNPRINTF(name_equal, "%s=", option_name);
 
-    if (strncmp32(arg, name_equal, length + 1) == 0) {
+    if (begins_with(arg, name_equal, length) == 0) {
         *parsed = arg + length + 1;
         return true;
     }
@@ -30,7 +30,7 @@ parse_option(char **parsed, char *arg, char *name, int32 length) {
 }
 
 #define PARSE_OPTION(arg, name) \
-    if (parse_option(&name, arg, #name, strlen32(#name))) { \
+    if (parse_option(&name, arg, #name)) { \
         continue; \
     }
 
