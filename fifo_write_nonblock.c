@@ -22,8 +22,8 @@ parse_option(char **parsed, char *arg, char *option_name) {
     char name_equal[256];
     int32 length = SNPRINTF(name_equal, "%s=", option_name);
 
-    if (begins_with(arg, name_equal, length) == 0) {
-        *parsed = arg + length + 1;
+    if (begins_with(arg, name_equal)) {
+        *parsed = arg + length;
         return true;
     }
     return false;
@@ -60,7 +60,7 @@ main(int argc, char **argv) {
     }
 
     if ((fd = open(fifo, O_WRONLY | O_NONBLOCK)) < 0) {
-        error("Error opening %s: %s\n", fifo, strerror(errno));
+        error("Error opening %s: %s.\n", fifo, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
