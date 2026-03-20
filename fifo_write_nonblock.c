@@ -21,9 +21,9 @@ static bool
 parse_option(char **parsed, char *arg, char *option_name) {
     char name_equal[256];
     char *tmp;
-    SNPRINTF(name_equal, "%s=", option_name);
+    int32 length = SNPRINTF(name_equal, "%s=", option_name);
 
-    if ((tmp = begins_with(arg, name_equal))) {
+    if ((tmp = BEGINS_WITH(arg, name_equal, length))) {
         *parsed = tmp;
         return true;
     }

@@ -82,16 +82,16 @@ is_image_preview(char *filename) {
     }
     strncpy(mime_type, result, sizeof(mime_type) - 1);
 
-    if (begins_with(mime_type, "image/")) {
+    if (BEGINS_WITH(mime_type, "image/")) {
         return true;
     }
-    if (begins_with(mime_type, "application/pdf")) {
+    if (BEGINS_WITH(mime_type, "application/pdf")) {
         return true;
     }
-    if (begins_with(mime_type, "audio/")) {
+    if (BEGINS_WITH(mime_type, "audio/")) {
         return true;
     }
-    if (begins_with(mime_type, "video/")) {
+    if (BEGINS_WITH(mime_type, "video/")) {
         return true;
     }
 

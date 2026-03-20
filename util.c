@@ -407,14 +407,17 @@ strncmp32(char *left, char *right, int64 size) {
 }
 
 INLINE char *
-begins_with(char *string, char *literal) {
-    int32 n = strlen32(literal);
-    if (strncmp32(literal, string, n) == 0) {
-        return string + n;
+begins_with(char *string, char *literal, int32 length) {
+    if (strncmp32(literal, string, length) == 0) {
+        return string + length;
     } else {
         return NULL;
     }
 }
+
+#define BEGINS_WITH_2(LONG, SHORT) begins_with(LONG, SHORT, strlen32(SHORT))
+#define BEGINS_WITH_3(LONG, SHORT, LEN) begins_with(LONG, SHORT, LEN)
+#define BEGINS_WITH(...) SELECT_ON_NUM_ARGS(BEGINS_WITH_, __VA_ARGS__)
 
 INLINE int
 memcmp64(void *left, void *right, int64 size) {
@@ -1987,7 +1990,7 @@ main(int argc, char **argv) {
 
     for (int32 i = 0; i < POWER_OF_TWO_LAST; i += 1) {
         char *value_name = POWER_OF_TWO_string(i);
-        if (!begins_with(value_name, "Unknown")) {
+        if (!BEGINS_WITH(value_name, "Unknown")) {
             printf("enum[%d] = %s\n", i, value_name);
         }
     }
