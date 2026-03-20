@@ -22,7 +22,7 @@ parse_option(char **parsed, char *arg, char *name, int32 length) {
     char name_equal[256];
     SNPRINTF(name_equal, "%s=", name);
 
-    if (strncmp64(arg, name_equal, length + 1) == 0) {
+    if (strncmp32(arg, name_equal, length + 1) == 0) {
         *parsed = arg + length + 1;
         return true;
     }

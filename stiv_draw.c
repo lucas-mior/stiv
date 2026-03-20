@@ -71,7 +71,7 @@ ends_with(char *str, char *end) {
     int64 length = 0;
     if (ldot != NULL) {
         length = strlen32(end);
-        return !strncmp64(ldot + 1, end, length);
+        return !strncmp32(ldot + 1, end, length);
     }
     return false;
 }
