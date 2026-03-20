@@ -415,8 +415,10 @@ begins_with(char *string, char *literal, int32 length) {
     }
 }
 
-#define BEGINS_WITH_2(LONG, SHORT) begins_with(LONG, SHORT, strlen32(SHORT))
-#define BEGINS_WITH_3(LONG, SHORT, LEN) begins_with(LONG, SHORT, LEN)
+#define BEGINS_WITH_2(LONG, SHORT) \
+        begins_with(LONG, SHORT, strlen32(SHORT))
+#define BEGINS_WITH_3(LONG, SHORT, LEN) \
+        begins_with(LONG, SHORT, LEN)
 #define BEGINS_WITH(...) SELECT_ON_NUM_ARGS(BEGINS_WITH_, __VA_ARGS__)
 
 INLINE int
