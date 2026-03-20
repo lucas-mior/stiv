@@ -924,9 +924,9 @@ xclose(char *file, int line, int *fd, char *fd_var_name, char *filename) {
     return 0;
 }
 
-#define xclose_1(FD)       xclose(__FILE__, __LINE__, FD, #FD, NULL)
-#define xclose_2(FD, NAME) xclose(__FILE__, __LINE__, FD, #FD, NAME)
-#define XCLOSE(...) SELECT_ON_NUM_ARGS(xclose_, __VA_ARGS__)
+#define XCLOSE_1(FD)       xclose(__FILE__, __LINE__, FD, #FD, NULL)
+#define XCLOSE_2(FD, NAME) xclose(__FILE__, __LINE__, FD, #FD, NAME)
+#define XCLOSE(...) SELECT_ON_NUM_ARGS(XCLOSE_, __VA_ARGS__)
 
 static int
 xunlink(char *filename) {
