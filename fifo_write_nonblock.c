@@ -30,7 +30,7 @@ parse_option(char **parsed, char *arg, char *name, int32 length) {
 }
 
 #define PARSE_OPTION(arg, name) \
-    if (parse_option(&name, arg, #name, strlen(#name))) { \
+    if (parse_option(&name, arg, #name, strlen32(#name))) { \
         continue; \
     }
 
