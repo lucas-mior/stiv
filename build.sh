@@ -4,6 +4,10 @@ target="${1:-build}"
 PREFIX="${PREFIX:-/usr/local}"
 DESTDIR="${DESTDIR:-/}"
 
+dir="$(readlink -f "$(dirname "$0")")"
+cbase="cbase"
+CPPFLAGS="$CPPFLAGS -I "$dir/$cbase""
+
 main1="fifo_write_nonblock.c"
 main2="stiv_clear.c"
 main3="stiv_draw.c"

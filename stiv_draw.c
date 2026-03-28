@@ -42,6 +42,8 @@ static bool print_dimensions = true;
 typedef struct Image {
     char *path;
     char *fullpath;
+    int32 fullpath_len;
+    int32 padding;
     int width;
     int height;
 } Image;
@@ -99,6 +101,7 @@ main(int argc, char *argv[]) {
         char *XDG_CACHE_HOME = NULL;
         struct stat file;
         char buffer[PATH_MAX];
+        int32 n;
 
         if (stat(image.path, &file) < 0) {
             error("Error calling stat on %s: %s.", image.path, strerror(errno));
@@ -110,11 +113,12 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        SNPRINTF(buffer, "%s/%s/%li_%lld_%lld.jpg", XDG_CACHE_HOME, preview,
-                 file.st_size, (llong)file.st_mtim.tv_sec,
-                 (llong)file.st_mtim.tv_nsec);
+        n = SNPRINTF(buffer, "%s/%s/%li_%lld_%lld.jpg", XDG_CACHE_HOME, preview,
+                     file.st_size, (llong)file.st_mtim.tv_sec,
+                     (llong)file.st_mtim.tv_nsec);
 
-        image.fullpath = xstrdup(buffer);
+        image.fullpath = xmemdup(buffer, n + 1);
+        image.fullpath_len = n;
     }
 
     if ((cache_img = open(image.fullpath, O_RDONLY)) >= 0) {
@@ -256,7 +260,7 @@ main(int argc, char *argv[]) {
         dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
         util_close(&UEBERZUG_FIFO);
-        free(image.fullpath);
+        free(image.fullpath, image.fullpath_len);
     } while (0);
 
     // it should return error so that programs will call it again to redraw
