@@ -34,7 +34,7 @@ if [ $CC = "clang" ]; then
 fi
 
 if [ "$target" = "debug" ]; then
-    CFLAGS="$CFLAGS -g -fsanitize=undefined"
+    CFLAGS="$CFLAGS -g -fsanitize=undefined -DDEBUGGING=1"
     CPPFLAGS="$CPPFLAGS"
 else
     CFLAGS="$CFLAGS -g -O2 -flto"
