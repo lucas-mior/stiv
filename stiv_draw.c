@@ -309,7 +309,7 @@ cache_image(void) {
     imlib_save_image_with_error_return(image.fullpath, &err);
     if (err) {
         error("Error caching image\n%s at %s:\n%s\n", image.path,
-              image.fullpath, imlib_strerror(err));
+              image.fullpath, imlib_strerror((int)err));
         return -1;
     }
 
