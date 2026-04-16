@@ -31,6 +31,8 @@ if [ $CC = "clang" ]; then
     CFLAGS="$CFLAGS -Wno-covered-switch-default"
     CFLAGS="$CFLAGS -Wno-disabled-macro-expansion"
     CFLAGS="$CFLAGS -Wno-implicit-void-ptr-cast"
+    CFLAGS="$CFLAGS -Wno-float-equal"
+    CFLAGS="$CFLAGS -Wno-cast-qual"
 fi
 
 if [ "$target" = "debug" ]; then
