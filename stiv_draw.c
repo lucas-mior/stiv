@@ -260,7 +260,7 @@ main(int argc, char *argv[]) {
         dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
 
         util_close(&UEBERZUG_FIFO);
-        free(image.fullpath, image.fullpath_len);
+        free2(image.fullpath, image.fullpath_len);
     } while (0);
 
     // it should return error so that programs will call it again to redraw
