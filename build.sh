@@ -63,6 +63,11 @@ case "$target" in
     install -Dm755 ${program2} ${DESTDIR}${PREFIX}/bin/${program2}
     install -Dm755 ${program3} ${DESTDIR}${PREFIX}/bin/${program3}
     ;;
+"check")
+    CC=gcc CFLAGS="-fanalyzer" ./build.sh
+    scan-build --view -analyze-headers --status-bugs ./build.sh
+    exit
+    ;;
 "build"|"debug"|"benchmark")
     set -x
     ctags --kinds-C=+l *.h *.c 2> /dev/null || true
