@@ -191,7 +191,6 @@ main(int argc, char *argv[]) {
         /* pane.y += 1; // tmux bugs lf's Y by 1 */
 
         pane.width -= 2;
-        pane.x += 2;
         if (argc >= 7) {
             print_dimensions = false;
             pane.y -= 1;
