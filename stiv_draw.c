@@ -227,7 +227,8 @@ main(int argc, char *argv[]) {
         /* pane.y = 1; */
         char *chafa[] = {
             "chafa",
-            "--format=sixel",
+            "--format",
+            "sixel",
             image.path,
             NULL,
         };
