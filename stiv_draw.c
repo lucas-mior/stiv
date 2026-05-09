@@ -178,7 +178,6 @@ main(int argc, char *argv[]) {
         printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n",
                image.width, image.height);
     }
-    printf("\nAAAAAAAAAAA\n");
     fflush(stdout);
 
     if (argc >= 6) {
