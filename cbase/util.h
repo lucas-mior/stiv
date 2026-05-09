@@ -45,7 +45,7 @@ static ullong here_counter = 0;
         error("Error forking: %s.\n", strerror(errno)); \
         fatal(EXIT_FAILURE); \
     case 0: \
-        execlp("dunstify", "dunstify", HEREbuffer, NULL); \
+        execlp("dunstify", "dunstify", program, HEREbuffer, NULL); \
         error("Error executing dunstify: %s.\n", strerror(errno)); \
         exit(EXIT_FAILURE); \
     default: \
