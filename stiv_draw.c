@@ -80,6 +80,8 @@ main(int argc, char *argv[]) {
     int cache_img;
     enum StivBackend stiv_backend = STIV_BACKEND_CHAFA;
 
+    HERE;
+
     program = basename(argv[0]);
 
     image.path = argv[1];
@@ -177,6 +179,7 @@ main(int argc, char *argv[]) {
                image.width, image.height);
     }
     printf("\nAAAAAAAAAAA\n");
+    fflush(stdout);
 
     if (argc >= 6) {
         // chamado por `lf > piscou > stiv`
