@@ -55,13 +55,13 @@ case "$target" in
     rm -f ${DESTDIR}${PREFIX}/bin/${program3}
     ;;
 "install")
-    if [ ! -f $program1 ] || [ ! -f $program2 ] || [ ! -f $program3 ]; then
+    if [ ! -f bin/$program1 ] || [ ! -f bin/$program2 ] || [ ! -f bin/$program3 ]; then
         build
     fi
     set -x
-    install -Dm755 ${program1} ${DESTDIR}${PREFIX}/bin/${program1}
-    install -Dm755 ${program2} ${DESTDIR}${PREFIX}/bin/${program2}
-    install -Dm755 ${program3} ${DESTDIR}${PREFIX}/bin/${program3}
+    install -Dm755 bin/${program1} ${DESTDIR}${PREFIX}/bin/${program1}
+    install -Dm755 bin/${program2} ${DESTDIR}${PREFIX}/bin/${program2}
+    install -Dm755 bin/${program3} ${DESTDIR}${PREFIX}/bin/${program3}
     ;;
 "check")
     CC=gcc CFLAGS="-fanalyzer" ./build.sh
@@ -72,9 +72,9 @@ case "$target" in
     set -x
     ctags --kinds-C=+l *.h *.c 2> /dev/null || true
     vtags.sed tags > .tags.vim 2> /dev/null || true
-    $CC $CPPFLAGS $CFLAGS -o ${program1} "$main1" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o ${program2} "$main2" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o ${program3} "$main3" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o bin/${program1} "$main1" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o bin/${program2} "$main2" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o bin/${program3} "$main3" $LDFLAGS
     ;;
 *)
     echo "usage: $0 [ uninstall / install / build / debug / benchmark ]"
