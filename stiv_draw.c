@@ -61,22 +61,16 @@ typedef enum ImageType {
     IMAGE_TYPE_OTHER,
 } ImageType;
 
+enum StivBackend {
+    STIV_BACKEND_CHAFA,
+    STIV_BACKEND_UEBERZUG,
+};
+
 static int exit_code = EXIT_FAILURE;
 
 static void usage(FILE *) __attribute__((noreturn));
 static int cache_image(void);
 static int exif_orientation(void);
-
-static bool
-ends_with(char *str, char *end) {
-    char *ldot = strrchr(str, '.');
-    int64 length = 0;
-    if (ldot != NULL) {
-        length = strlen32(end);
-        return !strncmp32(ldot + 1, end, length);
-    }
-    return false;
-}
 
 int
 main(int argc, char *argv[]) {
@@ -84,6 +78,7 @@ main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     int cache_img;
+    enum StivBackend stiv_backend = STIV_BACKEND_CHAFA;
 
     program = basename(argv[0]);
 
@@ -163,7 +158,7 @@ main(int argc, char *argv[]) {
 
         if (needs_rotation || (image.width > MAX_IMG_WIDTH)
             || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
-            || (ends_with(image.path, "ff"))
+            || (ENDS_WITH(image.path, "ff"))
             || (image_type == IMAGE_TYPE_WEBP)) {
             if (cache_image() < 0) {
                 image.fullpath = NULL;
@@ -239,38 +234,76 @@ main(int argc, char *argv[]) {
         usage(stderr);
     }
 
-    do {
-        File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+    switch (stiv_backend) {
+    case STIV_BACKEND_UEBERZUG: 
+        do {
+            File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
 
-        if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-            error("UEBERZUG_FIFO environment variable is not set.\n");
-            break;
-        }
-        if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
-            < 0) {
-            error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
-            break;
-        }
-
-        if (image.fullpath == NULL) {
-            if (!(image.fullpath = realpath(image.path, NULL))) {
-                error("Error getting realpath of %s: %s", image.fullpath,
-                      strerror(errno));
-                dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
-                util_close(&UEBERZUG_FIFO);
+            if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
+                error("UEBERZUG_FIFO environment variable is not set.\n");
                 break;
             }
-        }
+            if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
+                < 0) {
+                error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+                break;
+            }
 
-        dprintf(UEBERZUG_FIFO.fd,
-                "{\"action\": \"add\", \"identifier\": \"preview\","
-                "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
-                pane.x, pane.y, pane.width, pane.height);
-        dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
+            if (image.fullpath == NULL) {
+                if (!(image.fullpath = realpath(image.path, NULL))) {
+                    error("Error getting realpath of %s: %s", image.fullpath,
+                          strerror(errno));
+                    dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
+                    util_close(&UEBERZUG_FIFO);
+                    break;
+                }
+            }
 
-        util_close(&UEBERZUG_FIFO);
-        free2(image.fullpath, image.fullpath_len);
-    } while (0);
+            dprintf(UEBERZUG_FIFO.fd,
+                    "{\"action\": \"add\", \"identifier\": \"preview\","
+                    "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
+                    pane.x, pane.y, pane.width, pane.height);
+            dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
+
+            util_close(&UEBERZUG_FIFO);
+            free2(image.fullpath, image.fullpath_len);
+        } while (0);
+        break;
+    case STIV_BACKEND_CHAFA:
+        do {
+            char geom[64];
+
+            if (image.fullpath == NULL) {
+                if (!(image.fullpath = realpath(image.path, NULL))) {
+                    error("Error getting realpath of %s: %s\n",
+                          image.path, strerror(errno));
+                    break;
+                }
+            }
+
+            snprintf(geom, sizeof(geom), "%dx%d",
+                     pane.width, pane.height);
+
+            char *chafa[] = {
+                "chafa",
+                "--animate", "off",
+                "--format", "sixels",
+                "--size", geom,
+                image.fullpath,
+                NULL,
+            };
+
+            execvp(chafa[0], chafa);
+
+            error("Error executing chafa: %s.\n", strerror(errno));
+
+            free(image.fullpath);
+        } while (0);
+        break;
+    default:
+        error("This backend does not exist.\n");
+        fatal(EXIT_FAILURE);
+    }
 
     // it should return error so that programs will call it again to redraw
     exit(exit_code);

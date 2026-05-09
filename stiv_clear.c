@@ -61,8 +61,8 @@ main(int argc, char **argv) {
         error("UEBERZUG_FIFO environment variable is not set.\n");
         exit(EXIT_FAILURE);
     }
-    if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
-        < 0) {
+    if ((UEBERZUG_FIFO.fd
+                = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK)) < 0) {
         error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
         exit(EXIT_FAILURE);
     }
