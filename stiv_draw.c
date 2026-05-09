@@ -281,8 +281,7 @@ main(int argc, char *argv[]) {
                 }
             }
 
-            snprintf(geom, sizeof(geom), "%dx%d",
-                     pane.width, pane.height);
+            SNPRINTF(geom, "%dx%d", pane.width, pane.height);
 
             char *chafa[] = {
                 "chafa",
