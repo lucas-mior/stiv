@@ -222,25 +222,15 @@ main(int argc, char *argv[]) {
         exit_code = EXIT_SUCCESS;
     } else if (argc == 4) {
         // chamado por `zsh > stiv`
-        /* columns.string = argv[2]; */
-        /* lines.string = argv[3]; */
-        /* columns.number = atoi(columns.string); */
-        /* lines.number = atoi(lines.string); */
+        columns.string = argv[2];
+        lines.string = argv[3];
+        columns.number = atoi(columns.string);
+        lines.number = atoi(lines.string);
 
-        /* pane.width = columns.number; */
-        /* pane.height = HEIGHT_SHELL; */
-        /* pane.x = 0; */
-        /* pane.y = 1; */
-        char *chafa[] = {
-            "chafa",
-            "--format",
-            "sixel",
-            image.path,
-            NULL,
-        };
-        execvp(chafa[0], chafa);
-        error("Error executing chafa: %s.\n", strerror(errno));
-        exit(EXIT_FAILURE);
+        pane.width = columns.number;
+        pane.height = HEIGHT_SHELL;
+        pane.x = 0;
+        pane.y = 1;
     } else {
         usage(stderr);
     }
