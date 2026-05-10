@@ -74,24 +74,22 @@ main(int argc, char **argv) {
 
 int
 is_image_preview(char *filename) {
-    const char *result;
-    char mime_type[128];
+    const char *mime_type;
 
-    if ((result = magic_file(magic, filename)) == NULL) {
+    if ((mime_type = magic_file(magic, filename)) == NULL) {
         return false;
     }
-    strncpy(mime_type, result, sizeof(mime_type) - 1);
 
-    if (BEGINS_WITH(mime_type, "image/")) {
+    if (BEGINS_WITH((char *)mime_type, "image/")) {
         return true;
     }
-    if (BEGINS_WITH(mime_type, "application/pdf")) {
+    if (BEGINS_WITH((char *)mime_type, "application/pdf")) {
         return true;
     }
-    if (BEGINS_WITH(mime_type, "audio/")) {
+    if (BEGINS_WITH((char *)mime_type, "audio/")) {
         return true;
     }
-    if (BEGINS_WITH(mime_type, "video/")) {
+    if (BEGINS_WITH((char *)mime_type, "video/")) {
         return true;
     }
 
