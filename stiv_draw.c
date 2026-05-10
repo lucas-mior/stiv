@@ -80,7 +80,7 @@ main(int argc, char *argv[]) {
     bool caching = false;
     int cache_img;
     char *STIV_BACKEND;
-    enum StivBackend stiv_backend = STIV_BACKEND_CHAFA;
+    enum StivBackend stiv_backend = STIV_BACKEND_UEBERZUG;
 
     if ((STIV_BACKEND = getenv("STIV_BACKEND"))) {
         if (!strcmp(STIV_BACKEND, "chafa")) {
@@ -287,7 +287,7 @@ main(int argc, char *argv[]) {
             SNPRINTF(size, "--size=%dx%d", pane.width, pane.height);
 
             chafa[nargs++] = "chafa";
-            chafa[nargs++] = "--clear";
+            /* chafa[nargs++] = "--clear"; */
             chafa[nargs++] = "--polite=on";
             chafa[nargs++] = "--animate=off";
             chafa[nargs++] = "--format=sixels";
