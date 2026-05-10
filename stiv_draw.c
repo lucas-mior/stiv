@@ -79,7 +79,16 @@ main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     int cache_img;
+    char *STIV_BACKEND;
     enum StivBackend stiv_backend = STIV_BACKEND_CHAFA;
+
+    if ((STIV_BACKEND = getenv("STIV_BACKEND"))) {
+        if (!strcmp(STIV_BACKEND, "chafa")) {
+            stiv_backend = STIV_BACKEND_CHAFA;
+        } else {
+            stiv_backend = STIV_BACKEND_UEBERZUG;
+        }
+    }
 
     program = basename(argv[0]);
 
