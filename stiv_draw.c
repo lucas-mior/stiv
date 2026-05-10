@@ -21,6 +21,7 @@
 #include <Imlib2.h>
 #include <libexif/exif-data.h>
 
+#define ERROR_NOTIFY 1
 #include "util.c"
 
 typedef struct Pane {
@@ -78,7 +79,7 @@ main(int argc, char *argv[]) {
     Number columns;
     bool caching = false;
     int cache_img;
-    enum StivBackend stiv_backend = STIV_BACKEND_UEBERZUG;
+    enum StivBackend stiv_backend = STIV_BACKEND_CHAFA;
 
     program = basename(argv[0]);
 
@@ -272,7 +273,9 @@ main(int argc, char *argv[]) {
         break;
     case STIV_BACKEND_CHAFA:
         do {
-            char geom[64];
+            char size[64];
+            char *chafa[64];
+            int32 nargs = 0;
 
             if (image.fullpath == NULL) {
                 if (!(image.fullpath = realpath(image.path, NULL))) {
@@ -282,22 +285,33 @@ main(int argc, char *argv[]) {
                 }
             }
 
-            SNPRINTF(geom, "%dx%d", pane.width, pane.height);
+            SNPRINTF(size, "--size=%dx%d", pane.width, pane.height);
 
-            char *chafa[] = {
-                "chafa",
-                "--clear",
-                "--polite", "on",
-                "--animate", "off",
-                "--format", "sixels",
-                "--size", geom,
-                image.fullpath,
-                NULL,
-            };
+            chafa[nargs++] = "chafa";
+            chafa[nargs++] = "--clear";
+            chafa[nargs++] = "--polite=on";
+            chafa[nargs++] = "--animate=off";
+            chafa[nargs++] = "--format=sixels";
+            chafa[nargs++] = size;
+            chafa[nargs++] = image.fullpath;
+            chafa[nargs++] = NULL;
 
-            execvp(chafa[0], chafa);
-
-            error("Error executing chafa: %s.\n", strerror(errno));
+            switch (fork()) {
+            case -1:
+                error("Error forking: %s.\n", strerror(errno));
+                fatal(EXIT_FAILURE);
+            case 0:
+                {
+                    char cmd[4096];
+                    execvp(chafa[0], chafa);
+                    STRING_FROM_ARRAY(cmd, " ", chafa, nargs);
+                    error("Error executing\n\n%s\n\n%s.\n",
+                            cmd, strerror(errno));
+                    exit(EXIT_FAILURE);
+                }
+            default:
+                break;
+            }
 
             free(image.fullpath);
         } while (0);
