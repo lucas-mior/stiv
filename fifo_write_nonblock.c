@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define ERROR_NOTIFY 1
 #include "util.c"
 
 static bool
