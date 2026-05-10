@@ -18,6 +18,8 @@ program3="stiv_draw"
 CFLAGS="$CFLAGS -std=c11 -D_DEFAULT_SOURCE"
 CFLAGS="$CFLAGS -Wextra -Wall -Wno-unused-macros -Wno-unused-function"
 CFLAGS="$CFLAGS -Wno-constant-logical-operand"
+CFLAGS="$CFLAGS -Wno-gnu-union-cast"
+CFLAGS="$CFLAGS -Wno-padded"
 LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lm -lexif"
 
 CC=${CC:-cc}
