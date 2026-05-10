@@ -16,6 +16,7 @@
  */
 
 #include "stiv.h"
+#define ERROR_NOTIFY 1
 #include "util.c"
 
 static int is_image_preview(char *);
