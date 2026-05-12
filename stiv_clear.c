@@ -76,21 +76,23 @@ main(int argc, char **argv) {
 int
 is_image_preview(char *filename) {
     const char *mime_type;
+    int32 mime_type_len;
 
     if ((mime_type = magic_file(magic, filename)) == NULL) {
         return false;
     }
+    mime_type_len = strlen32((char *)mime_type);
 
-    if (BEGINS_WITH((char *)mime_type, "image/")) {
+    if (BEGINS_WITH((char *)mime_type, mime_type_len, "image/")) {
         return true;
     }
-    if (BEGINS_WITH((char *)mime_type, "application/pdf")) {
+    if (BEGINS_WITH((char *)mime_type, mime_type_len, "application/pdf")) {
         return true;
     }
-    if (BEGINS_WITH((char *)mime_type, "audio/")) {
+    if (BEGINS_WITH((char *)mime_type, mime_type_len, "audio/")) {
         return true;
     }
-    if (BEGINS_WITH((char *)mime_type, "video/")) {
+    if (BEGINS_WITH((char *)mime_type, mime_type_len, "video/")) {
         return true;
     }
 

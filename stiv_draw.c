@@ -43,10 +43,10 @@ static bool print_dimensions = true;
 typedef struct Image {
     char *path;
     char *fullpath;
+    int32 path_len;
     int32 fullpath_len;
-    int32 padding;
-    int width;
-    int height;
+    int32 width;
+    int32 height;
 } Image;
 
 static Image image = {
@@ -96,6 +96,7 @@ main(int argc, char *argv[]) {
     if ((argc == 3) && !strcmp(argv[2], "cache")) {
         caching = true;
     }
+    image.path_len = strlen32(image.path);
 
     if (argc <= 1) {
         usage(stderr);
@@ -168,7 +169,7 @@ main(int argc, char *argv[]) {
 
         if (needs_rotation || (image.width > MAX_IMG_WIDTH)
             || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
-            || (ENDS_WITH(image.path, "ff"))
+            || (ENDS_WITH(image.path, image.path_len, "ff"))
             || (image_type == IMAGE_TYPE_WEBP)) {
             if (cache_image() < 0) {
                 image.fullpath = NULL;
