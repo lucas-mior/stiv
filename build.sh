@@ -35,6 +35,7 @@ if [ $CC = "clang" ]; then
     CFLAGS="$CFLAGS -Wno-implicit-void-ptr-cast"
     CFLAGS="$CFLAGS -Wno-float-equal"
     CFLAGS="$CFLAGS -Wno-cast-qual"
+    CFLAGS="$CFLAGS -Wno-cast-function-type-strict"
 fi
 
 if [ "$target" = "debug" ]; then
