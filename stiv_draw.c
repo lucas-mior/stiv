@@ -82,7 +82,8 @@ main(int argc, char *argv[]) {
     char *STIV_BACKEND;
     enum StivBackend stiv_backend = STIV_BACKEND_UEBERZUG;
 
-    if ((STIV_BACKEND = getenv("STIV_BACKEND"))) {
+    GETENV(STIV_BACKEND);
+    if (STIV_BACKEND) {
         if (!strcmp(STIV_BACKEND, "chafa")) {
             stiv_backend = STIV_BACKEND_CHAFA;
         } else {
@@ -114,8 +115,8 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        if ((XDG_CACHE_HOME = getenv("XDG_CACHE_HOME")) == NULL) {
-            error("XDG_CACHE_HOME is not set. Exiting...\n");
+        GETENV(XDG_CACHE_HOME);
+        if (XDG_CACHE_HOME == NULL) {
             exit(EXIT_FAILURE);
         }
 
@@ -239,15 +240,17 @@ main(int argc, char *argv[]) {
     switch (stiv_backend) {
     case STIV_BACKEND_UEBERZUG: 
         do {
-            File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+            char *UEBERZUG_FIFO;
+            int32 ueberzug_fd;
 
-            if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-                error("UEBERZUG_FIFO environment variable is not set.\n");
+            GETENV(UEBERZUG_FIFO);
+            if (UEBERZUG_FIFO == NULL) {
                 break;
             }
-            if ((UEBERZUG_FIFO.fd = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK))
-                < 0) {
-                error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+            if ((ueberzug_fd
+                    = open(UEBERZUG_FIFO, O_WRONLY | O_NONBLOCK)) < 0) {
+                error("Error opening %s in non blocking mode: %s",
+                      UEBERZUG_FIFO, strerror(errno));
                 break;
             }
 
@@ -255,19 +258,19 @@ main(int argc, char *argv[]) {
                 if (!(image.fullpath = realpath(image.path, NULL))) {
                     error("Error getting realpath of %s: %s", image.fullpath,
                           strerror(errno));
-                    dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
-                    util_close(&UEBERZUG_FIFO);
+                    dprintf(ueberzug_fd, UEBERZUG_CLEAR);
+                    XCLOSE(&ueberzug_fd, UEBERZUG_FIFO);
                     break;
                 }
             }
 
-            dprintf(UEBERZUG_FIFO.fd,
+            dprintf(ueberzug_fd,
                     "{\"action\": \"add\", \"identifier\": \"preview\","
                     "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
                     pane.x, pane.y, pane.width, pane.height);
-            dprintf(UEBERZUG_FIFO.fd, "\"path\": \"%s\"}\n", image.fullpath);
+            dprintf(ueberzug_fd, "\"path\": \"%s\"}\n", image.fullpath);
 
-            util_close(&UEBERZUG_FIFO);
+            XCLOSE(&ueberzug_fd, UEBERZUG_FIFO);
             free2(image.fullpath, image.fullpath_len);
         } while (0);
         break;

@@ -24,7 +24,8 @@ static magic_t magic;
 
 int
 main(int argc, char **argv) {
-    File UEBERZUG_FIFO = {.file = NULL, .fd = -1, .name = NULL};
+    char *UEBERZUG_FIFO;
+    int ueberzug_fd;
 
     char *last_filename = NULL;
     char *next_filename = NULL;
@@ -58,18 +59,18 @@ main(int argc, char **argv) {
         }
     }
 
-    if ((UEBERZUG_FIFO.name = getenv("UEBERZUG_FIFO")) == NULL) {
-        error("UEBERZUG_FIFO environment variable is not set.\n");
+    GETENV(UEBERZUG_FIFO);
+    if (UEBERZUG_FIFO == NULL) {
         exit(EXIT_FAILURE);
     }
-    if ((UEBERZUG_FIFO.fd
-                = open(UEBERZUG_FIFO.name, O_WRONLY | O_NONBLOCK)) < 0) {
-        error("Error opening %s: %s", UEBERZUG_FIFO.name, strerror(errno));
+    if ((ueberzug_fd = open(UEBERZUG_FIFO, O_WRONLY | O_NONBLOCK)) < 0) {
+        error("Error opening %s in non blocking mode: %s",
+              UEBERZUG_FIFO, strerror(errno));
         exit(EXIT_FAILURE);
     }
 
-    dprintf(UEBERZUG_FIFO.fd, UEBERZUG_CLEAR);
-    util_close(&UEBERZUG_FIFO);
+    dprintf(ueberzug_fd , UEBERZUG_CLEAR);
+    XCLOSE(&ueberzug_fd, UEBERZUG_FIFO);
     exit(EXIT_SUCCESS);
 }
 
