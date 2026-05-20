@@ -97,6 +97,9 @@ is_image_preview(char *filename, int32 filename_len) {
     if (BEGINS_WITH((char *)mime_type, mime_type_len, "application/csv")) {
         return true;
     }
+    if (ENDS_WITH(filename, filename_len, ".csv")) {
+        return true;
+    }
     if (BEGINS_WITH((char *)mime_type, mime_type_len, "audio/")) {
         return true;
     }
