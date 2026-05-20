@@ -19,7 +19,7 @@
 #define ERROR_NOTIFY 1
 #include "util.c"
 
-static int is_image_preview(char *);
+static int is_image_preview(char *, int32);
 static magic_t magic;
 
 int
@@ -51,10 +51,13 @@ main(int argc, char **argv) {
     }
 
     if (last_filename && next_filename) {
-        if (!is_image_preview(last_filename)) {
+        int32 last_filename_len = strlen32(last_filename);
+        int32 next_filename_len = strlen32(next_filename);
+
+        if (!is_image_preview(last_filename, last_filename_len)) {
             exit(EXIT_SUCCESS);
         }
-        if (is_image_preview(next_filename)) {
+        if (is_image_preview(next_filename, next_filename_len)) {
             exit(EXIT_SUCCESS);
         }
     }
@@ -75,9 +78,10 @@ main(int argc, char **argv) {
 }
 
 int
-is_image_preview(char *filename) {
+is_image_preview(char *filename, int32 filename_len) {
     const char *mime_type;
     int32 mime_type_len;
+    (void)filename_len;
 
     if ((mime_type = magic_file(magic, filename)) == NULL) {
         return false;
@@ -88,6 +92,9 @@ is_image_preview(char *filename) {
         return true;
     }
     if (BEGINS_WITH((char *)mime_type, mime_type_len, "application/pdf")) {
+        return true;
+    }
+    if (BEGINS_WITH((char *)mime_type, mime_type_len, "application/csv")) {
         return true;
     }
     if (BEGINS_WITH((char *)mime_type, mime_type_len, "audio/")) {
