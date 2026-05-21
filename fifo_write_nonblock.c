@@ -18,25 +18,6 @@
 #define ERROR_NOTIFY 1
 #include "util.c"
 
-static bool
-parse_option(char **parsed, char *arg, char *option_name) {
-    char name_equal[256];
-    char *tmp;
-    int32 length = SNPRINTF(name_equal, "%s=", option_name);
-    int32 arg_len = strlen32(arg);
-
-    if ((tmp = BEGINS_WITH(arg, arg_len, name_equal, length))) {
-        *parsed = tmp;
-        return true;
-    }
-    return false;
-}
-
-#define PARSE_OPTION(arg, name) \
-    if (parse_option(&name, arg, #name)) { \
-        continue; \
-    }
-
 int
 main(int argc, char **argv) {
     int fd;
