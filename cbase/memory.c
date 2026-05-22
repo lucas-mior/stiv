@@ -144,7 +144,7 @@ memory_check(void) {
             DebugAllocInfo info;
             uchar *p;
 
-            if (bucket->slot_state != HASH_SLOT_USED) {
+            if (allocations->slot_states[i] != HASH_SLOT_USED) {
                 continue;
             }
 

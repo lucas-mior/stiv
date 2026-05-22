@@ -1696,7 +1696,9 @@ timezone_init(void) {
 
 #define GETENV(VAR) do { \
     if ((VAR = getenv(#VAR)) == NULL) { \
-        error(RED("%s") " is not defined.", #VAR); \
+        if (DEBUGGING) { \
+            error(RED("%s") " is not defined.", #VAR); \
+        } \
     } else { \
         int32 len = strlen32(VAR); \
         char *copy = malloc2(len + 1); \
@@ -1710,7 +1712,11 @@ parse_option(char **parsed, char *arg, char *option_name) {
     char name_equal[256];
     char *tmp;
     int32 length = SNPRINTF(name_equal, "%s=", option_name);
-    int32 arg_len = strlen32(arg);
+    int32 arg_len;
+    if (arg == NULL) {
+        return false;
+    }
+    arg_len = strlen32(arg);
 
     if ((tmp = BEGINS_WITH(arg, arg_len, name_equal, length))) {
         *parsed = tmp;
