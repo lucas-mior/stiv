@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2024 Lucas Mior
-
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
-
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "stiv.h"
 #include <sys/param.h>
 #include <stdlib.h>
@@ -142,6 +125,7 @@ main(int argc, char *argv[]) {
         magic_t magic;
         ImageType image_type = IMAGE_TYPE_OTHER;
         bool needs_rotation = exif_orientation();
+        bool is_gif = false;
         imlib_image_set_changes_on_disk();
 
         image.width = imlib_image_get_width();
@@ -165,13 +149,16 @@ main(int argc, char *argv[]) {
         if (!strcmp(mime_type, "image/webp")) {
             image_type = IMAGE_TYPE_WEBP;
         }
+        if (!strcmp(mime_type, "image/gif")) {
+            is_gif = true;
+        }
 
         magic_close(magic);
 
-        if (needs_rotation || (image.width > MAX_IMG_WIDTH)
+        if (!is_gif && (needs_rotation || (image.width > MAX_IMG_WIDTH)
             || ((image.width > MAX_PNG_WIDTH) && (image_type == IMAGE_TYPE_PNG))
             || (ENDS_WITH(image.path, image.path_len, "ff"))
-            || (image_type == IMAGE_TYPE_WEBP)) {
+            || (image_type == IMAGE_TYPE_WEBP))) {
             if (cache_image() < 0) {
                 image.fullpath = NULL;
             }
@@ -269,9 +256,15 @@ main(int argc, char *argv[]) {
                     "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
                     pane.x, pane.y, pane.width, pane.height);
             dprintf(ueberzug_fd, "\"path\": \"%s\"}\n", image.fullpath);
+            if (DEBUGGING) {
+                dprintf(STDERR_FILENO,
+                        "{\"action\": \"add\", \"identifier\": \"preview\","
+                        "\"x\": %d, \"y\": %d, \"max_width\": %d, \"max_height\": %d,",
+                        pane.x, pane.y, pane.width, pane.height);
+                dprintf(STDERR_FILENO, "\"path\": \"%s\"}\n", image.fullpath);
+            }
 
             XCLOSE(&ueberzug_fd, UEBERZUG_FIFO);
-            free2(image.fullpath, image.fullpath_len);
         } while (0);
         break;
     case STIV_BACKEND_CHAFA:
