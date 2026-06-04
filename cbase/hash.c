@@ -174,6 +174,7 @@ CAT(hash_print_, HASH_TYPE)(struct Map *map, bool verbose) {
     for (uint32 i = 0; i < map->capacity; i += 1) {
         Bucket *iterator = &map->array[i];
         int8 slot_state = map->slot_states[i];
+        (void)iterator;
 
         if (!verbose) {
             if (slot_state == HASH_SLOT_FREE) {
@@ -365,8 +366,8 @@ CAT(hash_resize_, HASH_TYPE)(struct Map *map) {
 
             rehash_step += 1;
             rehash_probe = (uint32)(rehash_base
-                            + ((uint64)rehash_step
-                               + (uint64)rehash_step*rehash_step) / 2) & new_bitmask;
+                                    + ((uint64)rehash_step
+                                       + (uint64)rehash_step*rehash_step) / 2) & new_bitmask;
         }
     }
 
@@ -393,7 +394,7 @@ CAT(hash_probe_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
                             , int32 key_length
 #endif
                             , uint64 hash, uint32 base_index, uint32 *out_idx
-) {
+                            ) {
     uint32 capacity = map->capacity;
     uint32 i = 0;
     uint32 probe = base_index;
@@ -421,8 +422,8 @@ CAT(hash_probe_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
             if (!memcmp64(&iterator->key, key, sizeof(HASH_KEY_TYPE)))
 #else
             if ((iterator->hash == hash)
-                    && (iterator->key_len == key_length)
-                    && !memcmp64(iterator->key, key, key_length))
+                && (iterator->key_len == key_length)
+                && !memcmp64(iterator->key, key, key_length))
 #endif
             {
                 *out_idx = probe;
@@ -452,7 +453,7 @@ CAT(hash_insert_pre_calc_, HASH_TYPE)(struct Map *map,
 #if defined(HASH_VALUE_TYPE)
                                       , HASH_VALUE_TYPE value
 #endif
-) {
+                                      ) {
     uint32 target_idx = MAXOF(target_idx);
     Bucket *target;
 
@@ -504,7 +505,7 @@ CAT(hash_insert_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
 #if defined(HASH_VALUE_TYPE)
                              , HASH_VALUE_TYPE value
 #endif
-) {
+                             ) {
 
 #if HASH_KEY_FIXED_LEN
     int32 key_length = sizeof(HASH_KEY_TYPE);
@@ -519,7 +520,7 @@ CAT(hash_insert_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
 #if defined(HASH_VALUE_TYPE)
                                                  , value
 #endif
-    );
+                                                 );
 }
 
 
@@ -532,7 +533,7 @@ CAT(hash_overwrite_pre_calc_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
                                          , int32 key_length
 #endif
                                          , uint64 hash, uint32 base_index, HASH_VALUE_TYPE value
-) {
+                                         ) {
     uint32 target_idx = MAXOF(target_idx);
     Bucket *target;
 
@@ -582,7 +583,7 @@ CAT(hash_overwrite_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
                                 , int32 key_length
 #endif
                                 , HASH_VALUE_TYPE value
-) {
+                                ) {
 #if HASH_KEY_FIXED_LEN
     int32 key_length = sizeof(HASH_KEY_TYPE);
 #endif
@@ -607,7 +608,7 @@ CAT(hash_lookup_pre_calc_, HASH_TYPE)(struct Map *map,
 #if defined(HASH_VALUE_TYPE)
                                       , HASH_VALUE_TYPE *value_ptr
 #endif
-) {
+                                      ) {
     uint32 target_idx;
 
 #if HASH_KEY_FIXED_LEN
@@ -633,7 +634,7 @@ CAT(hash_lookup_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
 #if defined(HASH_VALUE_TYPE)
                              , HASH_VALUE_TYPE *value_ptr
 #endif
-) {
+                             ) {
 #if HASH_KEY_FIXED_LEN
     int32 key_length = sizeof(HASH_KEY_TYPE);
 #endif
@@ -647,7 +648,7 @@ CAT(hash_lookup_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
 #if defined(HASH_VALUE_TYPE)
                                                  , value_ptr
 #endif
-    );
+                                                 );
 }
 
 
@@ -694,7 +695,7 @@ CAT(hash_remove_, HASH_TYPE)(struct Map *map, HASH_KEY_TYPE *key
 #if !HASH_KEY_FIXED_LEN
                              , int32 key_length
 #endif
-) {
+                             ) {
 #if HASH_KEY_FIXED_LEN
     int32 key_length = sizeof(HASH_KEY_TYPE);
 #endif
@@ -763,7 +764,7 @@ hash_function(void *key, int32 key_length) {
     if (DEBUGGING) {
         ASSERT_MORE(key_length, 0);
     }
-    hash = rapidhash(key, (size_t)key_length);
+    hash = rapidhash(key, key_length);
     return hash;
 }
 
