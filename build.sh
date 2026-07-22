@@ -15,7 +15,7 @@ program1="fifo_write_nonblock"
 program2="stiv_clear"
 program3="stiv_draw"
 
-CFLAGS="$CFLAGS -std=c11 -D_DEFAULT_SOURCE"
+CFLAGS="$CFLAGS -std=c11 -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700"
 CFLAGS="$CFLAGS -Wextra -Wall -Wno-unused-macros -Wno-unused-function"
 CFLAGS="$CFLAGS -Wno-constant-logical-operand"
 CFLAGS="$CFLAGS -Wno-gnu-union-cast"
