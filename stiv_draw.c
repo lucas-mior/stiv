@@ -5,7 +5,8 @@
 #include <libexif/exif-data.h>
 
 #define ERROR_NOTIFY 1
-#include "util.c"
+#define CBASE_IMPLEMENT
+#include "cbase.h"
 
 typedef struct Pane {
     int width;
