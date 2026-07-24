@@ -1,5 +1,5 @@
-#define ERROR_NOTIFY 1
-#include "util.c"
+#define CBASE_IMPLEMENT
+#include "cbase.h"
 
 int
 main(int argc, char **argv) {
