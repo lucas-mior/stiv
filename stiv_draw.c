@@ -104,9 +104,10 @@ main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        n = SNPRINTF(buffer, "%s/%s/%li_%lld_%lld.jpg", XDG_CACHE_HOME, preview,
-                     file.st_size, (llong)file.st_mtim.tv_sec,
-                     (llong)file.st_mtim.tv_nsec);
+        n = SNPRINTF(buffer,
+                     "%s/%s/%lld_%lld_%lld.jpg",
+                     XDG_CACHE_HOME, preview,
+                     file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 
         image.fullpath = xmemdup(buffer, n + 1);
         image.fullpath_len = n;
