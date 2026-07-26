@@ -105,7 +105,7 @@ main(int argc, char *argv[]) {
         }
 
         n = SNPRINTF(buffer,
-                     "%s/%s/%lld_%lld_%lld.jpg",
+                     "%s/%s/%ld_%ld_%ld.jpg",
                      XDG_CACHE_HOME, preview,
                      file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
 
