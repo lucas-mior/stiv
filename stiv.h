@@ -42,21 +42,4 @@ typedef union Number {
 
 #define UEBERZUG_CLEAR "{\"action\": \"remove\", \"identifier\": \"preview\"}\n"
 
-static void util_close(File *f);
-static bool util_open(File *f, const int flag);
-void
-util_close(File *f) {
-    if (f->fd >= 0) {
-        if (close(f->fd) < 0)
-            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
-        f->fd = -1;
-    }
-   if (f->file != NULL) {
-        if (fclose(f->file) != 0)
-            fprintf(stderr, "Error closing %s: %s\n", f->name, strerror(errno));
-        f->file = NULL;
-   }
-   return;
-}
-
 #endif /* STIV_H */
