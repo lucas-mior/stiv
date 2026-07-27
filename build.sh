@@ -36,6 +36,8 @@ if [ $CC = "clang" ]; then
     CFLAGS="$CFLAGS -Wno-float-equal"
     CFLAGS="$CFLAGS -Wno-cast-qual"
     CFLAGS="$CFLAGS -Wno-cast-function-type-strict"
+    CFLAGS="$CFLAGS -Wno-assign-enum"
+    CFLAGS="$CFLAGS -Wno-implicit-int-enum-cast"
 fi
 
 if [ "$target" = "debug" ]; then
