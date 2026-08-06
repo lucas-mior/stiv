@@ -147,7 +147,7 @@ main(int argc, char *argv[]) {
             error("Error in magic_file: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
-        mime_type = mime_type0;
+        mime_type = (char *)mime_type0;
         mime_type_len = strlen32(mime_type);
         if (STREQUAL(mime_type, mime_type_len, "image/png")) {
             image_type = IMAGE_TYPE_PNG;
