@@ -68,7 +68,7 @@ main(int argc, char *argv[]) {
 
     GETENV(STIV_BACKEND);
     if (STIV_BACKEND) {
-        if (!strcmp(STIV_BACKEND, "chafa")) {
+        if (strequal(STIV_BACKEND, "chafa")) {
             stiv_backend = STIV_BACKEND_CHAFA;
         } else {
             stiv_backend = STIV_BACKEND_UEBERZUG;
@@ -78,7 +78,7 @@ main(int argc, char *argv[]) {
     program = basename(argv[0]);
 
     image.path = argv[1];
-    if ((argc == 3) && !strcmp(argv[2], "cache")) {
+    if ((argc == 3) && strequal(argv[2], "cache")) {
         caching = true;
     }
     image.path_len = strlen32(image.path);
@@ -123,7 +123,9 @@ main(int argc, char *argv[]) {
         error("Error opening %s: %s\n", image.fullpath, strerror(errno));
         image.fullpath = NULL;
     } else {
-        const char *mime_type;
+        const char *mime_type0;
+        char *mime_type;
+        int32 mime_type_len;
         magic_t magic;
         ImageType image_type = IMAGE_TYPE_OTHER;
         bool needs_rotation = exif_orientation();
@@ -141,17 +143,19 @@ main(int argc, char *argv[]) {
             error("Error loading magic: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
-        if ((mime_type = magic_file(magic, image.path)) == NULL) {
+        if ((mime_type0 = magic_file(magic, image.path)) == NULL) {
             error("Error in magic_file: %s.\n", magic_error(magic));
             exit(EXIT_FAILURE);
         }
-        if (!strcmp(mime_type, "image/png")) {
+        mime_type = mime_type0;
+        mime_type_len = strlen32(mime_type);
+        if (STREQUAL(mime_type, mime_type_len, "image/png")) {
             image_type = IMAGE_TYPE_PNG;
         }
-        if (!strcmp(mime_type, "image/webp")) {
+        if (STREQUAL(mime_type, mime_type_len, "image/webp")) {
             image_type = IMAGE_TYPE_WEBP;
         }
-        if (!strcmp(mime_type, "image/gif")) {
+        if (STREQUAL(mime_type, mime_type_len, "image/gif")) {
             is_gif = true;
         }
 
