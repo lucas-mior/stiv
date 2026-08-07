@@ -77,15 +77,15 @@ main(int argc, char *argv[]) {
 
     program = basename(argv[0]);
 
+    if (argc <= 1) {
+        usage(stderr);
+    }
+
     image.path = argv[1];
     if ((argc == 3) && strequal(argv[2], "cache")) {
         caching = true;
     }
     image.path_len = strlen32(image.path);
-
-    if (argc <= 1) {
-        usage(stderr);
-    }
 
     {
         const char *preview = "preview/stiv";
@@ -108,6 +108,7 @@ main(int argc, char *argv[]) {
                      "%s/%s/%ld_%ld_%ld.jpg",
                      XDG_CACHE_HOME, preview,
                      file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+        ASSERT(n >= 0);
 
         image.fullpath = xmemdup(buffer, n + 1);
         image.fullpath_len = n;
@@ -231,7 +232,7 @@ main(int argc, char *argv[]) {
     }
 
     switch (stiv_backend) {
-    case STIV_BACKEND_UEBERZUG: 
+    case STIV_BACKEND_UEBERZUG:
         do {
             char *UEBERZUG_FIFO;
             int32 ueberzug_fd;
@@ -248,8 +249,9 @@ main(int argc, char *argv[]) {
             }
 
             if (image.fullpath == NULL) {
+                ASSERT(image.path != NULL);
                 if (!(image.fullpath = realpath(image.path, NULL))) {
-                    error("Error getting realpath of %s: %s", image.fullpath,
+                    error("Error getting realpath of %s: %s", image.path,
                           strerror(errno));
                     dprintf(ueberzug_fd, UEBERZUG_CLEAR);
                     XCLOSE(&ueberzug_fd, UEBERZUG_FIFO);
@@ -280,6 +282,7 @@ main(int argc, char *argv[]) {
             int32 nargs = 0;
 
             if (image.fullpath == NULL) {
+                ASSERT(image.path != NULL);
                 if (!(image.fullpath = realpath(image.path, NULL))) {
                     error("Error getting realpath of %s: %s\n",
                           image.path, strerror(errno));
