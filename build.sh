@@ -103,21 +103,21 @@ if [ "$CC" = "clang" ]; then
     CFLAGS="$CFLAGS -Wno-bad-function-cast"
 fi
 case "$target" in
-"debug")
+debug)
     CFLAGS="$CFLAGS -g3 -O0 -fsanitize=undefined"
     CPPFLAGS="$CPPFLAGS $GNUSOURCE -DDEBUGGING=1"
     ;;
-"benchmark")
+benchmark)
     CFLAGS="$CFLAGS -O2 -flto -march=native -ftree-vectorize"
     CPPFLAGS="$CPPFLAGS $GNUSOURCE"
     ;;
-"build")
+build)
     CFLAGS="$CFLAGS $GNUSOURCE -O2 -flto -march=native -ftree-vectorize"
     ;;
-"fast_feedback")
+fast_feedback)
     CFLAGS="$CFLAGS $GNUSOURCE -Werror"
     ;;
-"test"|"install"|"uninstall")
+test|install|uninstall)
     ;;
 *)
     CFLAGS="$CFLAGS -O2"
@@ -165,20 +165,20 @@ build_programs () {
 }
 
 case "$target" in
-"fast_feedback")
+fast_feedback)
     build_programs
     ;;
-"test")
+test)
     exit
     ;;
-"uninstall")
+uninstall)
     trace_on
     rm -f "${DESTDIR}${PREFIX}/bin/${program1}"
     rm -f "${DESTDIR}${PREFIX}/bin/${program2}"
     rm -f "${DESTDIR}${PREFIX}/bin/${program3}"
     trace_off
     ;;
-"install")
+install)
     if [ ! -f "bin/$program1" ] || [ ! -f "bin/$program2" ] || [ ! -f "bin/$program3" ]; then
         "$0" build
     fi
@@ -188,7 +188,7 @@ case "$target" in
     install -Dm755 "bin/${program3}" "${DESTDIR}${PREFIX}/bin/${program3}"
     trace_off
     ;;
-"check")
+check)
     CC=gcc CFLAGS="-fanalyzer -fdiagnostics-color=never" "$0" build
     CFLAGS="--analyze -Xanalyzer -analyzer-output=text"
     CFLAGS="$CFLAGS -Xanalyzer -analyzer-werror"
