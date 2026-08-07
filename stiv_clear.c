@@ -1,8 +1,9 @@
-#include "stiv.h"
-
 #define ERROR_NOTIFY 1
 #define CBASE_IMPLEMENT
 #include "cbase.h"
+
+#include "stiv.h"
+#include <magic.h>
 
 static int is_image_preview(char *, int32);
 static magic_t magic;

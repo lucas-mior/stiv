@@ -1,12 +1,11 @@
-#include "stiv.h"
-#include <sys/param.h>
-#include <stdlib.h>
-#include <Imlib2.h>
-#include <libexif/exif-data.h>
-
 #define ERROR_NOTIFY 1
 #define CBASE_IMPLEMENT
 #include "cbase.h"
+
+#include "stiv.h"
+#include <Imlib2.h>
+#include <libexif/exif-data.h>
+#include <magic.h>
 
 typedef struct Pane {
     int width;
