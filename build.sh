@@ -69,6 +69,8 @@ case "$target" in
     install -Dm755 bin/${program2} ${DESTDIR}${PREFIX}/bin/${program2}
     install -Dm755 bin/${program3} ${DESTDIR}${PREFIX}/bin/${program3}
     ;;
+"test")
+    ;;
 "check")
     CC=gcc CFLAGS="-fanalyzer" ./build.sh
 
@@ -88,6 +90,6 @@ case "$target" in
     $CC $CPPFLAGS $CFLAGS -o bin/${program3} "$main3" $LDFLAGS
     ;;
 *)
-    echo "usage: $0 [ uninstall / install / build / debug / benchmark ]"
+    echo "usage: $0 [ uninstall / install / build / debug / benchmark / test ]"
     ;;
 esac
