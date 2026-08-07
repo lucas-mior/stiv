@@ -23,10 +23,10 @@
 #include <time.h>
 #include <unistd.h>
 
-static const double MAX_CACHE_WIDTH = 1024;
-static const int MAX_IMG_WIDTH = 2048;
-static const int MAX_PNG_WIDTH = 1536;
-static const int HEIGHT_SHELL = 11;
+#define MAX_CACHE_WIDTH 1024.0
+#define MAX_IMG_WIDTH 2048
+#define MAX_PNG_WIDTH 1536
+#define HEIGHT_SHELL 11
 
 typedef struct File {
     FILE *file;
