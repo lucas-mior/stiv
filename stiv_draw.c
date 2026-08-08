@@ -65,6 +65,8 @@ main(int argc, char *argv[]) {
     char *STIV_BACKEND;
     enum StivBackend stiv_backend = STIV_BACKEND_UEBERZUG;
 
+    program = basename(argv[0]);
+
     GETENV(STIV_BACKEND);
     if (STIV_BACKEND) {
         if (strequal(STIV_BACKEND, "chafa")) {
@@ -73,8 +75,6 @@ main(int argc, char *argv[]) {
             stiv_backend = STIV_BACKEND_UEBERZUG;
         }
     }
-
-    program = basename(argv[0]);
 
     if (argc <= 1) {
         usage(stderr);
