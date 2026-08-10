@@ -99,6 +99,7 @@ fast_feedback)
     build_programs
     ;;
 test)
+    TEST_EXCLUDE_PATTERN='(^|/)cbase/' test "$2"
     exit
     ;;
 uninstall)
