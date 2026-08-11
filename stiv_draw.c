@@ -52,7 +52,7 @@ enum StivBackend {
 
 static int exit_code = EXIT_FAILURE;
 
-static void usage(FILE *) __attribute__((noreturn));
+static noreturn void usage(FILE *);
 static int cache_image(void);
 static int exif_orientation(void);
 

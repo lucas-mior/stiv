@@ -3,3 +3,4 @@ bin/
 *.o
 *.tar.gz
 *temp_delete_me*
+*.obj
