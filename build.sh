@@ -8,9 +8,9 @@ dir=$(dirname "$(readlink -f "$0")")
 
 cd "$dir" || exit
 script=$(basename "$0")
-target="${1:-debug}"
+build_parse_args "$@"
 
-printf "\n${script} ${RED}${1:-} ${2:-}$RES\n"
+build_print_invocation "$script"
 
 PREFIX="${PREFIX:-/usr/local}"
 DESTDIR="${DESTDIR:-/}"
@@ -23,7 +23,7 @@ program2="stiv_clear"
 program3="stiv_draw"
 mkdir -p bin
 
-CC=$(get_compiler "$target")
+CC=$(get_compiler "$mode")
 
 CPPFLAGS="$CPPFLAGS -I$dir/cbase"
 
@@ -54,7 +54,7 @@ fi
 
 LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lexif"
 
-case "$target" in
+case "$mode" in
 debug)
     CFLAGS="$CFLAGS -g3 -Og -fsanitize=undefined"
     CPPFLAGS="$CPPFLAGS -DDEBUGGING=1"
@@ -83,12 +83,12 @@ build_programs () {
     trace_off
 }
 
-case "$target" in
+case "$mode" in
 fast_feedback)
     build_programs
     ;;
 test)
-    TEST_EXCLUDE_PATTERN='(^|/)cbase/' test "$2"
+    TEST_EXCLUDE_PATTERN='(^|/)cbase/' test "$target"
     exit
     ;;
 uninstall)
