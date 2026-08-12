@@ -57,7 +57,7 @@ LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lexif"
 
 case "$mode" in
 debug)
-    CFLAGS="$CFLAGS -g3 -Og -fsanitize=undefined"
+    CFLAGS="$CFLAGS -g3 -Og"
     CPPFLAGS="$CPPFLAGS -DDEBUGGING=1"
     ;;
 benchmark)
