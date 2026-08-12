@@ -8,9 +8,9 @@ dir=$(dirname "$(readlink -f "$0")")
 
 cd "$dir" || exit
 script=$(basename "$0")
-build_parse_args "$@"
+common_build_parse_args "$@"
 
-build_print_invocation "$script"
+common_build_print_invocation "$script"
 
 PREFIX="${PREFIX:-/usr/local}"
 DESTDIR="${DESTDIR:-/}"
@@ -23,7 +23,7 @@ program2="stiv_clear"
 program3="stiv_draw"
 mkdir -p bin
 
-CC=$(get_compiler "$mode")
+CC=$(common_get_compiler "$mode")
 
 CPPFLAGS="$CPPFLAGS -I$dir/cbase"
 
@@ -75,7 +75,7 @@ test|install|uninstall)
 esac
 
 build_programs () {
-    build_tags
+    common_build_tags
     trace_on
     $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
     $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" $LDFLAGS
@@ -88,7 +88,7 @@ fast_feedback)
     build_programs
     ;;
 test)
-    TEST_EXCLUDE_PATTERN='(^|/)cbase/' test "$target"
+    TEST_EXCLUDE_PATTERN='(^|/)cbase/' common_test "$target"
     exit
     ;;
 uninstall)
