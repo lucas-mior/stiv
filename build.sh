@@ -71,7 +71,6 @@ fast_feedback)
 test|install|uninstall)
     ;;
 *)
-    CFLAGS="$CFLAGS -O2"
     ;;
 esac
 
@@ -111,12 +110,22 @@ check)
 
     exit
     ;;
-*)
+benchmark|build|debug|fast_feedback)
     common_build_tags
     trace_on
     $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
     $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" $LDFLAGS
     $CC $CPPFLAGS $CFLAGS -o "bin/${program3}" "$main3" $LDFLAGS
     trace_off
+    ;;
+esac
+
+
+case "$mode" in
+benchmark|build|check|debug|fast_feedback|install|test|uninstall)
+    ;;
+*)
+    echo "Unknown mode $mode"
+    exit 1
     ;;
 esac
