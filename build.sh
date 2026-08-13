@@ -75,19 +75,7 @@ test|install|uninstall)
     ;;
 esac
 
-build_programs () {
-    common_build_tags
-    trace_on
-    $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o "bin/${program3}" "$main3" $LDFLAGS
-    trace_off
-}
-
 case "$mode" in
-fast_feedback)
-    build_programs
-    ;;
 test)
     TEST_EXCLUDE_PATTERN='(^|/)cbase/' common_test "$target"
     exit
@@ -124,6 +112,11 @@ check)
     exit
     ;;
 *)
-    build_programs
+    common_build_tags
+    trace_on
+    $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o "bin/${program3}" "$main3" $LDFLAGS
+    trace_off
     ;;
 esac
