@@ -852,7 +852,7 @@ random_string(Arena *arena, uint32 nbytes) {
     }
     string.s[len] = '\0';
     string.len = len;
-    string.value = rand();
+    string.value = rand_int();
 
     return string;
 }
