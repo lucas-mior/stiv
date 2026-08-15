@@ -18,7 +18,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .cache/homebrew
-          key: ${{ runner.os }}-homebrew-${{ runner.arch }}-stiv-v1
+          key: ${{ runner.os }}-homebrew-${{ runner.arch }}-stiv-v2
           restore-keys: |
             ${{ runner.os }}-homebrew-${{ runner.arch }}-stiv-
 
@@ -32,13 +32,19 @@ jobs:
             imlib2 \
             libexif \
             libmagic \
+            libx11 \
             pkgconf
           cc --version
+          export PKG_CONFIG_PATH="$(brew --prefix libx11)/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
           pkg-config --version
-          pkg-config --libs imlib2 libmagic libexif
+          pkg-config --cflags x11
+          pkg-config --libs imlib2 libmagic libexif x11
 
       - name: Build and Test
         run: |
+          export PKG_CONFIG_PATH="$(brew --prefix libx11)/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+          export CPPFLAGS="${CPPFLAGS:-} $(pkg-config --cflags x11)"
+          export LDFLAGS="${LDFLAGS:-} $(pkg-config --libs x11)"
           ./build.sh build
           ./build.sh test
 
