@@ -1,0 +1,185 @@
+name: Test on various platforms CI
+
+on:
+  push:
+    branches:
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Homebrew cache dir
+        run: mkdir -p .cache/homebrew
+
+      - name: Cache Homebrew downloads
+        uses: actions/cache@v5
+        with:
+          path: .cache/homebrew
+          key: ${{ runner.os }}-homebrew-${{ runner.arch }}-stiv-v1
+          restore-keys: |
+            ${{ runner.os }}-homebrew-${{ runner.arch }}-stiv-
+
+      - name: Install build deps
+        env:
+          HOMEBREW_CACHE: ${{ github.workspace }}/.cache/homebrew
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: |
+          brew --cache
+          brew install \
+            imlib2 \
+            libexif \
+            libmagic \
+            pkgconf
+          cc --version
+          pkg-config --version
+          pkg-config --libs imlib2 libmagic libexif
+
+      - name: Build and Test
+        run: |
+          ./build.sh build
+          ./build.sh test
+
+  ubuntu:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libexif-dev \
+            libimlib2-dev \
+            libmagic-dev \
+            pkg-config
+          cc --version
+          pkg-config --version
+          pkg-config --libs imlib2 libmagic libexif
+
+      - name: Build and Test
+        run: |
+          ./build.sh build
+          ./build.sh test
+
+  freebsd:
+    runs-on: ubuntu-24.04
+    name: FreeBSD VM
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Test
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          run: |
+            pkg install -y \
+              file \
+              gcc \
+              imlib2 \
+              libexif \
+              pkgconf
+            cc --version
+            pkg-config --version
+            pkg-config --libs imlib2 libmagic libexif
+            ./build.sh build
+            ./build.sh test
+
+  openbsd:
+    runs-on: ubuntu-24.04
+    name: OpenBSD VM
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and Test
+        uses: vmactions/openbsd-vm@v1
+        with:
+          usesh: true
+          run: |
+            pkg_add \
+              imlib2 \
+              libexif \
+              libmagic
+            export PKG_CONFIG_PATH=/usr/X11R6/lib/pkgconfig:/usr/local/lib/pkgconfig
+            cc --version
+            pkg-config --version
+            pkg-config --libs imlib2 libmagic libexif
+            ./build.sh build
+            ./build.sh test
+
+  netbsd:
+    runs-on: ubuntu-24.04
+    name: NetBSD VM
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache NetBSD X sets
+        uses: actions/cache@v5
+        with:
+          path: .cache/netbsd-xsets
+          key: netbsd-xsets-v1
+          restore-keys: |
+            netbsd-xsets-
+
+      - name: Build and Test
+        uses: vmactions/netbsd-vm@v1
+        with:
+          usesh: true
+          run: |
+            netbsd_release=$(uname -r)
+            netbsd_release=${netbsd_release%%_*}
+            netbsd_machine=$(uname -m)
+            case "$netbsd_machine" in
+            x86_64)
+              netbsd_machine=amd64
+              ;;
+            esac
+
+            netbsd_sets_url="https://cdn.netbsd.org/pub/NetBSD"
+            netbsd_sets_url="$netbsd_sets_url/NetBSD-$netbsd_release"
+            netbsd_sets_url="$netbsd_sets_url/$netbsd_machine/binary/sets"
+
+            netbsd_xsets_cache="${GITHUB_WORKSPACE:-$PWD}/.cache/netbsd-xsets"
+            netbsd_xsets_cache="$netbsd_xsets_cache/$netbsd_release/$netbsd_machine"
+            mkdir -p "$netbsd_xsets_cache"
+
+            if [ ! -d /usr/X11R7/include/X11 ]; then
+              for netbsd_xset in xbase xcomp xetc xfont xserver; do
+                netbsd_xset_file="$netbsd_xsets_cache/$netbsd_xset.tar.xz"
+                if [ ! -f "$netbsd_xset_file" ]; then
+                  ftp -V -o "$netbsd_xset_file" \
+                    "$netbsd_sets_url/$netbsd_xset.tar.xz"
+                fi
+                tar -C / -xpf "$netbsd_xset_file"
+              done
+            fi
+
+            export PATH="/usr/X11R7/bin:$PATH"
+            export LD_LIBRARY_PATH="/usr/pkg/lib:/usr/X11R7/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+            PKG_CONFIG_PATH=/usr/X11R7/lib/pkgconfig
+            PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/pkg/lib/pkgconfig"
+            export PKG_CONFIG_PATH
+
+            LDFLAGS="${LDFLAGS:-}"
+            LDFLAGS="$LDFLAGS -Wl,-rpath,/usr/pkg/lib"
+            LDFLAGS="$LDFLAGS -Wl,-rpath,/usr/X11R7/lib"
+            export LDFLAGS
+
+            if ! command -v pkgin >/dev/null 2>&1; then
+              pkg_add pkgin
+            fi
+            pkgin -y install \
+              file \
+              imlib2 \
+              libexif \
+              pkgconf
+
+            cc --version
+            pkg-config --version
+            pkg-config --libs imlib2 libmagic libexif
+            ./build.sh build
+            ./build.sh test
