@@ -56,6 +56,24 @@ static noreturn void usage(FILE *);
 static int cache_image(void);
 static int exif_orientation(void);
 
+static int64
+stiv_stat_mtime_sec(struct stat *file) {
+#if OS_MAC || OS_NETBSD
+    return (int64)file->st_mtimespec.tv_sec;
+#else
+    return (int64)file->st_mtim.tv_sec;
+#endif
+}
+
+static int64
+stiv_stat_mtime_nsec(struct stat *file) {
+#if OS_MAC || OS_NETBSD
+    return (int64)file->st_mtimespec.tv_nsec;
+#else
+    return (int64)file->st_mtim.tv_nsec;
+#endif
+}
+
 int
 main(int argc, char *argv[]) {
     Number lines;
@@ -104,9 +122,11 @@ main(int argc, char *argv[]) {
         }
 
         n = SNPRINTF(buffer,
-                     "%s/%s/%ld_%ld_%ld.jpg",
+                     "%s/%s/%lld_%lld_%lld.jpg",
                      XDG_CACHE_HOME, preview,
-                     file.st_size, file.st_mtim.tv_sec, file.st_mtim.tv_nsec);
+                     (int64)file.st_size,
+                     stiv_stat_mtime_sec(&file),
+                     stiv_stat_mtime_nsec(&file));
         ASSERT(n >= 0);
 
         image.fullpath = xmemdup(buffer, n + 1);
