@@ -61,7 +61,17 @@ if [ "$CC" = "clang" ] || [ "$CC" = "zig cc" ]; then
     CFLAGS="$CFLAGS -Wno-used-but-marked-unused"
 fi
 
-LDFLAGS="$LDFLAGS -lm -lImlib2 -lmagic -lexif"
+PKG_CONFIG="${PKG_CONFIG:-pkg-config}"
+build_deps="imlib2 libmagic libexif"
+
+case "$mode" in
+benchmark|build|check|debug|fast_feedback|test)
+    CPPFLAGS="$CPPFLAGS $($PKG_CONFIG --cflags $build_deps)"
+    LDFLAGS="$LDFLAGS -lm $($PKG_CONFIG --libs $build_deps)"
+    ;;
+install|uninstall)
+    ;;
+esac
 
 case "$mode" in
 debug)
