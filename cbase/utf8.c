@@ -420,27 +420,27 @@ utf8_random_string(char *buffer, int32 capacity, int32 min_len) {
     range = max_len - target_len + 1;
 
     if (range > 1) {
-        target_len = target_len + (rand_int() % range);
+        target_len = target_len + (rand() % range);
     }
 
     current_byte_len = 0;
 
     while (current_byte_len < target_len) {
         char temp_buf[4];
-        int32 choice = rand_int() % 4;
+        int32 choice = rand() % 4;
         uint32 u = 0;
         int32 encoded_len;
 
         if (choice == 0) {
             /* Printable ASCII only: space (0x20) to tilde (0x7E) */
-            u = (uint32)(0x20 + (rand_int() % (0x7E - 0x20 + 1)));
+            u = (uint32)(0x20 + (rand() % (0x7E - 0x20 + 1)));
         } else if (choice == 1) {
             /* Printable 2-byte: Exclude C1 control codes (0x80-0x9F) */
-            u = (uint32)(0xA0 + (rand_int() % (0x7FF - 0xA0 + 1)));
+            u = (uint32)(0xA0 + (rand() % (0x7FF - 0xA0 + 1)));
         } else if (choice == 2) {
-            u = (uint32)(0x800 + (rand_int() % (0xFFFF - 0x800 + 1)));
+            u = (uint32)(0x800 + (rand() % (0xFFFF - 0x800 + 1)));
         } else {
-            u = (uint32)(0x10000 + (rand_int() % (0x10FFFF - 0x10000 + 1)));
+            u = (uint32)(0x10000 + (rand() % (0x10FFFF - 0x10000 + 1)));
         }
 
         if (!utf8_random_rune_allowed(u)) {
@@ -457,7 +457,7 @@ utf8_random_string(char *buffer, int32 capacity, int32 min_len) {
                 }
             } else {
                 if (current_byte_len + 1 <= max_len) {
-                    int32 ascii_val = 32 + (rand_int() % 95);
+                    int32 ascii_val = 32 + (rand() % 95);
 
                     buffer[current_byte_len] = (char)ascii_val;
                     current_byte_len += 1;
