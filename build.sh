@@ -12,7 +12,7 @@ script=$(basename "$0")
 common_build_parse_args "$@"
 
 case "$mode" in
-build|check|debug|fast_feedback|install|test|uninstall)
+build|check|debug|debug-fast|fast_feedback|install|test|uninstall)
     ;;
 *)
     common_build_unknown_mode
@@ -65,7 +65,7 @@ PKG_CONFIG="${PKG_CONFIG:-pkg-config}"
 build_deps="imlib2 libmagic libexif"
 
 case "$mode" in
-build|check|debug|fast_feedback|test)
+build|check|debug|debug-fast|fast_feedback|test)
     CPPFLAGS="$CPPFLAGS $($PKG_CONFIG --cflags $build_deps)"
     LDFLAGS="$LDFLAGS -lm $($PKG_CONFIG --libs $build_deps)"
     ;;
@@ -78,6 +78,10 @@ debug)
     CFLAGS="$CFLAGS -g3 -Og"
     CPPFLAGS="$CPPFLAGS -DDEBUGGING=1"
     ;;
+debug-fast)
+    CFLAGS="$CFLAGS -Wno-error -g2 -O2 -flto -march=native -ftree-vectorize"
+    CPPFLAGS="$CPPFLAGS -DDEBUGGING=1"
+    ;;
 build)
     CFLAGS="$CFLAGS -Wno-error -O2 -flto -march=native -ftree-vectorize"
     ;;
@@ -85,7 +89,7 @@ fast_feedback)
     ;;
 test|install|uninstall)
     ;;
-build|check|debug|fast_feedback|install|test|uninstall)
+build|check|debug|debug-fast|fast_feedback|install|test|uninstall)
     ;;
 *)
     common_build_unknown_mode
@@ -117,7 +121,7 @@ install)
 check)
     common_build_run_analyzers build
     ;;
-build|debug|fast_feedback)
+build|debug|debug-fast|fast_feedback)
     common_build_tags
     trace_on
     $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
