@@ -38,7 +38,7 @@ CPPFLAGS="$CPPFLAGS -Icbase"
 
 CFLAGS="$CFLAGS -std=c11"
 CFLAGS="$CFLAGS -Wfatal-errors"
-# CFLAGS="$CFLAGS -Werror"  # Only uncomment occasionally, keep this line
+CFLAGS="$CFLAGS -Werror"  # Only uncomment occasionally, keep this line
 
 PKG_CONFIG="${PKG_CONFIG:-pkg-config}"
 build_deps="imlib2 libmagic libexif"
