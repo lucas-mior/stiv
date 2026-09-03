@@ -98,7 +98,11 @@ install)
     trace_off
     ;;
 check)
-    common_build_run_analyzers build
+    (
+        common_build_run_analyzers build
+    )
+    echo "static analysis finished."
+    exit
     ;;
 build|debug|debug-fast|fast_feedback)
     common_build_tags
