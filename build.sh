@@ -58,7 +58,7 @@ debug)
     ;;
 debug-fast)
     CFLAGS="$CFLAGS -g2 -O2 -flto -march=native -ftree-vectorize"
-    CFLAGS="$CFLAGS -fsanitize=undefined"
+    CFLAGS="$CFLAGS -fsanitize-trap=undefined"
     CPPFLAGS="$CPPFLAGS -DDEBUGGING=1"
     ;;
 build)
