@@ -4,3 +4,4 @@ bin/
 *.tar.gz
 *temp_delete_me*
 *.obj
+static-analyzers-warnings.txt
