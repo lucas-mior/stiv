@@ -127,7 +127,6 @@ main(int argc, char *argv[]) {
                      (int64)file.st_size,
                      stiv_stat_mtime_sec(&file),
                      stiv_stat_mtime_nsec(&file));
-        ASSERT(n >= 0);
 
         image.fullpath = xmemdup(buffer, n + 1);
         image.fullpath_len = n;

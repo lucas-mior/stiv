@@ -780,6 +780,30 @@ ASSERT(pointer != NULL);
 - Do not use `ASSERT_EQUAL` for enums.
   * Use `ASSERT(enumvalue1 == enumvalue2)` instead, so that the compiler does
     not complain.
+- For asserting that a function did or didn't fail/return NULL:
+  ```c
+  // bad
+  void *res = function();
+  ASSERT(!res);
+
+  // good
+  ASSERT(function() == NULL);
+
+  // bad
+  MyStruct *res = function();
+  ASSERT(!res);
+  res->stuff = "stuff";
+
+  // good
+  MyStruct *res;
+  ASSERT(res = function());
+  res->stuff = "stuff";
+
+  // bad
+  ASSERT(access(path, F_OK) == 0);
+  // good
+  ASSERT(!access(path, F_OK));
+  ```
 - Prefer `ASSERT_ZERO(value);` instead of `ASSERT(value == 0)`.
 - Prefer `ASSERT_POSITIVE(value);` instead of `ASSERT(value > 0)`.
 - Prefer `ASSERT_NEGATIVE(value);` instead of `ASSERT(value < 0)`.
