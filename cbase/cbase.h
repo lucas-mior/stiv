@@ -323,12 +323,12 @@ is_punct(int32 c) {
 }
 
 INLINE bool32
-is_ident_start_char(int32 c) {
+is_ident_start(int32 c) {
     return is_alpha(c) || c == '_';
 }
 
 INLINE bool32
-is_ident_char(int32 c) {
+is_ident(int32 c) {
     return is_alnum(c) || c == '_';
 }
 
