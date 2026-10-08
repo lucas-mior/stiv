@@ -372,8 +372,10 @@ cache_image(void) {
     new_height = round(((double)image.height / resize_ratio));
 
     imlib_context_set_anti_alias(1);
-    imlib_image = imlib_create_cropped_scaled_image(
-        0, 0, image.width, image.height, new_width, (int)new_height);
+    imlib_image =
+        imlib_create_cropped_scaled_image(0, 0,
+                                          image.width, image.height,
+                                          new_width, (int)new_height);
     if (imlib_image == NULL) {
         error("Error in imlib_create_cropped_scaled_image()\n");
         return -1;
