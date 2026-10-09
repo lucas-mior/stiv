@@ -501,8 +501,7 @@ main(int argc, char **argv) {
 
             command_status = cmd_run_async(&command, CMD_NONE);
             if (command_status < 0) {
-                error("Error starting chafa: %s.\n",
-                      strerror(-command_status));
+                error("Error starting chafa: %s.\n", strerror(-command_status));
                 cmd_free(&command);
                 fatal(EXIT_FAILURE);
             }
