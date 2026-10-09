@@ -277,7 +277,8 @@ main(int argc, char **argv) {
         mtime_nsec = (int64)file.st_mtim.tv_nsec;
 #endif
 
-        n = SNPRINTF(buffer, "%.*s/preview/stiv/%lld_%lld_%lld.jpg",
+        n = SNPRINTF(buffer,
+                     "%.*s/preview/stiv/%lld_%lld_%lld.jpg",
                      xdg_cache_home_len, xdg_cache_home,
                      (int64)file.st_size, mtime_sec, mtime_nsec);
         image.fullpath = xmemdup(buffer, n + 1);
@@ -467,7 +468,7 @@ main(int argc, char **argv) {
                            "\"max_width\": %d, \"max_height\": %d,",
                            pane.x, pane.y, pane.width, pane.height);
                 str_printf(&message, "\"path\": \"%.*s\"}\n",
-                           image.fullpath_len, image.fullpath);
+                                     image.fullpath_len, image.fullpath);
                 write_all(ueberzug_fd, message.data, message.len);
                 if (DEBUGGING) {
                     write_all(STDERR_FILENO, message.data, message.len);
