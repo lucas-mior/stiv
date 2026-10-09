@@ -258,8 +258,7 @@ main(int argc, char **argv) {
         int32 n;
 
         if (stat(image.path, &file) < 0) {
-            error("Error calling stat on %s: %s.",
-                  image.path, strerror(errno));
+            error("Error calling stat on %s: %s.", image.path, strerror(errno));
             fatal(EXIT_FAILURE);
         }
 
