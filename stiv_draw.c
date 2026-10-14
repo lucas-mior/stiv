@@ -432,6 +432,7 @@ main(int argc, char **argv) {
         do {
             char *ueberzug_fifo;
             int32 ueberzug_fd;
+            String message = {0};
 
             ueberzug_fifo = getenv("UEBERZUG_FIFO");
             if (ueberzug_fifo == NULL) {
@@ -457,23 +458,19 @@ main(int argc, char **argv) {
                 }
             }
 
-            {
-                String message = {0};
-
-                str_printf(&message,
-                           "{\"action\": \"add\", "
-                           "\"identifier\": \"preview\","
-                           "\"x\": %d, \"y\": %d, "
-                           "\"max_width\": %d, \"max_height\": %d,",
-                           pane.x, pane.y, pane.width, pane.height);
-                str_printf(&message, "\"path\": \"%.*s\"}\n",
-                                     image.fullpath_len, image.fullpath);
-                write_all(ueberzug_fd, message.data, message.len);
-                if (DEBUGGING) {
-                    write_all(STDERR_FILENO, message.data, message.len);
-                }
-                str_free(&message);
+            str_printf(&message,
+                       "{\"action\": \"add\", "
+                       "\"identifier\": \"preview\","
+                       "\"x\": %d, \"y\": %d, "
+                       "\"max_width\": %d, \"max_height\": %d,",
+                       pane.x, pane.y, pane.width, pane.height);
+            str_printf(&message, "\"path\": \"%.*s\"}\n",
+                                 image.fullpath_len, image.fullpath);
+            write_all(ueberzug_fd, message.data, message.len);
+            if (DEBUGGING) {
+                write_all(STDERR_FILENO, message.data, message.len);
             }
+            str_free(&message);
 
             XCLOSE(&ueberzug_fd, ueberzug_fifo);
         } while (0);

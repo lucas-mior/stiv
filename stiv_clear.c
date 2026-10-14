@@ -14,6 +14,7 @@ stiv_preview_check(magic_t magic, char *filename, int32 filename_len,
     char *mime_type;
     int32 mime_type_len;
 
+    (void)filename_len;
     ASSERT(is_preview != NULL);
     *is_preview = false;
 
@@ -24,8 +25,8 @@ stiv_preview_check(magic_t magic, char *filename, int32 filename_len,
 
     if (BEGINS_WITH(mime_type, mime_type_len, "image/")
         || BEGINS_WITH(mime_type, mime_type_len, "application/pdf")
-        || BEGINS_WITH(mime_type, mime_type_len, "application/csv")
-        || ENDS_WITH(filename, filename_len, ".csv")
+        /* || BEGINS_WITH(mime_type, mime_type_len, "application/csv") */
+        /* || ENDS_WITH(filename, filename_len, ".csv") */
         || BEGINS_WITH(mime_type, mime_type_len, "audio/")
         || BEGINS_WITH(mime_type, mime_type_len, "video/")) {
         *is_preview = true;
