@@ -27,6 +27,7 @@ DESTDIR="${DESTDIR:-/}"
 main1="fifo_write_nonblock.c"
 main2="stiv_clear.c"
 main3="stiv_draw.c"
+common="stiv_fifo.c"
 program1="fifo_write_nonblock"
 program2="stiv_clear"
 program3="stiv_draw"
@@ -108,8 +109,8 @@ build|debug|debug-fast|fast_feedback)
     common_build_tags
     trace_on
     $CC $CPPFLAGS $CFLAGS -o "bin/${program1}" "$main1" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" $LDFLAGS
-    $CC $CPPFLAGS $CFLAGS -o "bin/${program3}" "$main3" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o "bin/${program2}" "$main2" "$common" $LDFLAGS
+    $CC $CPPFLAGS $CFLAGS -o "bin/${program3}" "$main3" "$common" $LDFLAGS
     trace_off
     ;;
 esac

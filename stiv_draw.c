@@ -211,6 +211,23 @@ stiv_cache_image(void) {
     return 0;
 }
 
+static void
+stiv_json_path_append(String *message, char *path, int32 path_len) {
+    for (int32 i = 0; i < path_len; i += 1) {
+        uint8 byte = (uint8)path[i];
+
+        if ((byte == '"') || (byte == '\\')) {
+            str_append_byte(message, '\\');
+            str_append_byte(message, (char)byte);
+        } else if (byte < 0x20) {
+            str_printf(message, "\\u%04x", byte);
+        } else {
+            str_append_byte(message, (char)byte);
+        }
+    }
+    return;
+}
+
 int
 main(int argc, char **argv) {
     char *fzf_columns;
@@ -221,6 +238,12 @@ main(int argc, char **argv) {
     bool caching = false;
     int32 cache_img;
     enum StivBackend stiv_backend = STIV_BACKEND_UEBERZUG;
+    struct timespec started;
+
+    if (clock_gettime(CLOCK_MONOTONIC, &started) < 0) {
+        error("Error reading clock: %s\n", strerror(errno));
+        fatal(EXIT_FAILURE);
+    }
 
     stiv_backend_env = getenv("STIV_BACKEND");
     if (stiv_backend_env != NULL) {
@@ -430,30 +453,14 @@ main(int argc, char **argv) {
     switch (stiv_backend) {
     case STIV_BACKEND_UEBERZUG:
         do {
-            char *ueberzug_fifo;
-            int32 ueberzug_fd;
             String message = {0};
-
-            ueberzug_fifo = getenv("UEBERZUG_FIFO");
-            if (ueberzug_fifo == NULL) {
-                break;
-            }
-            if ((ueberzug_fd = open(ueberzug_fifo,
-                                    O_WRONLY |O_NONBLOCK)) < 0) {
-                error("Error opening %s in non blocking mode: %s",
-                      ueberzug_fifo, strerror(errno));
-                break;
-            }
+            int32 status;
 
             if (image.fullpath == NULL) {
-                int32 resolve_status;
-
-                resolve_status = stiv_fullpath_resolve();
-                if (resolve_status < 0) {
-                    error("Error getting realpath of %s: %s",
-                          image.path, strerror(-resolve_status));
-                    write_all(ueberzug_fd, STRLIT(UEBERZUG_CLEAR));
-                    XCLOSE(&ueberzug_fd, ueberzug_fifo);
+                status = stiv_fullpath_resolve();
+                if (status < 0) {
+                    error("Error getting realpath of %s: %s\n",
+                          image.path, strerror(-status));
                     break;
                 }
             }
@@ -464,15 +471,20 @@ main(int argc, char **argv) {
                        "\"x\": %d, \"y\": %d, "
                        "\"max_width\": %d, \"max_height\": %d,",
                        pane.x, pane.y, pane.width, pane.height);
-            str_printf(&message, "\"path\": \"%.*s\"}\n",
-                                 image.fullpath_len, image.fullpath);
-            write_all(ueberzug_fd, message.data, message.len);
+            str_append(&message, STRLIT("\"path\": \""));
+            stiv_json_path_append(&message,
+                                  image.fullpath, image.fullpath_len);
+            str_append(&message, STRLIT("\"}\n"));
+            status = stiv_fifo_send(STIV_FIFO_DRAW, started,
+                                    message.data, message.len);
+            if (status < 0) {
+                error("Error sending ueberzug preview: %s\n",
+                      strerror(-status));
+            }
             if (DEBUGGING) {
                 write_all(STDERR_FILENO, message.data, message.len);
             }
             str_free(&message);
-
-            XCLOSE(&ueberzug_fd, ueberzug_fifo);
         } while (0);
         break;
     case STIV_BACKEND_CHAFA:
