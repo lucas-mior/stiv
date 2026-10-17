@@ -118,8 +118,8 @@ stiv_fifo_send(enum StivFifoAction action,
     if ((fifo == NULL) || (fifo[0] == '\0')) {
         return -ENOENT;
     }
-    path_len = snprintf(lock_path, sizeof(lock_path), "%s.lock", fifo);
-    if ((path_len < 0) || (path_len >= (int32)sizeof(lock_path))) {
+    path_len = snprintf(lock_path, SIZEOF(lock_path), "%s.lock", fifo);
+    if ((path_len < 0) || (path_len >= (int32)SIZEOF(lock_path))) {
         return -ENAMETOOLONG;
     }
     lock_fd = open(lock_path, O_RDWR | O_CREAT | O_CLOEXEC, 0600);
@@ -133,12 +133,12 @@ stiv_fifo_send(enum StivFifoAction action,
         }
     }
 
-    read_len = pread(lock_fd, &state, sizeof(state), 0);
+    read_len = pread(lock_fd, &state, SIZEOF(state), 0);
     if (read_len < 0) {
         err = errno;
         goto close_lock;
     }
-    if ((read_len != 0) && (read_len != sizeof(state))) {
+    if ((read_len != 0) && (read_len != SIZEOF(state))) {
         err = EIO;
         goto close_lock;
     }
@@ -161,9 +161,9 @@ stiv_fifo_send(enum StivFifoAction action,
         state.paused = false;
     }
     {
-        ssize_t written = pwrite(lock_fd, &state, sizeof(state), 0);
+        ssize_t written = pwrite(lock_fd, &state, SIZEOF(state), 0);
 
-        if (written != sizeof(state)) {
+        if (written != SIZEOF(state)) {
             err = written < 0 ? errno : EIO;
             goto close_lock;
         }
