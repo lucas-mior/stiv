@@ -15,11 +15,6 @@ typedef struct File {
     int unused;
 } File;
 
-typedef union Number {
-    char *string;
-    int number;
-} Number;
-
 enum StivFifoAction {
     STIV_FIFO_DRAW = 1,
     STIV_FIFO_CLEAR,
