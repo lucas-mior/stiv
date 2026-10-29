@@ -27,8 +27,8 @@ main(int argc, char **argv) {
     fifo_len = strlen32(fifo);
 
     if (DEBUGGING) {
-        printf("string=%.*s=\n", string_len, string);
-        printf("fifo=%.*s=\n", fifo_len, fifo);
+        fmt_printf("string=%.*s=\n", string_len, string);
+        fmt_printf("fifo=%.*s=\n", fifo_len, fifo);
     }
 
     if ((fd = open(fifo, O_WRONLY |O_NONBLOCK)) < 0) {
