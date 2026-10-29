@@ -75,8 +75,7 @@ stiv_parse_int32(char *string, int32 *result) {
     if (parsed_len != string_len) {
         return -EINVAL;
     }
-    if ((parsed_value <= MINOF((int32)0))
-        || (parsed_value >= MAXOF((int32)0))) {
+    if ((parsed_value <= INT32_MIN) || (parsed_value >= INT32_MAX)) {
         return -ERANGE;
     }
 
