@@ -388,8 +388,8 @@ main(int argc, char **argv) {
     }
 
     if (print_dimensions) {
-        printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n",
-               image.width, image.height);
+        fmt_printf("\033[01;31m%d\033[0;mx\033[01;31m%d\033[0;m\n",
+                   image.width, image.height);
     }
     fflush(stdout);
 
