@@ -173,8 +173,7 @@ stiv_cache_image(void) {
 
     resize_ratio = (double)image.width / (double)new_width;
     new_height = round((double)image.height / resize_ratio);
-    if ((new_height <= MINOF((int32)0))
-        || (new_height >= MAXOF((int32)0))) {
+    if ((new_height <= INT32_MIN) || (new_height >= INT32_MAX)) {
         error("Invalid scaled image height: %g\n", new_height);
         return -ERANGE;
     }
