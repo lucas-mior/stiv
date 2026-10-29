@@ -118,7 +118,7 @@ stiv_fifo_send(enum StivFifoAction action,
     if ((fifo == NULL) || (fifo[0] == '\0')) {
         return -ENOENT;
     }
-    path_len = snprintf(lock_path, SIZEOF(lock_path), "%s.lock", fifo);
+    path_len = SNPRINTF(lock_path, "%s.lock", fifo);
     if ((path_len < 0) || (path_len >= (int32)SIZEOF(lock_path))) {
         return -ENAMETOOLONG;
     }
