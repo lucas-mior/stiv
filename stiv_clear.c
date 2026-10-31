@@ -28,8 +28,9 @@ main(int argc, char **argv) {
         error("Error reading clock: %s\n", strerror(errno));
         fatal(EXIT_FAILURE);
     }
-    status = stiv_fifo_send(action, started, STRLIT(UEBERZUG_CLEAR));
-    if (status < 0) {
+
+    if ((status =
+            stiv_fifo_send(action, started, STRLIT(UEBERZUG_CLEAR))) < 0) {
         error("Error sending ueberzug request: %s\n", strerror(-status));
         fatal(EXIT_FAILURE);
     }
