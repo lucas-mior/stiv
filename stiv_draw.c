@@ -199,8 +199,7 @@ stiv_cache_image(void) {
     imlib_save_image_with_error_return(image.fullpath, &imlib_error);
     if (imlib_error != 0) {
         error("Error caching image\n%s at %s:\n%s\n",
-              image.path, image.fullpath,
-              imlib_strerror((int32)imlib_error));
+              image.path, image.fullpath, imlib_strerror((int32)imlib_error));
         imlib_free_image_and_decache();
         return -EIO;
     }
