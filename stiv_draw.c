@@ -471,9 +471,9 @@ main(int argc, char **argv) {
             stiv_json_path_append(&message,
                                   image.fullpath, image.fullpath_len);
             str_append(&message, STRLIT("\"}\n"));
-            status = stiv_fifo_send(STIV_FIFO_DRAW, started,
-                                    message.data, message.len);
-            if (status < 0) {
+
+            if ((status = stiv_fifo_send(STIV_FIFO_DRAW, started,
+                                         message.data, message.len)) < 0) {
                 error("Error sending ueberzug preview: %s\n",
                       strerror(-status));
             }
