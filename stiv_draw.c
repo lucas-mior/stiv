@@ -134,7 +134,7 @@ stiv_image_load(bool *needs_rotation) {
     byte_order = exif_data_get_byte_order(exif_data);
     exif_entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
                                         EXIF_TAG_ORIENTATION);
-    if (exif_entry != NULL) {
+    if (exif_entry) {
         orientation = exif_get_short(exif_entry->data, byte_order);
     }
     exif_data_unref(exif_data);
@@ -243,7 +243,7 @@ main(int argc, char **argv) {
     }
 
     stiv_backend_env = getenv("STIV_BACKEND");
-    if (stiv_backend_env != NULL) {
+    if (stiv_backend_env) {
         int32 stiv_backend_env_len = strlen32(stiv_backend_env);
 
         if (STREQUAL(stiv_backend_env, stiv_backend_env_len, "chafa")) {
@@ -411,7 +411,7 @@ main(int argc, char **argv) {
             print_dimensions = false;
             pane.y -= 1;
         }
-    } else if ((fzf_columns != NULL) && (fzf_lines != NULL)) {
+    } else if (fzf_columns && fzf_lines) {
         if ((stiv_parse_int32(fzf_columns, &pane.width) < 0)
             || (stiv_parse_int32(fzf_lines, &pane.height) < 0)) {
             error("Invalid fzf preview geometry.\n");
@@ -420,7 +420,7 @@ main(int argc, char **argv) {
 
         pane.x = pane.width + (pane.width % 2);
         pane.y = 1;
-    } else if ((terminal_columns != NULL) && (terminal_lines != NULL)) {
+    } else if (terminal_columns && terminal_lines) {
         if ((stiv_parse_int32(terminal_columns, &pane.width) < 0)
             || (stiv_parse_int32(terminal_lines, &pane.height) < 0)) {
             error("Invalid terminal geometry.\n");
