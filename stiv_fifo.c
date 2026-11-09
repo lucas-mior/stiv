@@ -14,96 +14,6 @@ typedef struct StivFifoState {
     int32 unused;
 } StivFifoState;
 
-static int32
-stiv_fifo_open(char *fifo) {
-    int32 fd;
-    int32 err = ENXIO;
-
-    for (int32 i = 0; i < STIV_FIFO_RETRIES; i += 1) {
-        fd = open(fifo, O_WRONLY | O_NONBLOCK | O_CLOEXEC);
-        if (fd >= 0) {
-            return fd;
-        }
-        err = errno;
-        if ((err != ENXIO) && (err != EINTR)) {
-            return -err;
-        }
-        sleep_ms(STIV_FIFO_RETRY_MS);
-    }
-    return -err;
-}
-
-static int32
-stiv_fifo_write(char *fifo, char *message, int32 message_len) {
-    int32 fd;
-    int32 err = 0;
-    ssize_t written;
-    struct sigaction ignore = {0};
-    struct sigaction old_action;
-    struct pollfd ready = {0};
-    long pipe_buf;
-
-    if ((fd = stiv_fifo_open(fifo)) < 0) {
-        return fd;
-    }
-    pipe_buf = fpathconf(fd, _PC_PIPE_BUF);
-    if (pipe_buf < 0) {
-        err = errno ? errno : EIO;
-        goto close_fifo;
-    }
-    if (message_len > pipe_buf) {
-        err = EMSGSIZE;
-        goto close_fifo;
-    }
-
-    ignore.sa_handler = SIG_IGN;
-    if (sigaction(SIGPIPE, &ignore, &old_action) < 0) {
-        err = errno;
-        goto close_fifo;
-    }
-
-    ready.fd = fd;
-    ready.events = POLLOUT;
-    for (int32 i = 0; i < STIV_FIFO_RETRIES; i += 1) {
-        written = write(fd, message, (size_t)message_len);
-        if (written == message_len) {
-            break;
-        }
-        if (written >= 0) {
-            err = EIO;
-            break;
-        }
-        err = errno;
-        if (err == EINTR) {
-            continue;
-        }
-        if (err != EAGAIN) {
-            break;
-        }
-        if (poll(&ready, 1, STIV_FIFO_RETRY_MS) < 0) {
-            err = errno;
-            if (err != EINTR) {
-                break;
-            }
-        }
-    }
-    if ((written != message_len) && (err == EAGAIN)) {
-        err = ETIMEDOUT;
-    }
-    if (written == message_len) {
-        err = 0;
-    }
-    if ((sigaction(SIGPIPE, &old_action, NULL) < 0) && (err == 0)) {
-        err = errno;
-    }
-
-close_fifo:
-    if ((close(fd) < 0) && (err == 0)) {
-        err = errno;
-    }
-    return -err;
-}
-
 int32
 stiv_fifo_send(enum StivFifoAction action,
                struct timespec started, char *message, int32 message_len) {
@@ -170,7 +80,84 @@ stiv_fifo_send(enum StivFifoAction action,
     }
 
     if (action != STIV_FIFO_RESUME) {
-        err = -stiv_fifo_write(fifo, message, message_len);
+        int32 fd = -1;
+        ssize_t written;
+        struct sigaction ignore = {0};
+        struct sigaction old_action;
+        struct pollfd ready = {0};
+        long pipe_buf;
+
+        for (int32 i = 0; i < STIV_FIFO_RETRIES; i += 1) {
+            fd = open(fifo, O_WRONLY | O_NONBLOCK | O_CLOEXEC);
+            if (fd >= 0) {
+                err = 0;
+                break;
+            }
+            err = errno;
+            if ((err != ENXIO) && (err != EINTR)) {
+                goto close_lock;
+            }
+            sleep_ms(STIV_FIFO_RETRY_MS);
+        }
+        if (fd < 0) {
+            goto close_lock;
+        }
+
+        pipe_buf = fpathconf(fd, _PC_PIPE_BUF);
+        if (pipe_buf < 0) {
+            err = errno ? errno : EIO;
+            goto close_fifo;
+        }
+        if (message_len > pipe_buf) {
+            err = EMSGSIZE;
+            goto close_fifo;
+        }
+
+        ignore.sa_handler = SIG_IGN;
+        if (sigaction(SIGPIPE, &ignore, &old_action) < 0) {
+            err = errno;
+            goto close_fifo;
+        }
+
+        ready.fd = fd;
+        ready.events = POLLOUT;
+        for (int32 i = 0; i < STIV_FIFO_RETRIES; i += 1) {
+            written = write(fd, message, (size_t)message_len);
+            if (written == message_len) {
+                break;
+            }
+            if (written >= 0) {
+                err = EIO;
+                break;
+            }
+            err = errno;
+            if (err == EINTR) {
+                continue;
+            }
+            if (err != EAGAIN) {
+                break;
+            }
+            if (poll(&ready, 1, STIV_FIFO_RETRY_MS) < 0) {
+                err = errno;
+                if (err != EINTR) {
+                    break;
+                }
+            }
+        }
+        if ((written != message_len) && (err == EAGAIN)) {
+            err = ETIMEDOUT;
+        }
+        if (written == message_len) {
+            err = 0;
+        }
+        if ((sigaction(SIGPIPE, &old_action, NULL) < 0) && (err == 0)) {
+            err = errno;
+        }
+
+close_fifo:
+        if ((close(fd) < 0) && (err == 0)) {
+            err = errno;
+        }
     }
 
 close_lock:

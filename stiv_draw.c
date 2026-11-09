@@ -111,54 +111,6 @@ stiv_fullpath_resolve(void) {
 }
 
 static int32
-stiv_image_load(bool *needs_rotation) {
-    Imlib_Image imlib_image;
-    ExifData *exif_data;
-    ExifEntry *exif_entry;
-    ExifByteOrder byte_order;
-    int32 orientation = 0;
-
-    ASSERT(needs_rotation != NULL);
-    *needs_rotation = false;
-
-    if ((imlib_image = imlib_load_image(image.path)) == NULL) {
-        return -EIO;
-    }
-    imlib_context_set_image(imlib_image);
-    imlib_image_set_changes_on_disk();
-
-    if ((exif_data = exif_data_new_from_file(image.path)) == NULL) {
-        return 0;
-    }
-
-    byte_order = exif_data_get_byte_order(exif_data);
-    exif_entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
-                                        EXIF_TAG_ORIENTATION);
-    if (exif_entry) {
-        orientation = exif_get_short(exif_entry->data, byte_order);
-    }
-    exif_data_unref(exif_data);
-
-    switch (orientation) {
-    case 3:
-        imlib_rotate_image_from_buffer(180, imlib_image);
-        *needs_rotation = true;
-        break;
-    case 6:
-        imlib_rotate_image_from_buffer(270, imlib_image);
-        *needs_rotation = true;
-        break;
-    case 8:
-        imlib_rotate_image_from_buffer(90, imlib_image);
-        *needs_rotation = true;
-        break;
-    default:
-        break;
-    }
-    return 0;
-}
-
-static int32
 stiv_cache_image(void) {
     Imlib_Image imlib_image;
     Imlib_Load_Error imlib_error;
@@ -322,17 +274,50 @@ main(int argc, char **argv) {
         error("Error opening %s: %s\n", image.fullpath, strerror(errno));
         stiv_fullpath_clear();
     } else {
+        Imlib_Image imlib_image;
+        ExifData *exif_data;
+        ExifEntry *exif_entry;
+        ExifByteOrder byte_order;
         char *mime_type;
         int32 mime_type_len;
-        int32 load_status;
+        int32 orientation = 0;
         magic_t magic;
         enum ImageType image_type = IMAGE_TYPE_OTHER;
-        bool needs_rotation;
+        bool needs_rotation = false;
         bool is_gif = false;
 
-        if ((load_status = stiv_image_load(&needs_rotation)) < 0) {
+        if ((imlib_image = imlib_load_image(image.path)) == NULL) {
             error("Error loading image %s.\n", image.path);
             fatal(EXIT_FAILURE);
+        }
+        imlib_context_set_image(imlib_image);
+        imlib_image_set_changes_on_disk();
+
+        if ((exif_data = exif_data_new_from_file(image.path))) {
+            byte_order = exif_data_get_byte_order(exif_data);
+            exif_entry = exif_content_get_entry(exif_data->ifd[EXIF_IFD_0],
+                                                EXIF_TAG_ORIENTATION);
+            if (exif_entry) {
+                orientation = exif_get_short(exif_entry->data, byte_order);
+            }
+            exif_data_unref(exif_data);
+
+            switch (orientation) {
+            case 3:
+                imlib_rotate_image_from_buffer(180, imlib_image);
+                needs_rotation = true;
+                break;
+            case 6:
+                imlib_rotate_image_from_buffer(270, imlib_image);
+                needs_rotation = true;
+                break;
+            case 8:
+                imlib_rotate_image_from_buffer(90, imlib_image);
+                needs_rotation = true;
+                break;
+            default:
+                break;
+            }
         }
 
         image.width = imlib_image_get_width();
