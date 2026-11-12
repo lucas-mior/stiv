@@ -48,7 +48,7 @@ stiv_fifo_send(enum StivFifoAction action,
         err = errno;
         goto close_lock;
     }
-    if ((read_len != 0) && (read_len != SIZEOF(state))) {
+    if ((read_len > 0) && (read_len != SIZEOF(state))) {
         err = EIO;
         goto close_lock;
     }
