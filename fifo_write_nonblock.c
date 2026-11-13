@@ -37,7 +37,7 @@ main(int argc, char **argv) {
     }
 
     write_all(fd, string, string_len);
-    write_all(fd, STRLIT("\n"));
+    write_all(fd, SL("\n"));
     XCLOSE(&fd, fifo);
 
     exit(EXIT_SUCCESS);

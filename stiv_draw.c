@@ -452,10 +452,10 @@ main(int argc, char **argv) {
                        "\"x\": %d, \"y\": %d, "
                        "\"max_width\": %d, \"max_height\": %d,",
                        pane.x, pane.y, pane.width, pane.height);
-            str_append(&message, STRLIT("\"path\": \""));
+            str_append(&message, SL("\"path\": \""));
             stiv_json_path_append(&message,
                                   image.fullpath, image.fullpath_len);
-            str_append(&message, STRLIT("\"}\n"));
+            str_append(&message, SL("\"}\n"));
 
             if ((status = stiv_fifo_send(STIV_FIFO_DRAW, started,
                                          message.data, message.len)) < 0) {
