@@ -474,9 +474,8 @@ main(int argc, char **argv) {
             int32 command_status;
 
             if (image.fullpath == NULL) {
-                int32 resolve_status;
+                int32 resolve_status = stiv_fullpath_resolve();
 
-                resolve_status = stiv_fullpath_resolve();
                 if (resolve_status < 0) {
                     error("Error getting realpath of %s: %s\n",
                           image.path, strerror(-resolve_status));
