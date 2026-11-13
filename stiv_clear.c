@@ -29,8 +29,7 @@ main(int argc, char **argv) {
         fatal(EXIT_FAILURE);
     }
 
-    if ((status = stiv_fifo_send(action, started,
-                                 SL(UEBERZUG_CLEAR))) < 0) {
+    if ((status = stiv_fifo_send(action, started, SL(UEBERZUG_CLEAR))) < 0) {
         error("Error sending ueberzug request: %s\n", strerror(-status));
         fatal(EXIT_FAILURE);
     }
