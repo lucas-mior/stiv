@@ -6198,7 +6198,7 @@ test_fmt_public_api(void) {
     ASSERT_EQ(buffer, len + 1, "public:42:ok", 13);
 
     ASSERT_LE_VAR(SIZEOF(buffer), fmt_snprintf_estimate("%g", 1.0));
-    len = fmt_sprintf(buffer, SIZEOF(buffer), "%g", 1.0);
+    len = SNPRINTF(buffer, "%g", 1.0);
     ASSERT_EQ(len, 1);
     ASSERT_EQ(buffer, "1");
 
@@ -6220,7 +6220,7 @@ test_fmt_public_api(void) {
     ASSERT_EQ(count, 4);
     ASSERT_EQ(tiny, SIZEOF(tiny), "abc", 4);
 
-    len = fmt_sprintf(buffer, SIZEOF(buffer), "fast:%d:%s", 42, "ok");
+    len = SNPRINTF(buffer, "fast:%d:%s", 42, "ok");
     ASSERT_EQ(len, 10);
     ASSERT_EQ(buffer, len + 1, "fast:42:ok", 11);
 
@@ -6230,12 +6230,12 @@ test_fmt_public_api(void) {
     ASSERT_EQ(buffer, len + 1, "<nil>:a\0b", 10);
 
     count = -1;
-    len = fmt_sprintf(buffer, SIZEOF(buffer), "abcd%n", &count);
+    len = SNPRINTF(buffer, "abcd%n", &count);
     ASSERT_EQ(len, 4);
     ASSERT_EQ(count, 4);
     ASSERT_EQ(buffer, "abcd");
 
-    ASSERT_EQ(fmt_sprintf(tiny, SIZEOF(tiny), "abcdef"), -ENOSPC);
+    ASSERT_EQ(SNPRINTF(tiny, "abcdef"), -ENOSPC);
     ASSERT_EQ(fmt_test_public_vsprintf(tiny, SIZEOF(tiny), "abcdef"), -ENOSPC);
 
     {
