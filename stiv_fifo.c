@@ -81,7 +81,7 @@ stiv_fifo_send(enum StivFifoAction action,
 
     if (action != STIV_FIFO_RESUME) {
         int32 fd = -1;
-        ssize_t written;
+        ssize_t written = 0;
         struct sigaction ignore = {0};
         struct sigaction old_action;
         struct pollfd ready = {0};
